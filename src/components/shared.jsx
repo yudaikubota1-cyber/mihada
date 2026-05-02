@@ -17,7 +17,7 @@ export function SkinrLogo({ size = 16, color = '#111' }) {
       fontSize: size,
       color,
       paddingLeft: '0.36em',
-    }}>SKINR</span>
+    }}>miHada</span>
   );
 }
 

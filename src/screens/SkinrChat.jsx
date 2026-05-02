@@ -118,7 +118,7 @@ export default function SkinrChat({ initialMessage, onComplete, onBack }) {
             background: aiTyping ? '#7A7A7A' : '#111',
             animation: aiTyping ? 'skinrPulse 1s ease infinite' : 'none',
           }} />
-          <SkinrEyebrow size={9}>{aiTyping ? '絞り込み中...' : 'SKINR · LOGIC'}</SkinrEyebrow>
+          <SkinrEyebrow size={9}>{aiTyping ? '絞り込み中...' : 'miHada · LOGIC'}</SkinrEyebrow>
         </div>
         <div style={{ width: 32 }} />
       </div>

@@ -178,14 +178,17 @@ export default function SkinrChat({ initialMessage, onComplete, onBack }) {
           const binaryOptions = extractBinaryOptions(lastAiText);
 
           // 肌タイプを聞いているバイナリー質問かどうか判定
-          // →「つっぱる？それともテカる？」など → バイナリー抽出テキストではなく肌タイプチップを出す
+          // 条件：「テカ」と「つっぱ」が両方ある、または「洗顔後」がある
+          // →「ニキビ vs 乾燥」のような悩み質問では誤発火しない
+          const hasTeka = lastAiText.includes('テカ');
+          const hasTsuppa = lastAiText.includes('つっぱ');
+          const hasSenganGo = lastAiText.includes('洗顔後');
           const isSkinTypeBinary = binaryOptions &&
-            SYMPTOM_KEYS.some(k => lastAiText.includes(k));
+            (hasSenganGo || (hasTeka && hasTsuppa));
 
-          // ② 肌タイプチップ：肌タイプバイナリー質問 OR 症状キーワード OR 肌タイプ名2つ以上
-          const hasSymptomQuestion = SYMPTOM_KEYS.some(k => lastAiText.includes(k)) && lastAiText.includes('？');
+          // ② 肌タイプチップ：肌タイプバイナリー質問 OR 肌タイプ名2つ以上
           const hasMultipleSkinTypeNames = SKIN_TYPE_NAMES.filter(n => lastAiText.includes(n)).length >= 2;
-          const showSkinTypeChips = isSkinTypeBinary || (!binaryOptions && (hasSymptomQuestion || hasMultipleSkinTypeNames));
+          const showSkinTypeChips = isSkinTypeBinary || (!binaryOptions && hasMultipleSkinTypeNames);
 
           // バイナリーチップは肌タイプ質問以外のときだけ表示
           const showBinaryChips = binaryOptions && !isSkinTypeBinary;

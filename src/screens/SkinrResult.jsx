@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PRODUCTS } from '../data/products.js';
-import { buildRakutenSearchUrl, searchRakutenProducts } from '../lib/rakuten.js';
+import { buildRakutenSearchUrl, buildProductUrl, searchRakutenProducts } from '../lib/rakuten.js';
 import {
   SkinrLogo, SkinrEyebrow, ProductImage, Icon,
   Divider, PrimaryButton,
@@ -426,11 +426,13 @@ export default function SkinrResult({ diagnosis, onBack, onOpenProduct, onNewCha
                   WebkitOverflowScrolling: 'touch',
                 }}>
                   {items.map((p, idx) => (
-                    <div
+                    <a
                       key={p.id}
-                      onClick={() => onOpenProduct(p.id)}
+                      href={buildProductUrl(p)}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="skinr-tappable"
-                      style={{ flex: '0 0 120px', cursor: 'pointer' }}
+                      style={{ flex: '0 0 120px', textDecoration: 'none', color: 'inherit', cursor: 'pointer' }}
                     >
                       <div style={{ width: 120, height: 120, overflow: 'hidden', borderRadius: 8, marginBottom: 8, position: 'relative' }}>
                         <div style={{ transform: `scale(${120 / 140})`, transformOrigin: 'top left', width: 140, height: 168 }}>
@@ -448,7 +450,7 @@ export default function SkinrResult({ diagnosis, onBack, onOpenProduct, onNewCha
                       <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 8, letterSpacing: '0.18em', color: '#B5B5B5', marginBottom: 3 }}>{p.brand}</div>
                       <div style={{ fontSize: 11, fontWeight: 500, lineHeight: 1.4, color: '#111', marginBottom: 4 }}>{p.nameJa}</div>
                       <div style={{ fontSize: 10, color: '#7A7A7A' }}>{p.tags.slice(0, 2).join('・')}</div>
-                    </div>
+                    </a>
                   ))}
                 </div>
               </div>

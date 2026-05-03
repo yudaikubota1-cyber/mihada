@@ -21,6 +21,16 @@ const CATEGORY_KEYWORDS = {
   sunscreen: '日焼け止め',
 };
 
+// 楽天商品ページURL（個別商品名で検索）
+export function buildProductUrl(product) {
+  const keyword = encodeURIComponent(`${product.brand} ${product.nameJa || product.name}`.trim());
+  const searchUrl = `https://search.rakuten.co.jp/search/mall/${keyword}/`;
+  if (AFFILIATE_ID) {
+    return `https://hb.afl.rakuten.co.jp/hgc/${AFFILIATE_ID}/?pc=${encodeURIComponent(searchUrl)}&m=${encodeURIComponent(searchUrl)}`;
+  }
+  return searchUrl;
+}
+
 // 楽天検索アフィリエイトURL（カテゴリ別の外部検索リンク）
 export function buildRakutenSearchUrl({ concerns = [], category }) {
   const concernKw = concerns.slice(0, 2).map(c => CONCERN_KEYWORDS[c] || c).join(' ');

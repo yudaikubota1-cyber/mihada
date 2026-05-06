@@ -35,12 +35,41 @@ export function SkinrEyebrow({ children, color = '#7A7A7A', size = 10 }) {
 }
 
 export function ProductImage({ product, size = 'md', label = true }) {
+  const [imgError, setImgError] = React.useState(false);
   const dims = {
     sm: { w: 64, h: 64, fs: 9 },
     md: { w: 140, h: 168, fs: 10 },
     lg: { w: '100%', h: 280, fs: 11 },
     xl: { w: '100%', h: 360, fs: 12 },
   }[size];
+
+  // 実画像がある場合はそちらを優先表示
+  if (product.image && !imgError) {
+    return (
+      <div style={{
+        width: dims.w, height: dims.h,
+        position: 'relative', overflow: 'hidden',
+        borderRadius: 8, flexShrink: 0,
+        background: '#F5F5F5',
+        boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+      }}>
+        <img
+          src={product.image}
+          alt={product.nameJa || product.brand}
+          onError={() => setImgError(true)}
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+        />
+        {label && (
+          <div style={{
+            position: 'absolute', left: 8, bottom: 8,
+            fontFamily: 'JetBrains Mono, monospace', fontSize: 8,
+            letterSpacing: '0.14em', color: '#fff',
+            background: 'rgba(0,0,0,0.35)', padding: '2px 5px', borderRadius: 2,
+          }}>{(product.categoryLabel || '').toUpperCase()}</div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div style={{

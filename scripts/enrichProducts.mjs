@@ -41,8 +41,11 @@ const OFFICIAL_KEYS = {
 
 function isOfficial(shopName, brand) {
   const s = shopName.toLowerCase();
-  if (s.includes('公式')) return true;
-  return (OFFICIAL_KEYS[brand] || []).some(k => s.includes(k.toLowerCase()));
+  // 公式・official はブランド問わず公式扱い
+  if (s.includes('公式') || s.includes('official')) return true;
+  // ブランドキーワードがショップ名に含まれるか（大文字小文字を無視）
+  const keys = OFFICIAL_KEYS[brand] || OFFICIAL_KEYS[brand.toUpperCase()] || [];
+  return keys.some(k => s.includes(k.toLowerCase()));
 }
 
 async function sleep(ms) {

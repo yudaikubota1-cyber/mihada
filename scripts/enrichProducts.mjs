@@ -2,7 +2,7 @@
  * Rakuten API で各商品の直リンク＋画像を取得して products.js に書き込む
  * Usage: node scripts/enrichProducts.mjs
  */
-import { writeFileSync } from 'fs';
+import { writeFileSync, readFileSync } from 'fs';
 import { pathToFileURL } from 'url';
 import { resolve } from 'path';
 
@@ -10,6 +10,11 @@ const RAKUTEN_APP_ID   = 'bc7f9188-26cb-4124-bcc0-8b0cbb28da0c';
 const RAKUTEN_ACCESS_KEY = 'pk_5pxOxRBORZurmxgJAjQU4lg1do4j9lwNHkeMNW67fWT';
 const RAKUTEN_AFF_ID   = '5365226b.aee5572f.5365226c.046695be';
 const DELAY_MS         = 500; // レート制限対策
+
+// 書き換え前に PRODUCTS/CATEGORIES 以外のエクスポートを保存しておく
+const origSrc = readFileSync('src/data/products.js', 'utf-8');
+const extraMatch = origSrc.match(/export const SKIN_TYPE_CHIPS[\s\S]*/);
+const EXTRA_EXPORTS = extraMatch ? '\n' + extraMatch[0] : '';
 
 // ブランド公式ショップの判定キーワード
 const OFFICIAL_KEYS = {
@@ -145,7 +150,7 @@ function val(v) {
 const categoriesJs = JSON.stringify(CATEGORIES, null, 2);
 const productsLines = enriched.map(p => `  ${val(p)}`).join(',\n');
 
-const output = `export const PRODUCTS = [\n${productsLines}\n];\n\nexport const CATEGORIES = ${categoriesJs};\n`;
+const output = `export const PRODUCTS = [\n${productsLines}\n];\n\nexport const CATEGORIES = ${categoriesJs};\n${EXTRA_EXPORTS}`;
 
 writeFileSync('src/data/products.js', output, 'utf-8');
 console.log('\n✅ src/data/products.js を更新しました\n');

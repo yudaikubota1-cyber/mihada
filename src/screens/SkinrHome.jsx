@@ -24,7 +24,10 @@ export default function SkinrHome({ onStartChat, onOpenProduct, onSendInline, la
   const filtered = PRODUCTS.filter(p => {
     if (cat !== 'all' && p.category !== cat) return false;
     if (activeFilterIds && !activeFilterIds.includes(p.id)) return false;
-    if (skinFilter && !p.forSkin.some(s => s.includes(skinFilter))) return false;
+    if (skinFilter) {
+      const haystack = [...(p.skinTypes || []), ...(p.forSkin || [])];
+      if (!haystack.some(s => s.includes(skinFilter))) return false;
+    }
     if (query) {
       const searchTarget = [
         p.nameJa, p.name, p.brand,

@@ -57,7 +57,8 @@ function scoreProduct(product, concerns, skinType) {
       if (product.concerns.some(c => c.includes(kw) || kw.includes(c))) score += 2;
     }
   }
-  if (skinType && product.forSkin.some(s => s === skinType || skinType.includes(s.replace('肌', '')))) score += 1;
+  const skinHaystack = [...(product.skinTypes || []), ...(product.forSkin || [])];
+  if (skinType && skinHaystack.some(s => s === skinType || skinType.includes(s.replace('肌', '')))) score += 1;
   return score;
 }
 

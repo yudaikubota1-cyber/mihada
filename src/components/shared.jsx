@@ -261,10 +261,11 @@ export function ProductCard({ product, onClick }) {
         paddingTop: '125%',
         borderRadius: 14,
         overflow: 'hidden',
-        background: product.swatch || '#F0EDE8',
+        background: showImg ? '#F7F5F2' : (product.swatch || '#F0EDE8'),
+        border: showImg ? '1px solid #EDEBE8' : 'none',
         boxShadow: pressed
-          ? '0 2px 8px rgba(0,0,0,0.07)'
-          : '0 8px 28px rgba(0,0,0,0.11)',
+          ? '0 2px 8px rgba(0,0,0,0.05)'
+          : '0 6px 24px rgba(0,0,0,0.09)',
         transition: 'box-shadow 0.16s ease',
         marginBottom: 10,
       }}>
@@ -277,7 +278,7 @@ export function ProductCard({ product, onClick }) {
               position: 'absolute', inset: 0,
               width: '100%', height: '100%',
               objectFit: 'contain',
-              padding: '8px',
+              padding: '6%',
             }}
           />
         ) : (

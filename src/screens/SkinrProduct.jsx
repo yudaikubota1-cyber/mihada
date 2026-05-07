@@ -68,13 +68,13 @@ export default function SkinrProduct({ isDesktop, productId, onBack }) {
         </div>
 
         {/* Hero image — full bleed */}
-        <div style={{ position: 'relative', overflow: 'hidden', background: '#F8F6F3' }}>
+        <div style={{ position: 'relative', overflow: 'hidden', background: '#F7F5F2' }}>
           {product.image && !imgError ? (
             <img
               src={product.image}
               alt={product.nameJa}
               onError={() => setImgError(true)}
-              style={{ width: '100%', height: 340, objectFit: 'contain', display: 'block', padding: '16px' }}
+              style={{ width: '100%', height: 340, objectFit: 'contain', display: 'block', padding: '5%' }}
             />
           ) : (
             <div style={{

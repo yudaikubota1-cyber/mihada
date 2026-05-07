@@ -256,7 +256,9 @@ function ResultProductCard({ product: p, idx, onDetail }) {
         onClick={onDetail}
         style={{
           width: 130, height: 130, borderRadius: 10, overflow: 'hidden',
-          background: p.swatch || '#F0EDE8', marginBottom: 8, position: 'relative',
+          background: p.image ? '#F7F5F2' : (p.swatch || '#F0EDE8'),
+          border: p.image ? '1px solid #EDEBE8' : 'none',
+          marginBottom: 8, position: 'relative',
           boxShadow: pressed ? '0 2px 8px rgba(0,0,0,0.07)' : '0 4px 16px rgba(0,0,0,0.10)',
           transform: pressed ? 'scale(0.96)' : 'scale(1)',
           transition: 'all 0.15s ease',
@@ -267,7 +269,7 @@ function ResultProductCard({ product: p, idx, onDetail }) {
             src={p.image}
             alt={p.nameJa}
             onError={() => setImgError(true)}
-            style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '6px' }}
+            style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '8%' }}
           />
         ) : (
           <div style={{

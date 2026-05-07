@@ -119,9 +119,9 @@ for (let i = 0; i < PRODUCTS.length; i++) {
     notFound.push(p);
     enriched.push({ ...p });
   } else if (!result.isOfficial) {
-    console.log(`⚠️  公式なし (${result.shopName})`);
+    console.log(`⚠️  公式なし (${result.shopName}) — スキップ`);
     noOfficial.push({ product: p, shopName: result.shopName });
-    enriched.push({ ...p, url: result.url, image: result.image });
+    enriched.push({ ...p }); // url/image は設定しない
   } else {
     console.log(`✅ 公式 (${result.shopName})`);
     enriched.push({ ...p, url: result.url, image: result.image });
@@ -162,7 +162,7 @@ console.log('──────────────────────�
 notFound.forEach(p => console.log(`  • [${p.category}] ${p.brand} — ${p.nameJa}`));
 
 console.log('');
-console.log(`公式ショップなし (${noOfficial.length} 件) — 一般ショップで代用済み`);
+console.log(`公式ショップなし (${noOfficial.length} 件) — 保留（リンク・画像なし）`);
 console.log('───────────────────────────────────────');
 noOfficial.forEach(({ product: p, shopName }) =>
   console.log(`  • [${p.category}] ${p.brand} — ${p.nameJa.slice(0, 40)}  (${shopName})`)

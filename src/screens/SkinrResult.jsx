@@ -267,7 +267,7 @@ function ResultProductCard({ product: p, idx, onDetail }) {
             src={p.image}
             alt={p.nameJa}
             onError={() => setImgError(true)}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '6px' }}
           />
         ) : (
           <div style={{

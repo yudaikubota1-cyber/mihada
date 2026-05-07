@@ -74,7 +74,7 @@ export default function SkinrProduct({ isDesktop, productId, onBack }) {
               src={product.image}
               alt={product.nameJa}
               onError={() => setImgError(true)}
-              style={{ width: '100%', height: 340, objectFit: 'cover', display: 'block' }}
+              style={{ width: '100%', height: 340, objectFit: 'contain', display: 'block', padding: '16px' }}
             />
           ) : (
             <div style={{

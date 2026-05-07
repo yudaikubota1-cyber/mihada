@@ -11,6 +11,9 @@ const RAKUTEN_ACCESS_KEY = 'pk_5pxOxRBORZurmxgJAjQU4lg1do4j9lwNHkeMNW67fWT';
 const RAKUTEN_AFF_ID   = '5365226b.aee5572f.5365226c.046695be';
 const DELAY_MS         = 500; // レート制限対策
 
+// 公式ショップがなくても口コミ最多ショップを採用するブランド
+const ALLOW_ANY_SHOP = new Set(['キュレル']);
+
 // 書き換え前に PRODUCTS/CATEGORIES 以外のエクスポートを保存しておく
 const origSrc = readFileSync('src/data/products.js', 'utf-8');
 const extraMatch = origSrc.match(/export const SKIN_TYPE_CHIPS[\s\S]*/);
@@ -52,8 +55,14 @@ async function sleep(ms) {
   return new Promise(r => setTimeout(r, ms));
 }
 
+// 楽天検索用のブランド名エイリアス（英語ブランド名が日本語で登録されているケース）
+const BRAND_SEARCH_ALIAS = {
+  'Numbuzin': 'ナンバーズイン',
+};
+
 async function searchRakuten(product) {
-  const keyword = `${product.brand} ${product.nameJa}`;
+  const brandAlias = BRAND_SEARCH_ALIAS[product.brand] || product.brand;
+  const keyword = `${brandAlias} ${product.nameJa}`;
   const params = new URLSearchParams({
     applicationId: RAKUTEN_APP_ID,
     accessKey:     RAKUTEN_ACCESS_KEY,
@@ -121,12 +130,13 @@ for (let i = 0; i < PRODUCTS.length; i++) {
     console.log('❌ 未発見');
     notFound.push(p);
     enriched.push({ ...p });
-  } else if (!result.isOfficial) {
+  } else if (!result.isOfficial && !ALLOW_ANY_SHOP.has(p.brand)) {
     console.log(`⚠️  公式なし (${result.shopName}) — スキップ`);
     noOfficial.push({ product: p, shopName: result.shopName });
     enriched.push({ ...p }); // url/image は設定しない
   } else {
-    console.log(`✅ 公式 (${result.shopName})`);
+    const label = result.isOfficial ? `✅ 公式 (${result.shopName})` : `🔶 口コミ最多 (${result.shopName})`;
+    console.log(label);
     enriched.push({ ...p, url: result.url, image: result.image });
   }
 

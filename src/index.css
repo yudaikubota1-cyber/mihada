@@ -153,12 +153,13 @@ textarea:focus:not(:focus-visible) {
   }
 
   .app-shell {
+    display: flex;
+    flex-direction: row;
     max-width: 1300px;
     width: 100%;
     height: auto;
     min-height: 100dvh;
     overflow: visible;
-    flex-direction: row;
     box-shadow: 0 0 80px rgba(0,0,0,0.09);
     padding-bottom: 0;
   }

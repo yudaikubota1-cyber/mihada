@@ -12,7 +12,7 @@ if (!TARGET_BRAND) { console.error('Usage: node enrichBrand.mjs <brand>'); proce
 const RAKUTEN_APP_ID     = 'bc7f9188-26cb-4124-bcc0-8b0cbb28da0c';
 const RAKUTEN_ACCESS_KEY = 'pk_5pxOxRBORZurmxgJAjQU4lg1do4j9lwNHkeMNW67fWT';
 const RAKUTEN_AFF_ID     = '5365226b.aee5572f.5365226c.046695be';
-const DELAY_MS           = 600;
+const DELAY_MS           = 2500;
 
 async function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
@@ -22,7 +22,25 @@ const BRAND_SEARCH_ALIAS = { 'Numbuzin': 'ナンバーズイン' };
 
 // 公式ショップの判定（shopName に含まれるキーワード）
 const OFFICIAL_SHOP_KEYWORDS = {
-  'Numbuzin': ['numbuzin'],
+  'Numbuzin':     ['numbuzin'],
+  'COSRX':        ['cosrx'],
+  'Centellian24': ['centellian'],
+  'BIOHEAL BOH':  ['bioheal'],
+  'Torriden':     ['torriden'],
+  'ANUA':         ['anua'],
+  'MEDICUBE':     ['medicube'],
+  'Mediheal':     ['mediheal'],
+  'Beauty of Joseon': ['beauty of joseon', 'joseon'],
+  'Round Lab':    ['round lab'],
+  'Abib':         ['abib'],
+  'Goodal':       ['goodal'],
+  '魔女工場':      ['魔女工場'],
+  'BANILA CO':    ['banila'],
+  'ファンケル':    ['ファンケル', 'fancl'],
+  "d'Alba":       ["d'alba", 'ダルバ'],
+  'VT COSMETICS': ['vt cosmetics', 'vtコスメ'],
+  'Dr.G':         ['dr.g', 'drg'],
+  'Goodal':       ['goodal'],
 };
 const ALLOW_ANY_SHOP = new Set(['キュレル']);
 
@@ -32,19 +50,22 @@ function isOfficial(shopName, brand) {
   return (OFFICIAL_SHOP_KEYWORDS[brand] || []).some(k => s.includes(k));
 }
 
-function buildKeyword(product) {
+function buildKeyword(product, short = false) {
   if (product.brand === 'Numbuzin') {
     const m = product.nameJa.match(/No\.(\d+)/i);
     const num = m ? `${m[1]}番` : '';
-    const catJa = CAT_JA[product.category] || '';
-    return `ナンバーズイン ${num} ${catJa}`.trim();
+    return `ナンバーズイン ${num}`.trim();
   }
   const alias = BRAND_SEARCH_ALIAS[product.brand] || product.brand;
+  if (short) {
+    // 長いキーワードで見つからない場合、ブランド名＋商品名の最初の8文字で再検索
+    const shortName = product.nameJa.replace(/（.*?）/g, '').replace(/\s*SPF.*$/, '').trim().slice(0, 12);
+    return `${alias} ${shortName}`;
+  }
   return `${alias} ${product.nameJa}`;
 }
 
-async function searchRakuten(product) {
-  const keyword = buildKeyword(product);
+async function fetchRakuten(keyword) {
   const params = new URLSearchParams({
     applicationId: RAKUTEN_APP_ID,
     accessKey:     RAKUTEN_ACCESS_KEY,
@@ -56,20 +77,34 @@ async function searchRakuten(product) {
     formatVersion: '2',
   });
   const url = `https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20260401?${params}`;
+  const res = await fetch(url, {
+    headers: { 'Referer': 'https://mihada.vercel.app/', 'Origin': 'https://mihada.vercel.app' },
+  });
+  if (!res.ok) { console.error(`  API ${res.status}`); return null; }
+  const data = await res.json();
+  return data.Items?.length ? data.Items : null;
+}
+
+async function searchRakuten(product) {
   try {
-    const res = await fetch(url, {
-      headers: { 'Referer': 'https://mihada.vercel.app/', 'Origin': 'https://mihada.vercel.app' },
-    });
-    if (!res.ok) { console.error(`  API ${res.status}`); return null; }
-    const data = await res.json();
-    if (!data.Items?.length) return null;
-    const item = data.Items[0]; // 口コミ最多
+    // 1st try: フルキーワード
+    let items = await fetchRakuten(buildKeyword(product, false));
+    // 2nd try: 短縮キーワード（1st tryで結果なしの場合）
+    if (!items) {
+      await sleep(2500);
+      items = await fetchRakuten(buildKeyword(product, true));
+    }
+    if (!items) return null;
+    // 公式ショップを優先、なければ口コミ最多（Items[0]）
+    const official = items.find(i => isOfficial(i.shopName, product.brand));
+    const item = official || items[0];
     return {
       url:   item.affiliateUrl || item.itemUrl,
       image: (item.mediumImageUrls?.[0] ?? item.smallImageUrls?.[0] ?? null)
                ?.replace('_ex=128x128','_ex=400x400')
                ?.replace('_ex=64x64','_ex=400x400'),
       shopName: item.shopName,
+      isOfficial: !!official,
     };
   } catch (e) { return null; }
 }

@@ -238,6 +238,111 @@ function RakutenSection({ concerns, category, searchUrl }) {
   );
 }
 
+// アプリ内商品カード（診断結果用）
+function ResultProductCard({ product: p, idx, onDetail }) {
+  const [pressed, setPressed] = React.useState(false);
+  const [imgError, setImgError] = React.useState(false);
+
+  return (
+    <div
+      style={{ flex: '0 0 130px', cursor: 'pointer' }}
+      onMouseDown={() => setPressed(true)}
+      onMouseUp={() => setPressed(false)}
+      onTouchStart={() => setPressed(true)}
+      onTouchEnd={() => setPressed(false)}
+    >
+      {/* 画像 */}
+      <div
+        onClick={onDetail}
+        style={{
+          width: 130, height: 130, borderRadius: 10, overflow: 'hidden',
+          background: p.swatch || '#F0EDE8', marginBottom: 8, position: 'relative',
+          boxShadow: pressed ? '0 2px 8px rgba(0,0,0,0.07)' : '0 4px 16px rgba(0,0,0,0.10)',
+          transform: pressed ? 'scale(0.96)' : 'scale(1)',
+          transition: 'all 0.15s ease',
+        }}
+      >
+        {p.image && !imgError ? (
+          <img
+            src={p.image}
+            alt={p.nameJa}
+            onError={() => setImgError(true)}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        ) : (
+          <div style={{
+            width: '100%', height: '100%',
+            background: p.swatch,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <span style={{
+              fontFamily: 'JetBrains Mono, monospace', fontSize: 9,
+              letterSpacing: '0.14em', color: p.accent, opacity: 0.6,
+            }}>{p.brand.split(' ')[0]}</span>
+          </div>
+        )}
+        {idx === 0 && (
+          <div style={{
+            position: 'absolute', top: 6, left: 6,
+            background: '#111', color: '#fff',
+            fontSize: 7, fontFamily: 'JetBrains Mono, monospace',
+            letterSpacing: '0.12em', padding: '2px 6px', borderRadius: 2,
+          }}>BEST MATCH</div>
+        )}
+      </div>
+
+      {/* テキスト情報 */}
+      <div onClick={onDetail}>
+        <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 7, letterSpacing: '0.14em', color: '#C0C0C0', marginBottom: 3 }}>
+          {p.brand}
+        </div>
+        <div style={{ fontSize: 11, fontWeight: 500, lineHeight: 1.4, color: '#111', marginBottom: 5 }}>
+          {p.nameJa}
+        </div>
+        <div style={{ fontSize: 11, fontWeight: 600, color: '#111', marginBottom: 5 }}>
+          {p.price}
+        </div>
+      </div>
+
+      {/* アクションボタン行 */}
+      <div style={{ display: 'flex', gap: 5 }}>
+        {/* 詳細を見る */}
+        <button
+          onClick={onDetail}
+          style={{
+            flex: 1, padding: '6px 0',
+            background: '#111', color: '#fff',
+            border: 'none', borderRadius: 5,
+            fontSize: 9, fontFamily: 'inherit', fontWeight: 600,
+            cursor: 'pointer', letterSpacing: '0.02em',
+          }}
+        >
+          詳細
+        </button>
+        {/* 楽天で直接購入 */}
+        {p.url && (
+          <a
+            href={p.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              flex: 1, padding: '6px 0',
+              background: '#BF0000', color: '#fff',
+              border: 'none', borderRadius: 5,
+              fontSize: 9, fontFamily: 'inherit', fontWeight: 600,
+              cursor: 'pointer', letterSpacing: '0.02em',
+              textDecoration: 'none',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            購入
+          </a>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function SkinrResult({ diagnosis, onBack, onOpenProduct, onNewChat, onViewCategory }) {
   const skinType = diagnosis?.skin_type || '混合肌';
   const concerns = diagnosis?.concerns || ['乾燥', '毛穴の開き', 'くすみ'];
@@ -445,31 +550,12 @@ export default function SkinrResult({ diagnosis, onBack, onOpenProduct, onNewCha
                   WebkitOverflowScrolling: 'touch',
                 }}>
                   {items.map((p, idx) => (
-                    <a
+                    <ResultProductCard
                       key={p.id}
-                      href={buildProductUrl(p)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="skinr-tappable"
-                      style={{ flex: '0 0 120px', textDecoration: 'none', color: 'inherit', cursor: 'pointer' }}
-                    >
-                      <div style={{ width: 120, height: 120, overflow: 'hidden', borderRadius: 8, marginBottom: 8, position: 'relative' }}>
-                        <div style={{ transform: `scale(${120 / 140})`, transformOrigin: 'top left', width: 140, height: 168 }}>
-                          <ProductImage product={p} size="md" label={false} />
-                        </div>
-                        {idx === 0 && (
-                          <div style={{
-                            position: 'absolute', top: 6, left: 6,
-                            background: '#111', color: '#fff',
-                            fontSize: 8, fontFamily: 'JetBrains Mono, monospace',
-                            letterSpacing: '0.12em', padding: '3px 6px', borderRadius: 2,
-                          }}>BEST MATCH</div>
-                        )}
-                      </div>
-                      <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 8, letterSpacing: '0.18em', color: '#B5B5B5', marginBottom: 3 }}>{p.brand}</div>
-                      <div style={{ fontSize: 11, fontWeight: 500, lineHeight: 1.4, color: '#111', marginBottom: 4 }}>{p.nameJa}</div>
-                      <div style={{ fontSize: 10, color: '#7A7A7A' }}>{p.tags.slice(0, 2).join('・')}</div>
-                    </a>
+                      product={p}
+                      idx={idx}
+                      onDetail={() => onOpenProduct(p.id)}
+                    />
                   ))}
                 </div>
               </div>

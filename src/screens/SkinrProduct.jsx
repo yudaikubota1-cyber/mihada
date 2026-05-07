@@ -14,7 +14,7 @@ function lookupIngredient(name) {
   ) || null;
 }
 
-export default function SkinrProduct({ productId, onBack }) {
+export default function SkinrProduct({ isDesktop, productId, onBack }) {
   const product = PRODUCTS.find(p => p.id === productId) || PRODUCTS[0];
   const [routineTab, setRoutineTab] = useState('morning');
   const [imgError, setImgError] = useState(false);
@@ -36,13 +36,23 @@ export default function SkinrProduct({ productId, onBack }) {
         : product.ingredients.map(i => i.name || ''))
     : [];
 
+  const px = isDesktop ? '40px' : '24px';
+
   return (
-    <div style={{ height: '100%', position: 'relative', background: '#fff' }}>
-      <div className="skinr-scroll" style={{ height: '100%', overflowY: 'auto', paddingBottom: 100 }}>
+    <div style={{
+      height: isDesktop ? 'auto' : '100%',
+      minHeight: isDesktop ? '100dvh' : 'auto',
+      position: 'relative', background: '#fff',
+    }}>
+      <div className={`skinr-scroll${isDesktop ? ' skinr-page' : ''}`} style={{
+        height: isDesktop ? 'auto' : '100%',
+        overflowY: isDesktop ? 'visible' : 'auto',
+        paddingBottom: isDesktop ? 0 : 100,
+      }}>
 
         {/* Top bar */}
         <div style={{
-          position: 'sticky', top: 0, zIndex: 10,
+          position: isDesktop ? 'static' : 'sticky', top: 0, zIndex: 10,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '12px 16px',
           background: 'rgba(255,255,255,0.94)',
@@ -96,7 +106,7 @@ export default function SkinrProduct({ productId, onBack }) {
         </div>
 
         {/* Title block */}
-        <div style={{ padding: '24px 24px 12px' }}>
+        <div style={{ padding: `24px ${px} 12px` }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
             <SkinrEyebrow size={10}>{product.brand}</SkinrEyebrow>
             <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
@@ -125,7 +135,7 @@ export default function SkinrProduct({ productId, onBack }) {
 
         {/* ingredientDesc — expert summary */}
         {product.ingredientDesc && (
-          <div style={{ padding: '0 24px 16px' }}>
+          <div style={{ padding: `0 ${px} 16px` }}>
             <div style={{
               padding: '14px 16px',
               background: '#F9F7F4',
@@ -142,7 +152,7 @@ export default function SkinrProduct({ productId, onBack }) {
         )}
 
         {/* Tag chips */}
-        <div style={{ padding: '0 24px 16px', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+        <div style={{ padding: `0 ${px} 16px`, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           {(product.tags || []).map(t => (
             <span key={t} style={{
               padding: '5px 11px', borderRadius: 999,
@@ -153,10 +163,10 @@ export default function SkinrProduct({ productId, onBack }) {
         </div>
 
         {/* Use timing */}
-        <div style={{ padding: '0 24px 4px' }}>
+        <div style={{ padding: `0 ${px} 4px` }}>
           <Divider />
         </div>
-        <div style={{ padding: '16px 24px', display: 'flex', gap: 10 }}>
+        <div style={{ padding: `16px ${px}`, display: 'flex', gap: 10 }}>
           {['朝', '夜'].map(t => {
             const active = (product.timing || []).includes(t);
             return (
@@ -178,10 +188,10 @@ export default function SkinrProduct({ productId, onBack }) {
         </div>
 
         {/* ─── Ingredients ─────────────────────────────── */}
-        <div style={{ padding: '8px 24px 0' }}>
+        <div style={{ padding: `8px ${px} 0` }}>
           <Divider label="主要成分" />
         </div>
-        <div style={{ padding: '20px 24px 24px' }}>
+        <div style={{ padding: `20px ${px} 24px` }}>
           <h3 style={{ margin: '0 0 16px', fontSize: 17, fontWeight: 400, letterSpacing: '-0.01em' }}>
             成分と効果
           </h3>
@@ -252,10 +262,10 @@ export default function SkinrProduct({ productId, onBack }) {
         </div>
 
         {/* ─── Skin types & Concerns ─────────────────── */}
-        <div style={{ padding: '0 24px 0' }}>
+        <div style={{ padding: `0 ${px} 0` }}>
           <Divider label="向いている肌" />
         </div>
-        <div style={{ padding: '18px 24px 20px' }}>
+        <div style={{ padding: `18px ${px} 20px` }}>
           <div style={{ marginBottom: 20 }}>
             <h3 style={{ margin: '0 0 10px', fontSize: 14, fontWeight: 600, letterSpacing: '-0.01em', color: '#111' }}>
               向いている肌タイプ
@@ -297,10 +307,10 @@ export default function SkinrProduct({ productId, onBack }) {
         {/* ─── Good / Avoid combos ─────────────────── */}
         {(product.goodWith?.length > 0 || product.avoidWith?.length > 0) && (
           <>
-            <div style={{ padding: '0 24px 0' }}>
+            <div style={{ padding: `0 ${px} 0` }}>
               <Divider label="成分の相性" />
             </div>
-            <div style={{ padding: '18px 24px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ padding: `18px ${px} 20px`, display: 'flex', flexDirection: 'column', gap: 12 }}>
               {product.goodWith?.length > 0 && (
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
@@ -357,10 +367,10 @@ export default function SkinrProduct({ productId, onBack }) {
         )}
 
         {/* ─── Routine ─────────────────────────────── */}
-        <div style={{ padding: '0 24px 0' }}>
+        <div style={{ padding: `0 ${px} 0` }}>
           <Divider label="毎日のルーティン" />
         </div>
-        <div style={{ padding: '14px 24px 4px' }}>
+        <div style={{ padding: `14px ${px} 4px` }}>
           <h2 style={{ margin: '0 0 4px', fontSize: 19, fontWeight: 300, letterSpacing: '-0.01em' }}>
             この商品を使ったルーティン
           </h2>
@@ -368,7 +378,7 @@ export default function SkinrProduct({ productId, onBack }) {
             朝・夜それぞれのステップ順
           </p>
         </div>
-        <div style={{ padding: '12px 24px 0', display: 'flex', gap: 0, borderBottom: '1px solid #F0F0F0' }}>
+        <div style={{ padding: `12px ${px} 0`, display: 'flex', gap: 0, borderBottom: '1px solid #F0F0F0' }}>
           {[
             { id: 'morning', label: '朝', icon: 'sun' },
             { id: 'night',   label: '夜', icon: 'moon' },
@@ -394,7 +404,7 @@ export default function SkinrProduct({ productId, onBack }) {
             </button>
           ))}
         </div>
-        <div style={{ padding: '20px 24px 32px' }}>
+        <div style={{ padding: `20px ${px} 32px` }}>
           {!ROUTINE_STEPS[routineTab].some(s => s.productId === product.id) && (
             <div style={{
               padding: '12px 14px', marginBottom: 16,
@@ -454,7 +464,7 @@ export default function SkinrProduct({ productId, onBack }) {
         </div>
 
         {/* Reviews link */}
-        <div style={{ padding: '0 24px 32px' }}>
+        <div style={{ padding: `0 ${px} 32px` }}>
           <button
             onClick={openRakuten}
             className="skinr-tappable"
@@ -490,27 +500,47 @@ export default function SkinrProduct({ productId, onBack }) {
         </div>
       </div>
 
-      {/* Sticky CTA */}
-      <div style={{
-        position: 'absolute', left: 0, right: 0, bottom: 0,
-        padding: '12px 16px calc(16px + env(safe-area-inset-bottom, 0px))',
-        background: 'rgba(255,255,255,0.97)',
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
-        borderTop: '1px solid rgba(0,0,0,0.06)',
-        zIndex: 5,
-        display: 'flex', alignItems: 'center', gap: 14,
-      }}>
-        <div style={{ flex: 1 }}>
-          <PrimaryButton full onClick={openRakuten} icon={<Icon name="arrowRight" size={14} color="#fff" />}>
-            楽天で購入する
-          </PrimaryButton>
+      {/* CTA — sticky on mobile, inline on desktop */}
+      {isDesktop ? (
+        /* Desktop: inline purchase section at bottom */
+        <div style={{
+          padding: `24px ${px} 60px`,
+          borderTop: '1px solid #F0F0F0',
+          display: 'flex', alignItems: 'center', gap: 20,
+        }}>
+          <div style={{ flex: 1 }}>
+            <PrimaryButton full onClick={openRakuten} icon={<Icon name="arrowRight" size={14} color="#fff" />}>
+              楽天で購入する
+            </PrimaryButton>
+          </div>
+          <div style={{ textAlign: 'right', flexShrink: 0 }}>
+            <div style={{ fontSize: 26, fontWeight: 300, letterSpacing: '-0.02em', lineHeight: 1 }}>{product.price}</div>
+            <div style={{ fontSize: 11, color: '#BABABA', marginTop: 3 }}>{product.volume}</div>
+          </div>
         </div>
-        <div style={{ textAlign: 'right', flexShrink: 0 }}>
-          <div style={{ fontSize: 20, fontWeight: 300, letterSpacing: '-0.02em', lineHeight: 1 }}>{product.price}</div>
-          <div style={{ fontSize: 10, color: '#BABABA', marginTop: 2 }}>{product.volume}</div>
+      ) : (
+        /* Mobile: absolute sticky at bottom */
+        <div style={{
+          position: 'absolute', left: 0, right: 0, bottom: 0,
+          padding: '12px 16px calc(16px + env(safe-area-inset-bottom, 0px))',
+          background: 'rgba(255,255,255,0.97)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          borderTop: '1px solid rgba(0,0,0,0.06)',
+          zIndex: 5,
+          display: 'flex', alignItems: 'center', gap: 14,
+        }}>
+          <div style={{ flex: 1 }}>
+            <PrimaryButton full onClick={openRakuten} icon={<Icon name="arrowRight" size={14} color="#fff" />}>
+              楽天で購入する
+            </PrimaryButton>
+          </div>
+          <div style={{ textAlign: 'right', flexShrink: 0 }}>
+            <div style={{ fontSize: 20, fontWeight: 300, letterSpacing: '-0.02em', lineHeight: 1 }}>{product.price}</div>
+            <div style={{ fontSize: 10, color: '#BABABA', marginTop: 2 }}>{product.volume}</div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

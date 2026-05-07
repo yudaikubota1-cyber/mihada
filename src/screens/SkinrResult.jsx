@@ -141,7 +141,7 @@ function RakutenCard({ item }) {
 }
 
 // 楽天商品ローダー（カテゴリ別）
-function RakutenSection({ concerns, category, searchUrl }) {
+function RakutenSection({ concerns, category, searchUrl, px = '24px' }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -156,7 +156,7 @@ function RakutenSection({ concerns, category, searchUrl }) {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', gap: 10, padding: '0 24px 14px' }}>
+      <div style={{ display: 'flex', gap: 10, padding: `0 ${px} 14px` }}>
         {[1, 2, 3].map(i => (
           <div key={i} style={{
             flex: '0 0 120px', height: 120, borderRadius: 8,
@@ -172,7 +172,7 @@ function RakutenSection({ concerns, category, searchUrl }) {
   if (items.length === 0) {
     // APIが使えない場合は検索リンクボタンのみ
     return (
-      <div style={{ padding: '0 24px 14px' }}>
+      <div style={{ padding: `0 ${px} 14px` }}>
         <a
           href={searchUrl}
           target="_blank"
@@ -207,7 +207,7 @@ function RakutenSection({ concerns, category, searchUrl }) {
       <div className="skinr-scroll" style={{
         display: 'flex', gap: 10,
         overflowX: 'auto',
-        padding: '0 24px 14px',
+        padding: `0 ${px} 14px`,
         WebkitOverflowScrolling: 'touch',
       }}>
         {items.map(item => (
@@ -343,7 +343,7 @@ function ResultProductCard({ product: p, idx, onDetail }) {
   );
 }
 
-export default function SkinrResult({ diagnosis, onBack, onOpenProduct, onNewChat, onViewCategory }) {
+export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduct, onNewChat, onViewCategory }) {
   const skinType = diagnosis?.skin_type || '混合肌';
   const concerns = diagnosis?.concerns || ['乾燥', '毛穴の開き', 'くすみ'];
   const aiMessage = diagnosis?.message;
@@ -385,23 +385,37 @@ export default function SkinrResult({ diagnosis, onBack, onOpenProduct, onNewCha
     categoryOrder.map(cat => [cat.key, buildRakutenSearchUrl({ concerns, category: cat.key })])
   );
 
+  const px = isDesktop ? '40px' : '24px';
+
   return (
-    <div className="skinr-scroll" style={{ height: '100%', overflowY: 'auto', background: '#fff' }}>
+    <div className={`skinr-scroll${isDesktop ? ' skinr-page' : ''}`} style={{
+      height: isDesktop ? 'auto' : '100%',
+      overflowY: isDesktop ? 'visible' : 'auto',
+      background: '#fff',
+    }}>
       {/* Top bar */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '14px 16px', borderBottom: '1px solid #F0F0F0',
-        position: 'sticky', top: 0, background: '#fff', zIndex: 5,
+        position: isDesktop ? 'static' : 'sticky',
+        top: 0, background: '#fff', zIndex: 5,
       }}>
         <button onClick={onBack} style={{ background: 'none', border: 'none', padding: 6, cursor: 'pointer', display: 'flex' }}>
           <Icon name="arrowLeft" size={20} />
         </button>
-        <SkinrLogo size={13} />
+        {!isDesktop && <SkinrLogo size={13} />}
+        <div style={{ flex: isDesktop ? 1 : 'none', textAlign: 'center' }}>
+          {isDesktop && (
+            <span style={{ fontSize: 12, color: '#ABABAB', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.1em' }}>
+              DIAGNOSIS RESULT
+            </span>
+          )}
+        </div>
         <div style={{ width: 32 }} />
       </div>
 
       {/* Hero */}
-      <div style={{ padding: '40px 24px 8px' }}>
+      <div style={{ padding: `40px ${px} 8px` }}>
         <SkinrEyebrow>Result · {dateStr}</SkinrEyebrow>
         <h1 style={{
           margin: '14px 0 0',
@@ -473,7 +487,7 @@ export default function SkinrResult({ diagnosis, onBack, onOpenProduct, onNewCha
 
       {/* 相性ガイド */}
       {(comboGood.length > 0 || comboAvoid.length > 0) && (
-        <div style={{ padding: '0 24px 24px' }}>
+        <div style={{ padding: `0 ${px} 24px` }}>
           <div style={{ border: '1px solid #EBEBEB', borderRadius: 8, overflow: 'hidden' }}>
             <div style={{
               padding: '10px 16px', borderBottom: '1px solid #F0F0F0',
@@ -513,7 +527,7 @@ export default function SkinrResult({ diagnosis, onBack, onOpenProduct, onNewCha
       )}
 
       {/* Products */}
-      <div style={{ padding: '4px 24px 0' }}>
+      <div style={{ padding: `4px ${px} 0` }}>
         <Divider label="01 — Recommended Products" />
       </div>
 
@@ -525,7 +539,7 @@ export default function SkinrResult({ diagnosis, onBack, onOpenProduct, onNewCha
             {/* カテゴリヘッダー */}
             <div style={{
               display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
-              marginBottom: 12, padding: '0 24px',
+              marginBottom: 12, padding: `0 ${px}`,
             }}>
               <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, letterSpacing: '0.18em', fontWeight: 500, color: '#111' }}>
                 {cat.key.toUpperCase()} · {cat.label}
@@ -546,7 +560,7 @@ export default function SkinrResult({ diagnosis, onBack, onOpenProduct, onNewCha
                 <div className="skinr-scroll" style={{
                   display: 'flex', gap: 10,
                   overflowX: 'auto',
-                  padding: '0 24px 14px',
+                  padding: `0 ${px} 14px`,
                   WebkitOverflowScrolling: 'touch',
                 }}>
                   {items.map((p, idx) => (
@@ -562,7 +576,7 @@ export default function SkinrResult({ diagnosis, onBack, onOpenProduct, onNewCha
             )}
 
             {/* 楽天商品（リアルタイム取得） */}
-            <div style={{ padding: '0 24px 8px' }}>
+            <div style={{ padding: `0 ${px} 8px` }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
                 <div style={{ width: 14, height: 14, borderRadius: '50%', background: '#BF0000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <span style={{ color: '#fff', fontSize: 7, fontWeight: 700 }}>R</span>
@@ -570,16 +584,16 @@ export default function SkinrResult({ diagnosis, onBack, onOpenProduct, onNewCha
                 <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, letterSpacing: '0.14em', color: '#999' }}>RAKUTEN</span>
               </div>
             </div>
-            <RakutenSection concerns={concerns} category={cat.key} searchUrl={rakutenUrl} />
+            <RakutenSection concerns={concerns} category={cat.key} searchUrl={rakutenUrl} px={px} />
 
-            <div style={{ height: 1, background: '#F0F0F0', margin: '8px 24px 0' }} />
+            <div style={{ height: 1, background: '#F0F0F0', margin: `8px ${px} 0` }} />
           </div>
         );
       })}
 
       {/* CTA */}
       <div style={{
-        padding: '28px 24px 64px',
+        padding: `28px ${px} ${isDesktop ? '60px' : '64px'}`,
         borderTop: '1px solid #F0F0F0',
         marginTop: 8,
         display: 'flex', flexDirection: 'column', gap: 10,

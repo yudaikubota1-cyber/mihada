@@ -5,7 +5,7 @@ import {
   Chip, Divider, ProductCard,
 } from '../components/shared.jsx';
 
-export default function SkinrHome({ onStartChat, onOpenProduct, onSendInline, lastDiagnosis, onViewLastResult, homeFilter }) {
+export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSendInline, lastDiagnosis, onViewLastResult, homeFilter }) {
   const [cat, setCat] = useState(homeFilter?.cat || 'all');
   const [skinFilter, setSkinFilter] = useState(null); // 肌タイプ絞り込み
   const [query, setQuery] = useState('');
@@ -50,11 +50,16 @@ export default function SkinrHome({ onStartChat, onOpenProduct, onSendInline, la
     return 0;
   });
 
+  const px = isDesktop ? '40px' : '24px';
+
   return (
-    <div className="skinr-scroll" style={{
-      height: '100%', overflowY: 'auto', background: '#fff',
+    <div className={`skinr-scroll${isDesktop ? ' skinr-page' : ''}`} style={{
+      height: isDesktop ? 'auto' : '100%',
+      overflowY: isDesktop ? 'visible' : 'auto',
+      background: '#fff',
     }}>
-      {/* Header */}
+      {/* Header — hidden on desktop (logo is in sidebar) */}
+      {!isDesktop && (
       <div style={{
         position: 'sticky', top: 0, zIndex: 10,
         display: 'flex', justifyContent: 'center',
@@ -66,6 +71,7 @@ export default function SkinrHome({ onStartChat, onOpenProduct, onSendInline, la
       }}>
         <SkinrLogo size={15} />
       </div>
+      )}
 
       {/* 前回の診断バナー */}
       {lastDiagnosis && (
@@ -113,7 +119,7 @@ export default function SkinrHome({ onStartChat, onOpenProduct, onSendInline, la
       )}
 
       {/* Hero — AI chat invite */}
-      <div style={{ padding: '40px 24px 24px' }}>
+      <div style={{ padding: `${isDesktop ? '48px' : '40px'} ${px} 24px` }}>
         <SkinrEyebrow>Ingredient Logic</SkinrEyebrow>
         <h1 style={{
           margin: '12px 0 10px',
@@ -227,7 +233,7 @@ export default function SkinrHome({ onStartChat, onOpenProduct, onSendInline, la
             </span>
             <div style={{ flex: 1, height: 1, background: '#F0F0F0' }} />
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isDesktop ? 'repeat(8, 1fr)' : 'repeat(4, 1fr)', gap: 10 }}>
             {CONCERN_CHIPS.map((c, i) => (
               <ConcernChip key={c.label} chip={c} onSend={onSendInline} index={i} />
             ))}
@@ -236,12 +242,12 @@ export default function SkinrHome({ onStartChat, onOpenProduct, onSendInline, la
       </div>
 
       {/* Section break */}
-      <div style={{ padding: '20px 24px 0' }}>
+      <div style={{ padding: `20px ${px} 0` }}>
         <Divider label="商品を探す" />
       </div>
 
       {/* Self-search */}
-      <div style={{ padding: '20px 24px 8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ padding: `20px ${px} 8px`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <p style={{ fontSize: 13, fontWeight: 500, color: '#111', margin: 0 }}>
             {activeFilterIds
@@ -272,7 +278,7 @@ export default function SkinrHome({ onStartChat, onOpenProduct, onSendInline, la
       </div>
 
       {/* Search bar */}
-      <div style={{ padding: '8px 24px 12px' }}>
+      <div style={{ padding: `8px ${px} 12px` }}>
         <div style={{
           display: 'flex', alignItems: 'center', gap: 10,
           padding: '10px 16px',
@@ -305,7 +311,7 @@ export default function SkinrHome({ onStartChat, onOpenProduct, onSendInline, la
       {/* Category filter */}
       <div className="skinr-scroll" style={{
         display: 'flex', gap: 6, overflowX: 'auto',
-        padding: '4px 24px 4px',
+        padding: `4px ${px} 4px`,
       }}>
         {CATEGORIES.map(c => (
           <Chip key={c.id} active={cat === c.id} onClick={() => { setCat(c.id); setActiveFilterIds(null); }} size="sm">
@@ -317,7 +323,7 @@ export default function SkinrHome({ onStartChat, onOpenProduct, onSendInline, la
       {/* 肌タイプ絞り込み（AIなしで使えるセカンダリフィルター） */}
       <div className="skinr-scroll" style={{
         display: 'flex', gap: 5, overflowX: 'auto',
-        padding: '4px 24px 8px',
+        padding: `4px ${px} 8px`,
         alignItems: 'center',
       }}>
         <span style={{
@@ -358,10 +364,12 @@ export default function SkinrHome({ onStartChat, onOpenProduct, onSendInline, la
 
       {/* Product grid */}
       <div style={{
-        padding: '16px 24px 24px',
+        padding: `16px ${px} 24px`,
         display: 'grid',
-        gridTemplateColumns: 'repeat(2, 1fr)',
-        gap: '24px 14px',
+        gridTemplateColumns: isDesktop
+          ? 'repeat(auto-fill, minmax(190px, 1fr))'
+          : 'repeat(2, 1fr)',
+        gap: isDesktop ? '28px 20px' : '24px 14px',
       }}>
         {filtered.map(p => (
           <ProductCard key={p.id} product={p} onClick={() => onOpenProduct(p.id)} />
@@ -369,7 +377,7 @@ export default function SkinrHome({ onStartChat, onOpenProduct, onSendInline, la
       </div>
 
       {filtered.length === 0 && (
-        <div style={{ padding: '48px 24px', textAlign: 'center', animation: 'skinrFadeIn 0.3s ease both' }}>
+        <div style={{ padding: `48px ${px}`, textAlign: 'center', animation: 'skinrFadeIn 0.3s ease both' }}>
           <div style={{ fontSize: 28, marginBottom: 12 }}>🔍</div>
           <div style={{ fontSize: 13, fontWeight: 500, color: '#333', marginBottom: 6 }}>
             該当する商品が見つかりません
@@ -394,7 +402,7 @@ export default function SkinrHome({ onStartChat, onOpenProduct, onSendInline, la
       {/* Footer */}
       <div style={{
         borderTop: '1px solid #F0F0F0',
-        padding: '40px 24px 60px',
+        padding: `40px ${px} ${isDesktop ? '60px' : '60px'}`,
         textAlign: 'center',
       }}>
         <SkinrLogo size={12} />

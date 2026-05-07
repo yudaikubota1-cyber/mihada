@@ -1,3 +1,18 @@
+:root {
+  --bg: #fff;
+  --bg-soft: #FAFAF8;
+  --bg-warm: #F9F7F4;
+  --border: #EDEBE8;
+  --border-strong: #D5D0C8;
+  --text: #111;
+  --text-secondary: #7A7A7A;
+  --text-muted: #ABABAB;
+  --accent: #111;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;

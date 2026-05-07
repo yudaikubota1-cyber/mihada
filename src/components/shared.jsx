@@ -34,24 +34,24 @@ export function SkinrEyebrow({ children, color = '#7A7A7A', size = 10 }) {
   );
 }
 
+// ProductImage — used in detail pages (xl/lg size)
 export function ProductImage({ product, size = 'md', label = true }) {
   const [imgError, setImgError] = React.useState(false);
   const dims = {
-    sm: { w: 64, h: 64, fs: 9 },
-    md: { w: 140, h: 168, fs: 10 },
+    sm: { w: 64,    h: 64,  fs: 9 },
+    md: { w: 140,   h: 168, fs: 10 },
     lg: { w: '100%', h: 280, fs: 11 },
     xl: { w: '100%', h: 360, fs: 12 },
   }[size];
 
-  // 実画像がある場合はそちらを優先表示
   if (product.image && !imgError) {
     return (
       <div style={{
         width: dims.w, height: dims.h,
         position: 'relative', overflow: 'hidden',
-        borderRadius: 8, flexShrink: 0,
+        borderRadius: size === 'xl' || size === 'lg' ? 0 : 8,
+        flexShrink: 0,
         background: '#F5F5F5',
-        boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
       }}>
         <img
           src={product.image}
@@ -61,10 +61,11 @@ export function ProductImage({ product, size = 'md', label = true }) {
         />
         {label && (
           <div style={{
-            position: 'absolute', left: 8, bottom: 8,
+            position: 'absolute', left: 10, bottom: 10,
             fontFamily: 'JetBrains Mono, monospace', fontSize: 8,
-            letterSpacing: '0.14em', color: '#fff',
-            background: 'rgba(0,0,0,0.35)', padding: '2px 5px', borderRadius: 2,
+            letterSpacing: '0.16em', color: '#fff',
+            background: 'rgba(0,0,0,0.38)', padding: '3px 7px', borderRadius: 3,
+            backdropFilter: 'blur(4px)',
           }}>{(product.categoryLabel || '').toUpperCase()}</div>
         )}
       </div>
@@ -77,10 +78,9 @@ export function ProductImage({ product, size = 'md', label = true }) {
       background: product.swatch,
       position: 'relative',
       overflow: 'hidden',
-      borderRadius: 8,
+      borderRadius: size === 'xl' || size === 'lg' ? 0 : 8,
       flexShrink: 0,
       backgroundImage: `repeating-linear-gradient(135deg, ${product.swatch} 0px, ${product.swatch} 14px, ${shade(product.swatch, -3)} 14px, ${shade(product.swatch, -3)} 15px)`,
-      boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
     }}>
       <div style={{
         position: 'absolute',
@@ -117,7 +117,7 @@ export function ProductImage({ product, size = 'md', label = true }) {
           letterSpacing: '0.14em',
           color: product.accent,
           opacity: 0.55,
-        }}>{product.categoryLabel.toUpperCase()}</div>
+        }}>{(product.categoryLabel || '').toUpperCase()}</div>
       )}
     </div>
   );
@@ -150,6 +150,10 @@ export function Icon({ name, size = 20, color = 'currentColor', strokeWidth = 1.
       return (<svg {...props}><path d="M12 3l2.6 5.6 6.4.6-4.8 4.4 1.4 6.4L12 17l-5.6 3 1.4-6.4L3 9.2l6.4-.6L12 3z"/></svg>);
     case 'sparkle':
       return (<svg {...props}><path d="M12 3l1.8 5.4L19 10l-5.2 1.6L12 17l-1.8-5.4L5 10l5.2-1.6L12 3z"/></svg>);
+    case 'flask':
+      return (<svg {...props}><path d="M9 3h6M9 3v8l-4 9h14l-4-9V3"/><path d="M6.8 15h10.4"/></svg>);
+    case 'leaf':
+      return (<svg {...props}><path d="M17 8C8 10 5.9 16.17 3.82 19.82A1 1 0 0 0 5 21C9 21 16 14 18 10"/><path d="M17 8C17 8 17 14 13 19"/></svg>);
     default: return null;
   }
 }
@@ -223,6 +227,7 @@ export function PrimaryButton({ children, onClick, full = false, icon = null }) 
         gap: 10,
         transform: pressed ? 'scale(0.98)' : 'scale(1)',
         transition: 'all 0.1s ease',
+        boxShadow: pressed ? 'none' : '0 4px 16px rgba(0,0,0,0.18)',
       }}
     >
       {children}
@@ -231,40 +236,151 @@ export function PrimaryButton({ children, onClick, full = false, icon = null }) 
   );
 }
 
+// ─── ProductCard — redesigned, image-forward ───────────────────────────────
 export function ProductCard({ product, onClick }) {
   const [pressed, setPressed] = React.useState(false);
-  const [hovered, setHovered] = React.useState(false);
+  const [imgError, setImgError] = React.useState(false);
+  const showImg = product.image && !imgError;
+
   return (
     <div
       onClick={onClick}
       onMouseDown={() => setPressed(true)}
       onMouseUp={() => setPressed(false)}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => { setHovered(false); setPressed(false); }}
       onTouchStart={() => setPressed(true)}
       onTouchEnd={() => setPressed(false)}
-      className="skinr-tappable"
       style={{
         cursor: 'pointer',
-        background: '#fff',
-        transform: pressed ? 'scale(0.97)' : hovered ? 'scale(1.015)' : 'scale(1)',
-        transition: 'transform 0.18s ease',
+        transform: pressed ? 'scale(0.955)' : 'scale(1)',
+        transition: 'transform 0.16s ease',
       }}
     >
-      <ProductImage product={product} size="md" />
-      <div style={{ paddingTop: 10 }}>
-        <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 8, letterSpacing: '0.16em', color: '#ABABAB', marginBottom: 4 }}>
-          {product.brand}
+      {/* Full-width image — 4:5 aspect ratio */}
+      <div style={{
+        position: 'relative',
+        paddingTop: '125%',
+        borderRadius: 14,
+        overflow: 'hidden',
+        background: product.swatch || '#F0EDE8',
+        boxShadow: pressed
+          ? '0 2px 8px rgba(0,0,0,0.07)'
+          : '0 8px 28px rgba(0,0,0,0.11)',
+        transition: 'box-shadow 0.16s ease',
+        marginBottom: 10,
+      }}>
+        {showImg ? (
+          <img
+            src={product.image}
+            alt={product.nameJa}
+            onError={() => setImgError(true)}
+            style={{
+              position: 'absolute', inset: 0,
+              width: '100%', height: '100%',
+              objectFit: 'cover',
+            }}
+          />
+        ) : (
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: product.swatch,
+            backgroundImage: `repeating-linear-gradient(135deg, ${product.swatch} 0px, ${product.swatch} 14px, ${shade(product.swatch, -3)} 14px, ${shade(product.swatch, -3)} 15px)`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexDirection: 'column', gap: 8,
+          }}>
+            <div style={{
+              width: '38%', aspectRatio: '1 / 1.6',
+              background: shade(product.swatch, -8),
+              borderRadius: 4,
+            }} />
+            <span style={{
+              fontFamily: 'JetBrains Mono, monospace',
+              fontSize: 9, letterSpacing: '0.18em',
+              color: product.accent, opacity: 0.6,
+            }}>
+              {product.brand.split(' ')[0].toUpperCase()}
+            </span>
+          </div>
+        )}
+
+        {/* Category badge — frosted glass */}
+        <div style={{
+          position: 'absolute', top: 8, left: 8,
+          background: 'rgba(255,255,255,0.86)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          padding: '3px 8px', borderRadius: 5,
+          fontFamily: 'JetBrains Mono, monospace',
+          fontSize: 7, letterSpacing: '0.18em',
+          color: '#444',
+        }}>
+          {(product.categoryLabel || '').toUpperCase()}
         </div>
-        <div style={{ fontSize: 12, fontWeight: 500, lineHeight: 1.45, color: '#111', marginBottom: 6, minHeight: 34 }}>
-          {product.nameJa}
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: '-0.01em' }}>{product.price}</span>
-          <span style={{ fontSize: 9, color: '#B5B5B5', display: 'flex', alignItems: 'center', gap: 3 }}>
-            <Icon name="star" size={9} color="#C8C8C8" />
+
+        {/* Rating badge — top right */}
+        <div style={{
+          position: 'absolute', top: 8, right: 8,
+          background: 'rgba(255,255,255,0.86)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          padding: '3px 7px', borderRadius: 5,
+          display: 'flex', alignItems: 'center', gap: 3,
+        }}>
+          <span style={{ fontSize: 9, color: '#D4A017' }}>★</span>
+          <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 8, color: '#444', letterSpacing: '0.06em' }}>
             {product.review.score}
           </span>
+        </div>
+      </div>
+
+      {/* Product info */}
+      <div>
+        {/* Brand */}
+        <div style={{
+          fontFamily: 'JetBrains Mono, monospace',
+          fontSize: 8, letterSpacing: '0.15em',
+          color: '#B8B8B8', marginBottom: 4,
+          textTransform: 'uppercase',
+        }}>
+          {product.brand}
+        </div>
+
+        {/* Product name */}
+        <div style={{
+          fontSize: 12, fontWeight: 500,
+          lineHeight: 1.45, color: '#111',
+          marginBottom: 7,
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
+          minHeight: '35px',
+        }}>
+          {product.nameJa}
+        </div>
+
+        {/* Key ingredients — first 2 */}
+        {Array.isArray(product.ingredients) && product.ingredients.length > 0 && (
+          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 8 }}>
+            {product.ingredients.slice(0, 2).map(ing => (
+              <span key={ing} style={{
+                fontSize: 9, padding: '2px 6px',
+                background: '#F6F4F1',
+                borderRadius: 3,
+                color: '#888',
+                fontWeight: 500,
+                letterSpacing: '0.01em',
+                lineHeight: 1.6,
+              }}>{ing}</span>
+            ))}
+          </div>
+        )}
+
+        {/* Price */}
+        <div style={{
+          fontSize: 13, fontWeight: 600,
+          letterSpacing: '-0.01em', color: '#111',
+        }}>
+          {product.price}
         </div>
       </div>
     </div>

@@ -1,17 +1,40 @@
 import React, { useState } from 'react';
 import { PRODUCTS, ROUTINE_STEPS } from '../data/products.js';
+import { INGREDIENT_DICT } from '../data/knowledge.js';
 import {
   SkinrLogo, SkinrEyebrow, ProductImage, Icon,
-  Divider, PrimaryButton,
+  Divider, PrimaryButton, shade,
 } from '../components/shared.jsx';
+
+// 成分名でINGREDIENT_DICTを検索（部分一致）
+function lookupIngredient(name) {
+  if (!name) return null;
+  return INGREDIENT_DICT.find(d =>
+    name.includes(d.name) || d.name.includes(name)
+  ) || null;
+}
 
 export default function SkinrProduct({ productId, onBack }) {
   const product = PRODUCTS.find(p => p.id === productId) || PRODUCTS[0];
   const [routineTab, setRoutineTab] = useState('morning');
+  const [imgError, setImgError] = useState(false);
 
-  // 楽天検索URL（ブランド名 + 商品名で検索）
-  const rakutenSearchUrl = `https://search.rakuten.co.jp/search/mall/${encodeURIComponent(`${product.brand} ${product.nameJa}`)}/`;
-  const openRakuten = () => window.open(rakutenSearchUrl, '_blank', 'noopener,noreferrer');
+  const openRakuten = () => {
+    const url = product.url || `https://search.rakuten.co.jp/search/mall/${encodeURIComponent(`${product.brand} ${product.nameJa}`)}/`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  // skin types: prefer Excel-imported skinTypes, fall back to forSkin
+  const skinTypes = (product.skinTypes && product.skinTypes.length > 0)
+    ? product.skinTypes
+    : (product.forSkin || []);
+
+  // ingredients: always string[] after Excel import
+  const ingredients = Array.isArray(product.ingredients)
+    ? (typeof product.ingredients[0] === 'string'
+        ? product.ingredients
+        : product.ingredients.map(i => i.name || ''))
+    : [];
 
   return (
     <div style={{ height: '100%', position: 'relative', background: '#fff' }}>
@@ -22,213 +45,333 @@ export default function SkinrProduct({ productId, onBack }) {
           position: 'sticky', top: 0, zIndex: 10,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '12px 16px',
-          background: 'rgba(255,255,255,0.92)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
-          borderBottom: '1px solid #F0F0F0',
+          background: 'rgba(255,255,255,0.94)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          borderBottom: '1px solid rgba(0,0,0,0.06)',
         }}>
           <button onClick={onBack} style={{ background: 'none', border: 'none', padding: 6, cursor: 'pointer', display: 'flex' }}>
             <Icon name="arrowLeft" size={20} />
           </button>
-          <SkinrEyebrow size={9}>{product.categoryLabel.toUpperCase()}</SkinrEyebrow>
+          <SkinrEyebrow size={9}>{(product.categoryLabel || '').toUpperCase()}</SkinrEyebrow>
           <div style={{ width: 32 }} />
         </div>
 
-        {/* Hero image */}
-        <ProductImage product={product} size="xl" label={false} />
+        {/* Hero image — full bleed */}
+        <div style={{ position: 'relative', overflow: 'hidden', background: '#F8F6F3' }}>
+          {product.image && !imgError ? (
+            <img
+              src={product.image}
+              alt={product.nameJa}
+              onError={() => setImgError(true)}
+              style={{ width: '100%', height: 340, objectFit: 'cover', display: 'block' }}
+            />
+          ) : (
+            <div style={{
+              width: '100%', height: 340,
+              background: product.swatch,
+              backgroundImage: `repeating-linear-gradient(135deg, ${product.swatch} 0px, ${product.swatch} 18px, ${shade(product.swatch, -3)} 18px, ${shade(product.swatch, -3)} 19px)`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexDirection: 'column', gap: 12,
+            }}>
+              <div style={{
+                width: 90, height: 140,
+                background: shade(product.swatch, -10),
+                borderRadius: 6,
+              }} />
+              <span style={{
+                fontFamily: 'JetBrains Mono, monospace',
+                fontSize: 11, letterSpacing: '0.22em',
+                color: product.accent, opacity: 0.7,
+              }}>
+                {product.brand.toUpperCase()}
+              </span>
+            </div>
+          )}
+          {/* Gradient overlay at bottom */}
+          <div style={{
+            position: 'absolute', bottom: 0, left: 0, right: 0, height: 80,
+            background: 'linear-gradient(to top, rgba(255,255,255,0.7), transparent)',
+          }} />
+        </div>
 
         {/* Title block */}
-        <div style={{ padding: '24px 24px 16px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
-            <SkinrEyebrow>{product.brand}</SkinrEyebrow>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <Icon name="star" size={12} />
-              <span style={{ fontSize: 12, fontWeight: 500 }}>{product.review.score}</span>
-              <span style={{ fontSize: 11, color: '#7A7A7A' }}>({product.review.count})</span>
+        <div style={{ padding: '24px 24px 12px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
+            <SkinrEyebrow size={10}>{product.brand}</SkinrEyebrow>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+              <span style={{ color: '#D4A017', fontSize: 13 }}>★</span>
+              <span style={{ fontSize: 13, fontWeight: 600 }}>{product.review.score}</span>
+              <span style={{ fontSize: 11, color: '#ABABAB' }}>({product.review.count})</span>
             </div>
           </div>
           <h1 style={{
-            margin: '0 0 8px',
-            fontSize: 22, fontWeight: 500, lineHeight: 1.3,
+            margin: '0 0 6px',
+            fontSize: 23, fontWeight: 500, lineHeight: 1.3,
             letterSpacing: '-0.01em',
           }}>{product.nameJa}</h1>
-          <p style={{ margin: 0, fontSize: 12, color: '#7A7A7A', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.04em' }}>
+          <p style={{ margin: '0 0 16px', fontSize: 11, color: '#ABABAB', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.04em' }}>
             {product.name}
           </p>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: 18 }}>
-            <span style={{ fontSize: 26, fontWeight: 300, letterSpacing: '-0.01em' }}>{product.price}</span>
-            <span style={{ fontSize: 12, color: '#7A7A7A' }}>{product.volume}</span>
+
+          {/* Price row */}
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
+            <span style={{ fontSize: 28, fontWeight: 300, letterSpacing: '-0.02em', lineHeight: 1 }}>
+              {product.price}
+            </span>
+            <span style={{ fontSize: 12, color: '#ABABAB' }}>{product.volume}</span>
           </div>
         </div>
 
+        {/* ingredientDesc — expert summary */}
+        {product.ingredientDesc && (
+          <div style={{ padding: '0 24px 16px' }}>
+            <div style={{
+              padding: '14px 16px',
+              background: '#F9F7F4',
+              border: '1px solid #EDE9E3',
+              borderLeft: '2.5px solid #111',
+              borderRadius: 6,
+              fontSize: 13, lineHeight: 1.7,
+              color: '#444',
+              letterSpacing: '0.01em',
+            }}>
+              {product.ingredientDesc}
+            </div>
+          </div>
+        )}
+
         {/* Tag chips */}
-        <div style={{ padding: '0 24px 20px', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-          {product.tags.map(t => (
+        <div style={{ padding: '0 24px 16px', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          {(product.tags || []).map(t => (
             <span key={t} style={{
               padding: '5px 11px', borderRadius: 999,
-              border: '1px solid #EBEBEB', fontSize: 11, color: '#888',
-              background: '#FAFAFA', letterSpacing: '0.01em',
+              border: '1px solid #EDEBE8', fontSize: 11, color: '#888',
+              background: '#FAFAF8', letterSpacing: '0.01em',
             }}># {t}</span>
           ))}
         </div>
 
         {/* Use timing */}
-        <div style={{ padding: '0 24px 8px' }}>
+        <div style={{ padding: '0 24px 4px' }}>
           <Divider />
         </div>
-        <div style={{ padding: '20px 24px', display: 'flex', gap: 10 }}>
+        <div style={{ padding: '16px 24px', display: 'flex', gap: 10 }}>
           {['朝', '夜'].map(t => {
-            const active = product.timing.includes(t);
+            const active = (product.timing || []).includes(t);
             return (
               <div key={t} style={{
                 flex: 1,
                 padding: '16px',
-                border: '1px solid ' + (active ? '#111' : '#F0F0F0'),
-                borderRadius: 4,
-                opacity: active ? 1 : 0.4,
+                border: '1px solid ' + (active ? '#111' : '#EDEDED'),
+                borderRadius: 8,
+                opacity: active ? 1 : 0.38,
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+                background: active ? '#FAFAFA' : '#fff',
               }}>
                 <Icon name={t === '朝' ? 'sun' : 'moon'} size={20} />
                 <span style={{ fontSize: 13, fontWeight: 500 }}>{t}に使用</span>
-                {active && <SkinrEyebrow size={9}>RECOMMENDED</SkinrEyebrow>}
+                {active && <SkinrEyebrow size={8}>RECOMMENDED</SkinrEyebrow>}
               </div>
             );
           })}
         </div>
 
-        {/* Ingredients */}
-        <div style={{ padding: '12px 24px 0' }}>
+        {/* ─── Ingredients ─────────────────────────────── */}
+        <div style={{ padding: '8px 24px 0' }}>
           <Divider label="主要成分" />
         </div>
-        <div style={{ padding: '20px 24px 8px' }}>
-          <h3 style={{ margin: '0 0 4px', fontSize: 18, fontWeight: 300, letterSpacing: '-0.01em' }}>
-            主要成分と効果
+        <div style={{ padding: '20px 24px 24px' }}>
+          <h3 style={{ margin: '0 0 16px', fontSize: 17, fontWeight: 400, letterSpacing: '-0.01em' }}>
+            成分と効果
           </h3>
-          <p style={{ margin: 0, fontSize: 12, color: '#7A7A7A' }}>
-            この商品が肌にどう効くのか
-          </p>
-        </div>
-        <div style={{ padding: '14px 24px 24px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {product.ingredients.map((ing, i) => (
-            <div key={ing.name} style={{
-              padding: '14px 14px',
-              border: '1px solid #EBEBEB',
-              borderLeft: i === 0 ? '2.5px solid #111' : '1px solid #EBEBEB',
-              borderRadius: 4,
-              display: 'flex', gap: 14, alignItems: 'flex-start',
-              background: i === 0 ? '#F9F9F9' : '#fff',
-              animation: `skinrFadeIn 0.3s ${i * 0.06}s ease both`,
-            }}>
-              <div style={{
-                fontFamily: 'JetBrains Mono, monospace',
-                fontSize: 10, letterSpacing: '0.12em', color: '#C0C0C0',
-                paddingTop: 2, minWidth: 22,
-              }}>
-                {String(i + 1).padStart(2, '0')}
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>{ing.name}</div>
-                <p style={{ margin: 0, fontSize: 12, lineHeight: 1.6, color: '#777' }}>{ing.effect}</p>
-              </div>
+          {ingredients.length === 0 ? (
+            <p style={{ fontSize: 12, color: '#ABABAB' }}>成分データなし</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {ingredients.map((ingName, i) => {
+                const dict = lookupIngredient(ingName);
+                const category = dict?.category || '';
+                const effects = dict?.effects || '';
+                const caution = dict?.caution || '';
+                const isPrimary = i === 0;
+
+                return (
+                  <div key={ingName + i} style={{
+                    padding: '14px 16px',
+                    border: '1px solid ' + (isPrimary ? '#D5D0C8' : '#EDEBE8'),
+                    borderLeft: isPrimary ? '3px solid #111' : '1px solid #EDEBE8',
+                    borderRadius: 8,
+                    background: isPrimary ? '#F9F7F4' : '#fff',
+                    animation: `skinrFadeIn 0.3s ${i * 0.055}s ease both`,
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: effects ? 7 : 0 }}>
+                      {/* Index */}
+                      <span style={{
+                        fontFamily: 'JetBrains Mono, monospace',
+                        fontSize: 9, letterSpacing: '0.12em',
+                        color: '#C8C8C8', flexShrink: 0,
+                        minWidth: 18,
+                      }}>
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                      {/* Name */}
+                      <span style={{ fontSize: 14, fontWeight: 600, flex: 1, lineHeight: 1.3 }}>
+                        {ingName}
+                      </span>
+                      {/* Category badge */}
+                      {category && (
+                        <span style={{
+                          fontSize: 8, fontFamily: 'JetBrains Mono, monospace',
+                          letterSpacing: '0.1em', color: '#888',
+                          background: '#EFEFEF', padding: '2px 7px', borderRadius: 3,
+                          flexShrink: 0,
+                        }}>{category}</span>
+                      )}
+                    </div>
+                    {effects && (
+                      <p style={{
+                        margin: '0 0 0 28px',
+                        fontSize: 12, lineHeight: 1.65, color: '#666',
+                      }}>{effects}</p>
+                    )}
+                    {caution && (
+                      <div style={{
+                        margin: '8px 0 0 28px',
+                        display: 'flex', alignItems: 'flex-start', gap: 6,
+                      }}>
+                        <Icon name="warn" size={12} color="#C0BBAF" />
+                        <span style={{ fontSize: 11, color: '#ABABAB', lineHeight: 1.5 }}>{caution}</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
-          ))}
+          )}
         </div>
 
-        {/* For skin types */}
-        <div style={{ padding: '8px 24px 0' }}>
+        {/* ─── Skin types & Concerns ─────────────────── */}
+        <div style={{ padding: '0 24px 0' }}>
           <Divider label="向いている肌" />
         </div>
-        <div style={{ padding: '20px 24px 8px' }}>
-          <h3 style={{ margin: '0 0 12px', fontSize: 16, fontWeight: 500, letterSpacing: '-0.01em' }}>
-            向いている肌タイプ
-          </h3>
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 20 }}>
-            {product.forSkin.map(s => (
-              <span key={s} style={{
-                padding: '6px 13px', borderRadius: 999,
-                background: '#111', color: '#fff',
-                fontSize: 11, fontWeight: 500,
-                letterSpacing: '0.01em',
-              }}>{s}</span>
-            ))}
+        <div style={{ padding: '18px 24px 20px' }}>
+          <div style={{ marginBottom: 20 }}>
+            <h3 style={{ margin: '0 0 10px', fontSize: 14, fontWeight: 600, letterSpacing: '-0.01em', color: '#111' }}>
+              向いている肌タイプ
+            </h3>
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              {skinTypes.map(s => (
+                <span key={s} style={{
+                  padding: '6px 14px', borderRadius: 999,
+                  background: '#111', color: '#fff',
+                  fontSize: 12, fontWeight: 500,
+                  letterSpacing: '0.01em',
+                }}>{s}</span>
+              ))}
+              {skinTypes.length === 0 && (
+                <span style={{ fontSize: 12, color: '#ABABAB' }}>—</span>
+              )}
+            </div>
           </div>
-          <h3 style={{ margin: '0 0 10px', fontSize: 16, fontWeight: 500, letterSpacing: '-0.01em' }}>
-            アプローチできる悩み
-          </h3>
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            {product.concerns.map(s => (
-              <span key={s} style={{
-                padding: '6px 13px', borderRadius: 999,
-                background: '#F5F5F5', fontSize: 11, fontWeight: 500,
-                border: '1px solid #E8E8E8', color: '#444',
-                letterSpacing: '0.01em',
-              }}>{s}</span>
-            ))}
-          </div>
-        </div>
-
-        {/* Good combos */}
-        <div style={{ padding: '20px 24px 0' }}>
-          <Divider label="相性のよい成分" />
-        </div>
-        <div style={{ padding: '20px 24px 0' }}>
-          <h3 style={{ margin: '0 0 14px', fontSize: 18, fontWeight: 300, letterSpacing: '-0.01em' }}>
-            相性のよい組み合わせ
-          </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {product.goodWith.map((g, i) => (
-              <div key={g} style={{
-                display: 'flex', alignItems: 'center', gap: 12,
-                padding: '12px 14px',
-                border: '1px solid #EBEBEB', borderRadius: 4,
-                animation: `skinrFadeIn 0.3s ${i * 0.06}s ease both`,
-              }}>
-                <Icon name="check" size={14} color="#555" />
-                <span style={{ fontSize: 12, color: '#444' }}>{g}</span>
-              </div>
-            ))}
+          <div>
+            <h3 style={{ margin: '0 0 10px', fontSize: 14, fontWeight: 600, letterSpacing: '-0.01em', color: '#111' }}>
+              アプローチできる悩み
+            </h3>
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              {(product.concerns || []).map(s => (
+                <span key={s} style={{
+                  padding: '6px 13px', borderRadius: 999,
+                  background: '#F5F3F0', fontSize: 12, fontWeight: 500,
+                  border: '1px solid #E8E4DE', color: '#444',
+                  letterSpacing: '0.01em',
+                }}>{s}</span>
+              ))}
+              {(!product.concerns || product.concerns.length === 0) && (
+                <span style={{ fontSize: 12, color: '#ABABAB' }}>—</span>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* NG combos */}
-        <div style={{ padding: '8px 24px 0' }}>
-          <Divider label="避けたい組み合わせ" />
-        </div>
-        <div style={{ padding: '16px 24px 24px' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {product.avoidWith.map((g, i) => (
-              <div key={g} style={{
-                display: 'flex', alignItems: 'center', gap: 12,
-                padding: '12px 14px',
-                background: '#FAFAFA',
-                border: '1px solid #EBEBEB',
-                borderLeft: '2.5px solid #DCDCDC',
-                borderRadius: 4,
-                animation: `skinrFadeIn 0.3s ${i * 0.06}s ease both`,
-              }}>
-                <Icon name="warn" size={13} color="#ABABAB" />
-                <span style={{ fontSize: 12, color: '#666', lineHeight: 1.5 }}>{g}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+        {/* ─── Good / Avoid combos ─────────────────── */}
+        {(product.goodWith?.length > 0 || product.avoidWith?.length > 0) && (
+          <>
+            <div style={{ padding: '0 24px 0' }}>
+              <Divider label="成分の相性" />
+            </div>
+            <div style={{ padding: '18px 24px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {product.goodWith?.length > 0 && (
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
+                    <div style={{ width: 16, height: 16, borderRadius: '50%', background: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Icon name="check" size={9} color="#fff" />
+                    </div>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: '#111' }}>一緒に使うと効果的</span>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {product.goodWith.map((g, i) => (
+                      <div key={g} style={{
+                        display: 'flex', alignItems: 'center', gap: 10,
+                        padding: '10px 13px',
+                        border: '1px solid #E8E4DE', borderRadius: 6,
+                        background: '#fff',
+                        animation: `skinrFadeIn 0.3s ${i * 0.05}s ease both`,
+                      }}>
+                        <Icon name="plus" size={12} color="#888" />
+                        <span style={{ fontSize: 12, color: '#444' }}>{g}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
-        {/* ─── Daily Routine（結果画面から移動）─── */}
-        <div style={{ padding: '8px 24px 0' }}>
+              {product.avoidWith?.length > 0 && (
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
+                    <div style={{ width: 16, height: 16, borderRadius: '50%', border: '1.5px solid #C0BBAF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Icon name="warn" size={8} color="#C0BBAF" />
+                    </div>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: '#666' }}>使うタイミングに注意</span>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {product.avoidWith.map((g, i) => (
+                      <div key={g} style={{
+                        display: 'flex', alignItems: 'center', gap: 10,
+                        padding: '10px 13px',
+                        background: '#FAF8F6',
+                        border: '1px solid #EDEBE8',
+                        borderLeft: '2.5px solid #D5D0C8',
+                        borderRadius: 6,
+                        animation: `skinrFadeIn 0.3s ${i * 0.05}s ease both`,
+                      }}>
+                        <Icon name="warn" size={12} color="#C0C0B8" />
+                        <span style={{ fontSize: 12, color: '#777', lineHeight: 1.5 }}>{g}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* ─── Routine ─────────────────────────────── */}
+        <div style={{ padding: '0 24px 0' }}>
           <Divider label="毎日のルーティン" />
         </div>
         <div style={{ padding: '14px 24px 4px' }}>
-          <h2 style={{ margin: '0 0 4px', fontSize: 20, fontWeight: 300, letterSpacing: '-0.01em' }}>
+          <h2 style={{ margin: '0 0 4px', fontSize: 19, fontWeight: 300, letterSpacing: '-0.01em' }}>
             この商品を使ったルーティン
           </h2>
-          <p style={{ margin: 0, fontSize: 12, color: '#7A7A7A' }}>
+          <p style={{ margin: 0, fontSize: 12, color: '#ABABAB' }}>
             朝・夜それぞれのステップ順
           </p>
         </div>
-        <div style={{ padding: '14px 24px 0', display: 'flex', gap: 0, borderBottom: '1px solid #F0F0F0' }}>
+        <div style={{ padding: '12px 24px 0', display: 'flex', gap: 0, borderBottom: '1px solid #F0F0F0' }}>
           {[
             { id: 'morning', label: '朝', icon: 'sun' },
-            { id: 'night', label: '夜', icon: 'moon' },
+            { id: 'night',   label: '夜', icon: 'moon' },
           ].map(t => (
             <button
               key={t.id}
@@ -236,13 +379,14 @@ export default function SkinrProduct({ productId, onBack }) {
               style={{
                 flex: 1, padding: '14px 0',
                 background: 'none', border: 'none',
-                borderBottom: '1.5px solid ' + (routineTab === t.id ? '#111' : 'transparent'),
+                borderBottom: '2px solid ' + (routineTab === t.id ? '#111' : 'transparent'),
                 cursor: 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 fontFamily: 'inherit', fontSize: 13,
-                fontWeight: routineTab === t.id ? 500 : 400,
-                color: routineTab === t.id ? '#111' : '#7A7A7A',
+                fontWeight: routineTab === t.id ? 600 : 400,
+                color: routineTab === t.id ? '#111' : '#ABABAB',
                 marginBottom: -1,
+                transition: 'all 0.15s ease',
               }}
             >
               <Icon name={t.icon} size={14} />
@@ -254,54 +398,49 @@ export default function SkinrProduct({ productId, onBack }) {
           {!ROUTINE_STEPS[routineTab].some(s => s.productId === product.id) && (
             <div style={{
               padding: '12px 14px', marginBottom: 16,
-              background: '#FAFAFA', border: '1px solid #EBEBEB',
-              borderRadius: 4, fontSize: 12, color: '#7A7A7A', lineHeight: 1.6,
+              background: '#FAF8F6', border: '1px solid #EDEBE8',
+              borderRadius: 6, fontSize: 12, color: '#888', lineHeight: 1.6,
             }}>
-              この商品はこのルーティンには含まれていませんが、{product.timing.join('・')}に使用できます。
+              この商品はこのルーティンには含まれていませんが、{(product.timing || []).join('・')}に使用できます。
             </div>
           )}
           <div style={{ position: 'relative' }}>
-            {/* Vertical connector line */}
             <div style={{
               position: 'absolute', left: 13, top: 26,
               width: 1, bottom: 26,
-              background: '#EBEBEB',
-              zIndex: 0,
+              background: '#EDEBE8', zIndex: 0,
             }} />
             {ROUTINE_STEPS[routineTab].map((step, i) => {
               const isCurrent = step.productId === product.id;
               return (
                 <div key={i} style={{
                   display: 'flex', alignItems: 'flex-start', gap: 14,
-                  padding: '14px 0',
+                  padding: '12px 0', position: 'relative', zIndex: 1,
                   animation: `skinrFadeIn 0.25s ${i * 0.05}s ease both`,
-                  position: 'relative', zIndex: 1,
                 }}>
                   <div style={{
                     width: 26, height: 26,
-                    border: '1.5px solid ' + (isCurrent ? '#111' : '#DCDCDC'),
+                    border: '1.5px solid ' + (isCurrent ? '#111' : '#D8D8D8'),
                     borderRadius: '50%',
                     background: isCurrent ? '#111' : '#fff',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: 11, fontFamily: 'JetBrains Mono, monospace',
-                    flexShrink: 0,
-                    color: isCurrent ? '#fff' : '#999',
+                    flexShrink: 0, color: isCurrent ? '#fff' : '#ABABAB',
                     boxShadow: isCurrent ? '0 0 0 3px rgba(17,17,17,0.08)' : 'none',
                   }}>
                     {step.step}
                   </div>
-                  <div style={{ flex: 1, paddingTop: 4 }}>
+                  <div style={{ flex: 1, paddingTop: 5 }}>
                     <div style={{
                       fontSize: 13,
                       fontWeight: isCurrent ? 600 : 500,
-                      marginBottom: 2,
-                      color: isCurrent ? '#111' : '#555',
+                      color: isCurrent ? '#111' : '#666',
                     }}>
                       {step.label}
                       {isCurrent && (
                         <span style={{
                           marginLeft: 8,
-                          fontSize: 9, fontFamily: 'JetBrains Mono, monospace',
+                          fontSize: 8, fontFamily: 'JetBrains Mono, monospace',
                           letterSpacing: '0.14em', color: '#fff',
                           background: '#111', padding: '2px 7px', borderRadius: 3,
                         }}>THIS ITEM</span>
@@ -314,37 +453,35 @@ export default function SkinrProduct({ productId, onBack }) {
           </div>
         </div>
 
-        {/* Reviews link — 楽天検索を新規タブで開く */}
-        <div style={{ padding: '8px 24px 32px' }}>
+        {/* Reviews link */}
+        <div style={{ padding: '0 24px 32px' }}>
           <button
             onClick={openRakuten}
             className="skinr-tappable"
             style={{
-              width: '100%',
-              padding: '14px 16px',
-              background: '#fff',
-              border: '1px solid #E8E8E8',
-              borderRadius: 8,
+              width: '100%', padding: '14px 16px',
+              background: '#FAFAF8',
+              border: '1px solid #E8E4DE',
+              borderRadius: 10,
               display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              cursor: 'pointer', fontFamily: 'inherit',
-              gap: 12,
+              cursor: 'pointer', fontFamily: 'inherit', gap: 12,
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{
-                width: 36, height: 36, borderRadius: 6,
-                background: '#F5F5F5',
+                width: 36, height: 36, borderRadius: 8,
+                background: '#F0EDE8',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 flexShrink: 0,
               }}>
-                <Icon name="star" size={16} color="#888" />
+                <span style={{ color: '#D4A017', fontSize: 16 }}>★</span>
               </div>
               <div style={{ textAlign: 'left' }}>
                 <div style={{ fontSize: 13, fontWeight: 500, color: '#111', marginBottom: 2 }}>
                   楽天レビューを見る
                 </div>
                 <div style={{ fontSize: 11, color: '#ABABAB', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.06em' }}>
-                  ★ {product.review.score} · {product.review.count} reviews
+                  {product.review.score} · {product.review.count} reviews
                 </div>
               </div>
             </div>
@@ -357,12 +494,12 @@ export default function SkinrProduct({ productId, onBack }) {
       <div style={{
         position: 'absolute', left: 0, right: 0, bottom: 0,
         padding: '12px 16px calc(16px + env(safe-area-inset-bottom, 0px))',
-        background: 'rgba(255,255,255,0.96)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
-        borderTop: '1px solid #F0F0F0',
+        background: 'rgba(255,255,255,0.97)',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+        borderTop: '1px solid rgba(0,0,0,0.06)',
         zIndex: 5,
-        display: 'flex', alignItems: 'center', gap: 12,
+        display: 'flex', alignItems: 'center', gap: 14,
       }}>
         <div style={{ flex: 1 }}>
           <PrimaryButton full onClick={openRakuten} icon={<Icon name="arrowRight" size={14} color="#fff" />}>
@@ -370,8 +507,8 @@ export default function SkinrProduct({ productId, onBack }) {
           </PrimaryButton>
         </div>
         <div style={{ textAlign: 'right', flexShrink: 0 }}>
-          <div style={{ fontSize: 18, fontWeight: 300, letterSpacing: '-0.01em' }}>{product.price}</div>
-          <div style={{ fontSize: 10, color: '#B5B5B5' }}>{product.volume}</div>
+          <div style={{ fontSize: 20, fontWeight: 300, letterSpacing: '-0.02em', lineHeight: 1 }}>{product.price}</div>
+          <div style={{ fontSize: 10, color: '#BABABA', marginTop: 2 }}>{product.volume}</div>
         </div>
       </div>
     </div>

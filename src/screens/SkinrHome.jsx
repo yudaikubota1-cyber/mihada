@@ -31,7 +31,7 @@ export default function SkinrHome({ onStartChat, onOpenProduct, onSendInline, la
         ...p.tags,
         ...p.concerns,
         ...p.forSkin,
-        ...p.ingredients.map(i => i.name),
+        ...(Array.isArray(p.ingredients) ? p.ingredients : p.ingredients.map(i => i.name || '')),
       ].join(' ').toLowerCase();
       if (!searchTarget.includes(query.toLowerCase())) return false;
     }

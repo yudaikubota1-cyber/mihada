@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PRODUCTS } from '../data/products.js';
+import { INGREDIENT_DICT } from '../data/knowledge.js';
 import { buildRakutenSearchUrl, buildProductUrl, searchRakutenProducts } from '../lib/rakuten.js';
 import {
   SkinrLogo, SkinrEyebrow, ProductImage, Icon,
@@ -31,7 +32,21 @@ function getIngCategory(name) {
   for (const [key, cat] of ING_CATEGORY_MAP) {
     if (name.includes(key)) return cat;
   }
-  return '有効成分';
+  // fallback: try INGREDIENT_DICT
+  const dict = INGREDIENT_DICT.find(d => name.includes(d.name) || d.name.includes(name));
+  return dict?.category || '有効成分';
+}
+
+function lookupIngEffect(name) {
+  const dict = INGREDIENT_DICT.find(d => name.includes(d.name) || d.name.includes(name));
+  return dict?.effects || '';
+}
+
+// ingredients フィールドが string[] か {name,effect}[] かを正規化する
+function normalizeIngredients(arr) {
+  if (!Array.isArray(arr) || arr.length === 0) return [];
+  if (typeof arr[0] === 'string') return arr;
+  return arr.map(i => i.name || '').filter(Boolean);
 }
 
 function scoreProduct(product, concerns, skinType) {
@@ -246,11 +261,14 @@ export default function SkinrResult({ diagnosis, onBack, onOpenProduct, onNewCha
 
   const topProducts = categoryOrder.map(cat => (byCategory[cat.key] || [])[0]).filter(Boolean);
   const ingredients = topProducts
-    .flatMap(p => p.ingredients.slice(0, 2).map(ing => ({
-      name: ing.name,
-      effect: ing.effect,
-      category: getIngCategory(ing.name),
-    })))
+    .flatMap(p => {
+      const names = normalizeIngredients(p.ingredients).slice(0, 2);
+      return names.map(name => ({
+        name,
+        effect: lookupIngEffect(name),
+        category: getIngCategory(name),
+      }));
+    })
     .filter((ing, i, arr) => arr.findIndex(x => x.name === ing.name) === i)
     .slice(0, 5);
 

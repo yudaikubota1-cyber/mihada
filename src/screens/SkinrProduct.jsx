@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PRODUCTS, ROUTINE_STEPS } from '../data/products.js';
+import { PRODUCTS } from '../data/products.js';
 import { INGREDIENT_DICT } from '../data/knowledge.js';
 import {
   SkinrLogo, SkinrEyebrow, ProductImage, Icon,
@@ -16,7 +16,6 @@ function lookupIngredient(name) {
 
 export default function SkinrProduct({ isDesktop, productId, onBack }) {
   const product = PRODUCTS.find(p => p.id === productId) || PRODUCTS[0];
-  const [routineTab, setRoutineTab] = useState('morning');
   const [imgError, setImgError] = useState(false);
 
   const openRakuten = () => {
@@ -68,13 +67,13 @@ export default function SkinrProduct({ isDesktop, productId, onBack }) {
         </div>
 
         {/* Hero image — full bleed */}
-        <div style={{ position: 'relative', overflow: 'hidden', background: '#F7F5F2' }}>
+        <div style={{ position: 'relative', overflow: 'hidden', background: '#fff' }}>
           {product.image && !imgError ? (
             <img
               src={product.image}
               alt={product.nameJa}
               onError={() => setImgError(true)}
-              style={{ width: '100%', height: 340, objectFit: 'contain', display: 'block', padding: '5%' }}
+              style={{ width: '100%', height: 340, objectFit: 'contain', display: 'block', padding: '6%' }}
             />
           ) : (
             <div style={{
@@ -365,103 +364,6 @@ export default function SkinrProduct({ isDesktop, productId, onBack }) {
             </div>
           </>
         )}
-
-        {/* ─── Routine ─────────────────────────────── */}
-        <div style={{ padding: `0 ${px} 0` }}>
-          <Divider label="毎日のルーティン" />
-        </div>
-        <div style={{ padding: `14px ${px} 4px` }}>
-          <h2 style={{ margin: '0 0 4px', fontSize: 19, fontWeight: 300, letterSpacing: '-0.01em' }}>
-            この商品を使ったルーティン
-          </h2>
-          <p style={{ margin: 0, fontSize: 12, color: '#ABABAB' }}>
-            朝・夜それぞれのステップ順
-          </p>
-        </div>
-        <div style={{ padding: `12px ${px} 0`, display: 'flex', gap: 0, borderBottom: '1px solid #F0F0F0' }}>
-          {[
-            { id: 'morning', label: '朝', icon: 'sun' },
-            { id: 'night',   label: '夜', icon: 'moon' },
-          ].map(t => (
-            <button
-              key={t.id}
-              onClick={() => setRoutineTab(t.id)}
-              style={{
-                flex: 1, padding: '14px 0',
-                background: 'none', border: 'none',
-                borderBottom: '2px solid ' + (routineTab === t.id ? '#111' : 'transparent'),
-                cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                fontFamily: 'inherit', fontSize: 13,
-                fontWeight: routineTab === t.id ? 600 : 400,
-                color: routineTab === t.id ? '#111' : '#ABABAB',
-                marginBottom: -1,
-                transition: 'all 0.15s ease',
-              }}
-            >
-              <Icon name={t.icon} size={14} />
-              {t.label}
-            </button>
-          ))}
-        </div>
-        <div style={{ padding: `20px ${px} 32px` }}>
-          {!ROUTINE_STEPS[routineTab].some(s => s.productId === product.id) && (
-            <div style={{
-              padding: '12px 14px', marginBottom: 16,
-              background: '#FAF8F6', border: '1px solid #EDEBE8',
-              borderRadius: 6, fontSize: 12, color: '#888', lineHeight: 1.6,
-            }}>
-              この商品はこのルーティンには含まれていませんが、{(product.timing || []).join('・')}に使用できます。
-            </div>
-          )}
-          <div style={{ position: 'relative' }}>
-            <div style={{
-              position: 'absolute', left: 13, top: 26,
-              width: 1, bottom: 26,
-              background: '#EDEBE8', zIndex: 0,
-            }} />
-            {ROUTINE_STEPS[routineTab].map((step, i) => {
-              const isCurrent = step.productId === product.id;
-              return (
-                <div key={i} style={{
-                  display: 'flex', alignItems: 'flex-start', gap: 14,
-                  padding: '12px 0', position: 'relative', zIndex: 1,
-                  animation: `skinrFadeIn 0.25s ${i * 0.05}s ease both`,
-                }}>
-                  <div style={{
-                    width: 26, height: 26,
-                    border: '1.5px solid ' + (isCurrent ? '#111' : '#D8D8D8'),
-                    borderRadius: '50%',
-                    background: isCurrent ? '#111' : '#fff',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 11, fontFamily: 'JetBrains Mono, monospace',
-                    flexShrink: 0, color: isCurrent ? '#fff' : '#ABABAB',
-                    boxShadow: isCurrent ? '0 0 0 3px rgba(17,17,17,0.08)' : 'none',
-                  }}>
-                    {step.step}
-                  </div>
-                  <div style={{ flex: 1, paddingTop: 5 }}>
-                    <div style={{
-                      fontSize: 13,
-                      fontWeight: isCurrent ? 600 : 500,
-                      color: isCurrent ? '#111' : '#666',
-                    }}>
-                      {step.label}
-                      {isCurrent && (
-                        <span style={{
-                          marginLeft: 8,
-                          fontSize: 8, fontFamily: 'JetBrains Mono, monospace',
-                          letterSpacing: '0.14em', color: '#fff',
-                          background: '#111', padding: '2px 7px', borderRadius: 3,
-                        }}>THIS ITEM</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
 
         {/* Reviews link */}
         <div style={{ padding: `0 ${px} 32px` }}>

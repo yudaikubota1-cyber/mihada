@@ -259,13 +259,12 @@ export function ProductCard({ product, onClick }) {
       <div style={{
         position: 'relative',
         paddingTop: '125%',
-        borderRadius: 14,
+        borderRadius: 12,
         overflow: 'hidden',
-        background: showImg ? '#F7F5F2' : (product.swatch || '#F0EDE8'),
-        border: showImg ? '1px solid #EDEBE8' : 'none',
+        background: showImg ? '#fff' : (product.swatch || '#F0EDE8'),
         boxShadow: pressed
-          ? '0 2px 8px rgba(0,0,0,0.05)'
-          : '0 6px 24px rgba(0,0,0,0.09)',
+          ? '0 1px 6px rgba(0,0,0,0.07)'
+          : '0 4px 20px rgba(0,0,0,0.08)',
         transition: 'box-shadow 0.16s ease',
         marginBottom: 10,
       }}>
@@ -278,7 +277,7 @@ export function ProductCard({ product, onClick }) {
               position: 'absolute', inset: 0,
               width: '100%', height: '100%',
               objectFit: 'contain',
-              padding: '6%',
+              padding: '5%',
             }}
           />
         ) : (

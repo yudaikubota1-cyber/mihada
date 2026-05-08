@@ -172,8 +172,8 @@ export function Chip({ children, active = false, onClick, size = 'md' }) {
       style={{
         padding: pad,
         borderRadius: 999,
-        border: '1px solid ' + (active ? '#111' : pressed ? '#888' : '#DCDCDC'),
-        background: active ? '#111' : pressed ? '#F0F0F0' : '#fff',
+        border: '1px solid ' + (active ? '#111' : pressed ? 'var(--border-strong)' : 'var(--border)'),
+        background: active ? '#111' : pressed ? 'var(--bg-warm)' : 'var(--bg)',
         color: active ? '#fff' : '#111',
         fontSize: fs,
         fontFamily: 'inherit',
@@ -190,12 +190,12 @@ export function Chip({ children, active = false, onClick, size = 'md' }) {
 }
 
 export function Divider({ label }) {
-  if (!label) return <div style={{ height: 1, background: '#F0F0F0' }} />;
+  if (!label) return <div style={{ height: 1, background: 'var(--border)' }} />;
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '4px 0' }}>
-      <div style={{ flex: 1, height: 1, background: '#F0F0F0' }} />
+      <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
       <SkinrEyebrow size={9}>{label}</SkinrEyebrow>
-      <div style={{ flex: 1, height: 1, background: '#F0F0F0' }} />
+      <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
     </div>
   );
 }
@@ -227,7 +227,7 @@ export function PrimaryButton({ children, onClick, full = false, icon = null }) 
         gap: 10,
         transform: pressed ? 'scale(0.98)' : 'scale(1)',
         transition: 'all 0.1s ease',
-        boxShadow: pressed ? 'none' : '0 4px 16px rgba(0,0,0,0.18)',
+        boxShadow: pressed ? 'none' : '0 4px 16px rgba(50,30,20,0.22)',
       }}
     >
       {children}
@@ -261,10 +261,10 @@ export function ProductCard({ product, onClick }) {
         paddingTop: '125%',
         borderRadius: 12,
         overflow: 'hidden',
-        background: showImg ? '#fff' : (product.swatch || '#F0EDE8'),
+        background: showImg ? 'var(--bg)' : (product.swatch || '#EDE5DA'),
         boxShadow: pressed
-          ? '0 1px 6px rgba(0,0,0,0.07)'
-          : '0 4px 20px rgba(0,0,0,0.08)',
+          ? '0 1px 6px rgba(80,60,40,0.07)'
+          : '0 4px 20px rgba(80,60,40,0.09)',
         transition: 'box-shadow 0.16s ease',
         marginBottom: 10,
       }}>
@@ -365,7 +365,7 @@ export function ProductCard({ product, onClick }) {
             {product.ingredients.slice(0, 2).map(ing => (
               <span key={ing} style={{
                 fontSize: 9, padding: '2px 6px',
-                background: '#F6F4F1',
+                background: 'var(--bg-soft)',
                 borderRadius: 3,
                 color: '#888',
                 fontWeight: 500,

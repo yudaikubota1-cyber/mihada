@@ -102,12 +102,12 @@ export default function SkinrChat({ initialMessage, onComplete, onBack }) {
   }
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: '#fff' }}>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg)' }}>
       {/* Top bar */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '12px 16px',
-        borderBottom: '1px solid #F0F0F0',
+        borderBottom: '1px solid var(--border)',
       }}>
         <button onClick={onBack} style={{ background: 'none', border: 'none', padding: 6, cursor: 'pointer', display: 'flex' }}>
           <Icon name="close" size={20} />
@@ -135,8 +135,8 @@ export default function SkinrChat({ initialMessage, onComplete, onBack }) {
         {error && (
           <div style={{
             padding: '13px 14px',
-            background: '#FAFAFA',
-            border: '1px solid #EBEBEB',
+            background: 'var(--bg-soft)',
+            border: '1px solid var(--border)',
             borderLeft: '2.5px solid #555',
             borderRadius: 6,
             fontSize: 13,
@@ -221,7 +221,7 @@ export default function SkinrChat({ initialMessage, onComplete, onBack }) {
               {/* 最初のターンのみ：悩みチップも表示 */}
               {isFirstTurn && (
                 <>
-                  {(binaryOptions || showSkinTypeChips) && <div style={{ height: 1, background: '#F0F0F0', margin: '10px 0' }} />}
+                  {(binaryOptions || showSkinTypeChips) && <div style={{ height: 1, background: 'var(--border)', margin: '10px 0' }} />}
                   <div className="skinr-scroll" style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2 }}>
                     {CONCERN_CHIPS.map((c, i) => (
                       <Chip key={c.label} size="sm" onClick={() => handleSend(c.message)}>
@@ -239,17 +239,17 @@ export default function SkinrChat({ initialMessage, onComplete, onBack }) {
 
       {/* Input */}
       <div style={{
-        borderTop: '1px solid #F0F0F0',
+        borderTop: '1px solid var(--border)',
         padding: '10px 16px 20px',
-        background: '#fff',
+        background: 'var(--bg)',
       }}>
         <div style={{
           display: 'flex', alignItems: 'flex-end', gap: 10,
           padding: '10px 12px 10px 16px',
-          border: '1.5px solid ' + (aiTyping ? '#EFEFEF' : '#DCDCDC'),
+          border: '1.5px solid ' + (aiTyping ? 'var(--border)' : 'var(--border-strong)'),
           borderRadius: 999,
           transition: 'border-color 0.15s ease',
-          background: aiTyping ? '#FAFAFA' : '#fff',
+          background: aiTyping ? 'var(--bg-soft)' : 'var(--bg)',
         }}>
           <textarea
             ref={textareaRef}
@@ -335,8 +335,8 @@ function BinaryOptionChip({ label, onSend, index = 0 }) {
         width: '100%',
         padding: '11px 14px',
         borderRadius: 10,
-        border: '1px solid ' + (pressed ? '#B0B0B0' : '#E0E0E0'),
-        background: pressed ? '#EFEFEF' : '#FAFAFA',
+        border: '1px solid ' + (pressed ? 'var(--border-strong)' : 'var(--border)'),
+        background: pressed ? 'var(--bg-warm)' : 'var(--bg-soft)',
         cursor: 'pointer',
         fontFamily: 'inherit',
         fontSize: 13,
@@ -384,8 +384,8 @@ function SkinTypeChip({ chip, onSend, index = 0 }) {
       style={{
         padding: chip.sub ? '7px 12px' : '7px 13px',
         borderRadius: 10,
-        border: `1px ${isUnknown ? 'dashed' : 'solid'} ${pressed ? '#888' : isUnknown ? '#C0C0C0' : '#DCDCDC'}`,
-        background: pressed ? '#F0F0F0' : isUnknown ? '#FAFAFA' : '#fff',
+        border: `1px ${isUnknown ? 'dashed' : 'solid'} ${pressed ? 'var(--border-strong)' : isUnknown ? 'var(--border)' : 'var(--border)'}`,
+        background: pressed ? 'var(--bg-warm)' : isUnknown ? 'var(--bg-soft)' : 'var(--bg)',
         color: isUnknown ? '#7A7A7A' : '#111',
         fontFamily: 'inherit',
         cursor: 'pointer',
@@ -454,7 +454,7 @@ function LoadingScreen({ step, onBack, skinType }) {
   const steps = ['肌タイプを分析中', '成分を選定中', '商品を絞り込み中'];
   return (
     <div style={{
-      height: '100%', background: '#fff',
+      height: '100%', background: 'var(--bg)',
       display: 'flex', flexDirection: 'column',
       padding: '60px 28px 40px',
     }}>
@@ -500,8 +500,8 @@ function LoadingScreen({ step, onBack, skinType }) {
               }}>
                 <div style={{
                   width: 22, height: 22, borderRadius: '50%',
-                  border: '1px solid ' + (status === 'pending' ? '#E2E2E2' : '#111'),
-                  background: status === 'done' ? '#111' : '#fff',
+                  border: '1px solid ' + (status === 'pending' ? 'var(--border)' : '#111'),
+                  background: status === 'done' ? '#111' : 'var(--bg)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   flexShrink: 0,
                 }}>
@@ -521,7 +521,7 @@ function LoadingScreen({ step, onBack, skinType }) {
                   </div>
                   {status === 'active' && (
                     <div style={{
-                      marginTop: 8, height: 1, background: '#F0F0F0',
+                      marginTop: 8, height: 1, background: 'var(--border)',
                       position: 'relative', overflow: 'hidden',
                     }}>
                       <div style={{

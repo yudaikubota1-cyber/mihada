@@ -79,7 +79,7 @@ function RakutenCard({ item }) {
       {/* 画像 */}
       <div style={{
         width: 120, height: 120, borderRadius: 8, overflow: 'hidden',
-        background: '#F5F5F5', marginBottom: 8, flexShrink: 0,
+        background: 'var(--bg-soft)', marginBottom: 8, flexShrink: 0,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         position: 'relative',
       }}>
@@ -160,7 +160,7 @@ function RakutenSection({ concerns, category, searchUrl, px = '24px' }) {
         {[1, 2, 3].map(i => (
           <div key={i} style={{
             flex: '0 0 120px', height: 120, borderRadius: 8,
-            background: 'linear-gradient(90deg, #F0F0F0 25%, #E8E8E8 50%, #F0F0F0 75%)',
+            background: 'linear-gradient(90deg, var(--bg-soft) 25%, var(--bg-warm) 50%, var(--bg-soft) 75%)',
             backgroundSize: '200% 100%',
             animation: 'skinrLoadBar 1.3s ease infinite',
           }} />
@@ -181,7 +181,7 @@ function RakutenSection({ concerns, category, searchUrl, px = '24px' }) {
             display: 'inline-flex', alignItems: 'center', gap: 8,
             padding: '10px 16px', borderRadius: 6,
             border: '1px solid #E0E0E0', textDecoration: 'none',
-            background: '#FAFAFA',
+            background: 'var(--bg-soft)',
           }}
         >
           <div style={{
@@ -224,7 +224,7 @@ function RakutenSection({ concerns, category, searchUrl, px = '24px' }) {
             alignItems: 'center', justifyContent: 'center',
             gap: 6, height: 120, alignSelf: 'flex-start',
             border: '1px solid #E8E8E8', borderRadius: 8,
-            background: '#FAFAFA', textDecoration: 'none',
+            background: 'var(--bg-soft)', textDecoration: 'none',
             padding: 12,
           }}
         >
@@ -392,14 +392,14 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
     <div className={`skinr-scroll${isDesktop ? ' skinr-page' : ''}`} style={{
       height: isDesktop ? 'auto' : '100%',
       overflowY: isDesktop ? 'visible' : 'auto',
-      background: '#fff',
+      background: 'var(--bg)',
     }}>
       {/* Top bar */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '14px 16px', borderBottom: '1px solid #F0F0F0',
+        padding: '14px 16px', borderBottom: '1px solid var(--border)',
         position: isDesktop ? 'static' : 'sticky',
-        top: 0, background: '#fff', zIndex: 5,
+        top: 0, background: 'var(--bg)', zIndex: 5,
       }}>
         <button onClick={onBack} style={{ background: 'none', border: 'none', padding: 6, cursor: 'pointer', display: 'flex' }}>
           <Icon name="arrowLeft" size={20} />
@@ -433,7 +433,7 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
             <div key={ing.name} style={{
               display: 'flex', alignItems: 'center', gap: 14,
               padding: '16px 0',
-              borderBottom: i < ingredients.length - 1 ? '1px solid #F0F0F0' : 'none',
+              borderBottom: i < ingredients.length - 1 ? '1px solid var(--border)' : 'none',
               animation: `skinrFadeIn 0.3s ${0.08 + i * 0.07}s ease both`,
             }}>
               <span style={{
@@ -470,7 +470,7 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
           {concerns.map(c => (
             <span key={c} style={{
               padding: '3px 9px', borderRadius: 999,
-              border: '1px solid #DCDCDC', fontSize: 11, color: '#555', fontWeight: 500,
+              border: '1px solid var(--border)', fontSize: 11, color: '#555', fontWeight: 500,
             }}>{c}</span>
           ))}
         </div>
@@ -491,20 +491,20 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
         <div style={{ padding: `0 ${px} 24px` }}>
           <div style={{ border: '1px solid #EBEBEB', borderRadius: 8, overflow: 'hidden' }}>
             <div style={{
-              padding: '10px 16px', borderBottom: '1px solid #F0F0F0',
-              background: '#FAFAFA', display: 'flex', alignItems: 'center', gap: 8,
+              padding: '10px 16px', borderBottom: '1px solid var(--border)',
+              background: 'var(--bg-soft)', display: 'flex', alignItems: 'center', gap: 8,
             }}>
               <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, letterSpacing: '0.18em', color: '#ABABAB' }}>PAIRING GUIDE</span>
             </div>
             {comboGood.length > 0 && (
-              <div style={{ padding: '14px 16px', borderBottom: comboAvoid.length > 0 ? '1px solid #F0F0F0' : 'none' }}>
+              <div style={{ padding: '14px 16px', borderBottom: comboAvoid.length > 0 ? '1px solid var(--border)' : 'none' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
                   <span style={{ fontSize: 11, fontWeight: 700, color: '#111', letterSpacing: '0.01em' }}>一緒に使うと効果的</span>
                   <span style={{ fontSize: 9, fontFamily: 'JetBrains Mono, monospace', color: '#fff', background: '#111', padding: '2px 6px', borderRadius: 2, letterSpacing: '0.08em' }}>◎</span>
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                   {comboGood.map(g => (
-                    <span key={g} style={{ padding: '5px 11px', borderRadius: 999, border: '1px solid #DCDCDC', background: '#fff', fontSize: 11, color: '#333', fontWeight: 500 }}>{g}</span>
+                    <span key={g} style={{ padding: '5px 11px', borderRadius: 999, border: '1px solid var(--border)', background: 'var(--bg)', fontSize: 11, color: '#333', fontWeight: 500 }}>{g}</span>
                   ))}
                 </div>
               </div>
@@ -595,7 +595,7 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
       {/* CTA */}
       <div style={{
         padding: `28px ${px} ${isDesktop ? '60px' : '64px'}`,
-        borderTop: '1px solid #F0F0F0',
+        borderTop: '1px solid var(--border)',
         marginTop: 8,
         display: 'flex', flexDirection: 'column', gap: 10,
       }}>
@@ -610,7 +610,7 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
           className="skinr-tappable"
           style={{
             width: '100%', padding: '14px',
-            background: 'none', border: '1px solid #DCDCDC',
+            background: 'none', border: '1px solid var(--border)',
             borderRadius: 4, cursor: 'pointer',
             fontFamily: 'inherit', fontSize: 13,
             color: '#666', fontWeight: 500,

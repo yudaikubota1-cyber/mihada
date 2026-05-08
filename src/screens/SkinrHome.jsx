@@ -56,7 +56,7 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
     <div className={`skinr-scroll${isDesktop ? ' skinr-page' : ''}`} style={{
       height: isDesktop ? 'auto' : '100%',
       overflowY: isDesktop ? 'visible' : 'auto',
-      background: '#fff',
+      background: 'var(--bg)',
     }}>
       {/* Header — hidden on desktop (logo is in sidebar) */}
       {!isDesktop && (
@@ -64,8 +64,8 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
         position: 'sticky', top: 0, zIndex: 10,
         display: 'flex', justifyContent: 'center',
         padding: '14px 0',
-        borderBottom: '1px solid #F0F0F0',
-        background: 'rgba(255,255,255,0.95)',
+        borderBottom: '1px solid var(--border)',
+        background: 'rgba(255,254,251,0.95)',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
       }}>
@@ -80,7 +80,7 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
           className="skinr-tappable"
           style={{
             width: '100%', background: 'none', border: 'none',
-            borderBottom: '1px solid #F0F0F0',
+            borderBottom: '1px solid var(--border)',
             padding: '12px 24px',
             display: 'flex', alignItems: 'center', gap: 12,
             cursor: 'pointer', fontFamily: 'inherit',
@@ -90,7 +90,7 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
         >
           <div style={{
             width: 36, height: 36, borderRadius: 4,
-            background: '#F5F5F5',
+            background: 'var(--bg-soft)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             flexShrink: 0,
           }}>
@@ -139,11 +139,11 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
 
         {/* Inline chat starter */}
         <div style={{
-          border: '1px solid rgba(0,0,0,0.06)',
+          border: '1px solid var(--border)',
           borderRadius: 24,
           overflow: 'hidden',
-          background: '#fff',
-          boxShadow: '0 16px 56px rgba(0,0,0,0.12)',
+          background: 'var(--bg)',
+          boxShadow: '0 16px 56px rgba(100,80,60,0.12)',
         }}>
           {/* Input zone */}
           <div style={{ padding: '18px 20px 12px' }}>
@@ -190,8 +190,8 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
 
           {/* Action bar */}
           <div style={{
-            background: '#F7F7F7',
-            borderTop: '1px solid #F0F0F0',
+            background: 'var(--bg-soft)',
+            borderTop: '1px solid var(--border)',
             padding: '10px 16px',
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           }}>
@@ -231,7 +231,7 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
             }}>
               悩みから選ぶ
             </span>
-            <div style={{ flex: 1, height: 1, background: '#F0F0F0' }} />
+            <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: isDesktop ? 'repeat(8, 1fr)' : 'repeat(4, 1fr)', gap: 10 }}>
             {CONCERN_CHIPS.map((c, i) => (
@@ -262,7 +262,7 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
               style={{
                 display: 'flex', alignItems: 'center', gap: 3,
                 padding: '3px 8px', borderRadius: 999,
-                border: '1px solid #DCDCDC', background: '#fff',
+                border: '1px solid var(--border)', background: 'var(--bg)',
                 fontSize: 10, color: '#888', cursor: 'pointer',
                 fontFamily: 'inherit', fontWeight: 500,
               }}
@@ -282,7 +282,7 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
         <div style={{
           display: 'flex', alignItems: 'center', gap: 10,
           padding: '10px 16px',
-          background: searchFocused ? '#EFEFEF' : '#F4F4F4',
+          background: searchFocused ? 'var(--bg-warm)' : 'var(--bg-soft)',
           borderRadius: 999,
           border: '1.5px solid ' + (searchFocused ? '#111' : 'transparent'),
           transition: 'all 0.15s ease',
@@ -351,7 +351,7 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
             style={{
               display: 'flex', alignItems: 'center', gap: 2,
               padding: '3px 7px', borderRadius: 999,
-              border: '1px solid #DCDCDC', background: '#fff',
+              border: '1px solid var(--border)', background: 'var(--bg)',
               fontSize: 10, color: '#888', cursor: 'pointer',
               fontFamily: 'inherit', flexShrink: 0,
             }}
@@ -389,7 +389,7 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
             onClick={() => { setQuery(''); setCat('all'); }}
             style={{
               padding: '9px 18px', borderRadius: 999,
-              border: '1px solid #DCDCDC', background: '#fff',
+              border: '1px solid var(--border)', background: 'var(--bg)',
               fontSize: 12, fontFamily: 'inherit', fontWeight: 500, color: '#555',
               cursor: 'pointer',
             }}
@@ -401,7 +401,7 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
 
       {/* Footer */}
       <div style={{
-        borderTop: '1px solid #F0F0F0',
+        borderTop: '1px solid var(--border)',
         padding: `40px ${px} ${isDesktop ? '60px' : '60px'}`,
         textAlign: 'center',
       }}>
@@ -424,8 +424,8 @@ function ConcernChip({ chip, onSend, index = 0 }) {
       style={{
         padding: '14px 6px 16px',
         borderRadius: 12,
-        border: '1px solid ' + (pressed ? '#C8C8C8' : '#E8E8E8'),
-        background: pressed ? '#F0F0F0' : '#FAFAFA',
+        border: '1px solid ' + (pressed ? 'var(--border-strong)' : 'var(--border)'),
+        background: pressed ? 'var(--bg-warm)' : 'var(--bg-soft)',
         cursor: 'pointer',
         fontFamily: 'inherit',
         display: 'flex', flexDirection: 'column',
@@ -434,7 +434,7 @@ function ConcernChip({ chip, onSend, index = 0 }) {
         transform: pressed ? 'scale(0.93)' : 'scale(1)',
         transition: 'all 0.12s ease',
         minHeight: 72,
-        boxShadow: pressed ? 'none' : '0 2px 10px rgba(0,0,0,0.05)',
+        boxShadow: pressed ? 'none' : '0 2px 10px rgba(100,80,60,0.07)',
         animation: `skinrFadeIn 0.3s ${index * 0.04}s ease both`,
       }}
     >

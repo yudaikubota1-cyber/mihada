@@ -1,12 +1,12 @@
 :root {
-  --bg: #fff;
-  --bg-soft: #FAFAF8;
-  --bg-warm: #F9F7F4;
-  --border: #EDEBE8;
-  --border-strong: #D5D0C8;
-  --text: #111;
-  --text-secondary: #7A7A7A;
-  --text-muted: #ABABAB;
+  --bg: #FFFEFB;
+  --bg-soft: #F5F0EA;
+  --bg-warm: #EDE5DA;
+  --border: #E4D9CE;
+  --border-strong: #C8B8A8;
+  --text: #1A1814;
+  --text-secondary: #7A706A;
+  --text-muted: #AAA098;
   --accent: #111;
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -29,8 +29,8 @@ body {
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #F0F0F0;
-  color: #111;
+  background: #E0D8CF;
+  color: var(--text);
   /* iOSでのタップ時ハイライトを無効化 */
   -webkit-tap-highlight-color: transparent;
 }
@@ -40,7 +40,7 @@ body {
   justify-content: center;
   align-items: flex-start;
   min-height: 100%;
-  background: #F0F0F0;
+  background: #E0D8CF;
 }
 
 .app-shell {
@@ -48,7 +48,7 @@ body {
   max-width: 390px;
   height: 100vh;
   height: 100dvh;
-  background: #fff;
+  background: var(--bg);
   position: relative;
   overflow: hidden;
   /* iOSノッチ・ホームバー対応 */
@@ -144,10 +144,10 @@ textarea:focus:not(:focus-visible) {
 ─────────────────────────────────────────── */
 @media (min-width: 768px) {
   body {
-    background: #EDECEA;
+    background: #D0C8BE;
   }
   #root {
-    background: #EDECEA;
+    background: #D0C8BE;
     align-items: flex-start;
     justify-content: center;
   }
@@ -185,8 +185,8 @@ textarea:focus:not(:focus-visible) {
     width: 220px;
     flex-shrink: 0;
     min-height: 100dvh;
-    border-right: 1px solid #EDEBE8;
-    background: #fff;
+    border-right: 1px solid var(--border);
+    background: var(--bg);
     position: sticky;
     top: 0;
     height: 100dvh;

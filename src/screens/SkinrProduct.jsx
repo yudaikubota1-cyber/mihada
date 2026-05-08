@@ -41,7 +41,7 @@ export default function SkinrProduct({ isDesktop, productId, onBack }) {
     <div style={{
       height: isDesktop ? 'auto' : '100%',
       minHeight: isDesktop ? '100dvh' : 'auto',
-      position: 'relative', background: '#fff',
+      position: 'relative', background: 'var(--bg)',
     }}>
       <div className={`skinr-scroll${isDesktop ? ' skinr-page' : ''}`} style={{
         height: isDesktop ? 'auto' : '100%',
@@ -67,7 +67,7 @@ export default function SkinrProduct({ isDesktop, productId, onBack }) {
         </div>
 
         {/* Hero image — full bleed */}
-        <div style={{ position: 'relative', overflow: 'hidden', background: '#fff' }}>
+        <div style={{ position: 'relative', overflow: 'hidden', background: 'var(--bg)' }}>
           {product.image && !imgError ? (
             <img
               src={product.image}
@@ -137,8 +137,8 @@ export default function SkinrProduct({ isDesktop, productId, onBack }) {
           <div style={{ padding: `0 ${px} 16px` }}>
             <div style={{
               padding: '14px 16px',
-              background: '#F9F7F4',
-              border: '1px solid #EDE9E3',
+              background: 'var(--bg-soft)',
+              border: '1px solid var(--border)',
               borderLeft: '2.5px solid #111',
               borderRadius: 6,
               fontSize: 13, lineHeight: 1.7,
@@ -172,11 +172,11 @@ export default function SkinrProduct({ isDesktop, productId, onBack }) {
               <div key={t} style={{
                 flex: 1,
                 padding: '16px',
-                border: '1px solid ' + (active ? '#111' : '#EDEDED'),
+                border: '1px solid ' + (active ? '#111' : 'var(--border)'),
                 borderRadius: 8,
                 opacity: active ? 1 : 0.38,
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
-                background: active ? '#FAFAFA' : '#fff',
+                background: active ? 'var(--bg-soft)' : 'var(--bg)',
               }}>
                 <Icon name={t === '朝' ? 'sun' : 'moon'} size={20} />
                 <span style={{ fontSize: 13, fontWeight: 500 }}>{t}に使用</span>
@@ -208,10 +208,10 @@ export default function SkinrProduct({ isDesktop, productId, onBack }) {
                 return (
                   <div key={ingName + i} style={{
                     padding: '14px 16px',
-                    border: '1px solid ' + (isPrimary ? '#D5D0C8' : '#EDEBE8'),
-                    borderLeft: isPrimary ? '3px solid #111' : '1px solid #EDEBE8',
+                    border: '1px solid ' + (isPrimary ? 'var(--border-strong)' : 'var(--border)'),
+                    borderLeft: isPrimary ? '3px solid #111' : '1px solid var(--border)',
                     borderRadius: 8,
-                    background: isPrimary ? '#F9F7F4' : '#fff',
+                    background: isPrimary ? 'var(--bg-soft)' : 'var(--bg)',
                     animation: `skinrFadeIn 0.3s ${i * 0.055}s ease both`,
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: effects ? 7 : 0 }}>
@@ -291,8 +291,8 @@ export default function SkinrProduct({ isDesktop, productId, onBack }) {
               {(product.concerns || []).map(s => (
                 <span key={s} style={{
                   padding: '6px 13px', borderRadius: 999,
-                  background: '#F5F3F0', fontSize: 12, fontWeight: 500,
-                  border: '1px solid #E8E4DE', color: '#444',
+                  background: 'var(--bg-soft)', fontSize: 12, fontWeight: 500,
+                  border: '1px solid var(--border)', color: '#444',
                   letterSpacing: '0.01em',
                 }}>{s}</span>
               ))}
@@ -323,8 +323,8 @@ export default function SkinrProduct({ isDesktop, productId, onBack }) {
                       <div key={g} style={{
                         display: 'flex', alignItems: 'center', gap: 10,
                         padding: '10px 13px',
-                        border: '1px solid #E8E4DE', borderRadius: 6,
-                        background: '#fff',
+                        border: '1px solid var(--border)', borderRadius: 6,
+                        background: 'var(--bg)',
                         animation: `skinrFadeIn 0.3s ${i * 0.05}s ease both`,
                       }}>
                         <Icon name="plus" size={12} color="#888" />
@@ -382,7 +382,7 @@ export default function SkinrProduct({ isDesktop, productId, onBack }) {
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{
                 width: 36, height: 36, borderRadius: 8,
-                background: '#F0EDE8',
+                background: 'var(--bg-warm)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 flexShrink: 0,
               }}>
@@ -407,7 +407,7 @@ export default function SkinrProduct({ isDesktop, productId, onBack }) {
         /* Desktop: inline purchase section at bottom */
         <div style={{
           padding: `24px ${px} 60px`,
-          borderTop: '1px solid #F0F0F0',
+          borderTop: '1px solid var(--border)',
           display: 'flex', alignItems: 'center', gap: 20,
         }}>
           <div style={{ flex: 1 }}>

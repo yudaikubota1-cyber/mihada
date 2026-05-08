@@ -29,7 +29,7 @@ function SidebarNavItem({ label, sub, icon, active, onClick }) {
         width: '100%',
         display: 'flex', alignItems: 'center', gap: 10,
         padding: '9px 14px',
-        background: active ? '#F2F0ED' : hovered ? '#F8F8F8' : 'transparent',
+        background: active ? 'var(--bg-soft)' : hovered ? 'var(--bg-soft)' : 'transparent',
         border: 'none', borderRadius: 8,
         cursor: 'pointer', fontFamily: 'inherit',
         textAlign: 'left',
@@ -38,7 +38,7 @@ function SidebarNavItem({ label, sub, icon, active, onClick }) {
     >
       <div style={{
         width: 30, height: 30, borderRadius: 7,
-        background: active ? '#111' : '#F0EDE8',
+        background: active ? '#111' : 'var(--bg-warm)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         flexShrink: 0, transition: 'background 0.14s ease',
       }}>
@@ -72,7 +72,7 @@ function DesktopSidebar({ screen, lastDiagnosis, onHome, onChat, onResult }) {
       </div>
 
       {/* Divider */}
-      <div style={{ height: 1, background: '#F0EDE8', margin: '0 20px 16px' }} />
+      <div style={{ height: 1, background: 'var(--border)', margin: '0 20px 16px' }} />
 
       {/* Nav */}
       <div style={{ padding: '0 12px', display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -107,7 +107,7 @@ function DesktopSidebar({ screen, lastDiagnosis, onHome, onChat, onResult }) {
       {/* Footer */}
       <div style={{
         padding: '16px 20px',
-        borderTop: '1px solid #F0EDE8',
+        borderTop: '1px solid var(--border)',
       }}>
         <div style={{
           fontSize: 9, fontFamily: 'JetBrains Mono, monospace',

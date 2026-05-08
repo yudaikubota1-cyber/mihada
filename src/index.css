@@ -144,23 +144,23 @@ textarea:focus:not(:focus-visible) {
 ─────────────────────────────────────────── */
 @media (min-width: 768px) {
   body {
-    background: #D0C8BE;
+    background: var(--bg);
   }
   #root {
-    background: #D0C8BE;
+    background: var(--bg);
     align-items: flex-start;
-    justify-content: center;
+    justify-content: flex-start;
   }
 
   .app-shell {
     display: flex;
     flex-direction: row;
-    max-width: 1300px;
+    max-width: 100%;
     width: 100%;
     height: auto;
     min-height: 100dvh;
     overflow: visible;
-    box-shadow: 0 0 80px rgba(0,0,0,0.09);
+    box-shadow: none;
     padding-bottom: 0;
   }
 

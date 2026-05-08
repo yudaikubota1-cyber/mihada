@@ -65,11 +65,11 @@ function DesktopHeader({ screen, lastDiagnosis, onHome, onChat, onResult }) {
         style={{
           display: 'flex', alignItems: 'center', gap: 7,
           padding: '9px 20px', borderRadius: 8, border: 'none',
-          background: screen === 'chat' ? '#333' : '#111',
+          background: screen === 'chat' ? '#155239' : '#1A6644',
           color: '#fff', fontSize: 13, fontWeight: 500,
           cursor: 'pointer', fontFamily: 'inherit',
           letterSpacing: '0.02em',
-          boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
+          boxShadow: '0 2px 16px rgba(26,102,68,0.30)',
           transition: 'all 0.14s ease',
         }}
       >

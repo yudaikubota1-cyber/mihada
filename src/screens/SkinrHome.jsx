@@ -155,7 +155,7 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
                 <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
                   <div style={{
                     width: 16, height: 16, borderRadius: 4,
-                    background: '#111', flexShrink: 0,
+                    background: '#1A6644', flexShrink: 0,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
                     <Icon name="sparkle" size={9} color="#fff" />
@@ -184,10 +184,10 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
                   onClick={() => { if (draft.trim()) onSendInline(draft.trim()); else onStartChat(); }}
                   style={{
                     width: 40, height: 40, borderRadius: '50%', border: 'none',
-                    background: draft.trim() ? '#111' : '#E4E4E4',
+                    background: draft.trim() ? '#1A6644' : '#E4E4E4',
                     cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
                     transition: 'all 0.18s ease', flexShrink: 0,
-                    boxShadow: draft.trim() ? '0 4px 16px rgba(0,0,0,0.22)' : 'none',
+                    boxShadow: draft.trim() ? '0 4px 16px rgba(26,102,68,0.35)' : 'none',
                   }}
                 >
                   <Icon name="arrowRight" size={15} color={draft.trim() ? '#fff' : '#BCBCBC'} />
@@ -245,7 +245,7 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
               </span>
               <button
                 onClick={() => { if (draft.trim()) onSendInline(draft.trim()); else onStartChat(); }}
-                style={{ width: 42, height: 42, borderRadius: '50%', border: 'none', background: draft.trim() ? '#111' : '#E4E4E4', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.18s ease', flexShrink: 0, boxShadow: draft.trim() ? '0 4px 16px rgba(0,0,0,0.22)' : 'none' }}
+                style={{ width: 42, height: 42, borderRadius: '50%', border: 'none', background: draft.trim() ? '#1A6644' : '#E4E4E4', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.18s ease', flexShrink: 0, boxShadow: draft.trim() ? '0 4px 16px rgba(0,0,0,0.22)' : 'none' }}
               >
                 <Icon name="arrowRight" size={16} color={draft.trim() ? '#fff' : '#BCBCBC'} />
               </button>
@@ -466,8 +466,9 @@ function ConcernChip({ chip, onSend, index = 0 }) {
       <span style={{
         fontSize: 8,
         fontFamily: 'JetBrains Mono, monospace',
-        color: '#CBCBCB',
+        color: '#1A6644',
         letterSpacing: '0.08em',
+        opacity: 0.65,
         lineHeight: 1,
         marginBottom: 7,
       }}>

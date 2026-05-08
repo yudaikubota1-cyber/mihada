@@ -17,8 +17,8 @@ function saveDiagnosis(d) {
   try { localStorage.setItem('skinr_last_diagnosis', JSON.stringify(d)); } catch {}
 }
 
-// ─── Desktop sidebar nav ─────────────────────────────────
-function SidebarNavItem({ label, sub, icon, active, onClick }) {
+// ─── Desktop top header ───────────────────────────────────
+function HeaderNavLink({ label, active, onClick }) {
   const [hovered, setHovered] = useState(false);
   return (
     <button
@@ -26,99 +26,57 @@ function SidebarNavItem({ label, sub, icon, active, onClick }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        width: '100%',
-        display: 'flex', alignItems: 'center', gap: 10,
-        padding: '9px 14px',
-        background: active ? 'var(--bg-soft)' : hovered ? 'var(--bg-soft)' : 'transparent',
-        border: 'none', borderRadius: 8,
-        cursor: 'pointer', fontFamily: 'inherit',
-        textAlign: 'left',
-        transition: 'background 0.14s ease',
+        background: 'none', border: 'none', cursor: 'pointer',
+        padding: '6px 14px', borderRadius: 6,
+        fontSize: 13, fontWeight: active ? 600 : 400,
+        color: active ? '#111' : hovered ? '#333' : '#666',
+        fontFamily: 'inherit', letterSpacing: '-0.01em',
+        borderBottom: active ? '2px solid #111' : '2px solid transparent',
+        transition: 'all 0.14s ease',
       }}
     >
-      <div style={{
-        width: 30, height: 30, borderRadius: 7,
-        background: active ? '#111' : 'var(--bg-warm)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        flexShrink: 0, transition: 'background 0.14s ease',
-      }}>
-        <Icon name={icon} size={14} color={active ? '#fff' : '#888'} />
-      </div>
-      <div style={{ minWidth: 0 }}>
-        <div style={{
-          fontSize: 13, fontWeight: active ? 600 : 400,
-          color: active ? '#111' : '#444',
-          letterSpacing: '-0.01em',
-        }}>{label}</div>
-        {sub && (
-          <div style={{
-            fontSize: 10, color: '#ABABAB',
-            fontFamily: 'JetBrains Mono, monospace',
-            letterSpacing: '0.04em', marginTop: 1,
-            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-          }}>{sub}</div>
-        )}
-      </div>
+      {label}
     </button>
   );
 }
 
-function DesktopSidebar({ screen, lastDiagnosis, onHome, onChat, onResult }) {
+function DesktopHeader({ screen, lastDiagnosis, onHome, onChat, onResult }) {
   return (
-    <nav className="skinr-desktop-sidebar">
+    <header className="skinr-desktop-header">
       {/* Logo */}
-      <div style={{ padding: '28px 20px 24px' }}>
-        <SkinrLogo size={14} />
-      </div>
+      <button onClick={onHome} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0 }}>
+        <SkinrLogo size={15} />
+      </button>
 
       {/* Divider */}
-      <div style={{ height: 1, background: 'var(--border)', margin: '0 20px 16px' }} />
+      <div style={{ width: 1, height: 20, background: 'var(--border)', margin: '0 28px 0 32px', flexShrink: 0 }} />
 
-      {/* Nav */}
-      <div style={{ padding: '0 12px', display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <SidebarNavItem
-          label="ホーム"
-          sub="全商品を探す"
-          icon="search"
-          active={screen === 'home'}
-          onClick={onHome}
-        />
-        <SidebarNavItem
-          label="AI診断"
-          sub="肌悩みを相談する"
-          icon="sparkle"
-          active={screen === 'chat'}
-          onClick={onChat}
-        />
+      {/* Nav links */}
+      <nav style={{ display: 'flex', alignItems: 'center', gap: 2, flex: 1 }}>
+        <HeaderNavLink label="商品一覧" active={screen === 'home'} onClick={onHome} />
         {lastDiagnosis && (
-          <SidebarNavItem
-            label="前回の診断結果"
-            sub={lastDiagnosis.skin_type || ''}
-            icon="arrowRight"
-            active={screen === 'result'}
-            onClick={onResult}
-          />
+          <HeaderNavLink label="診断結果" active={screen === 'result'} onClick={onResult} />
         )}
-      </div>
+      </nav>
 
-      {/* Spacer */}
-      <div style={{ flex: 1 }} />
-
-      {/* Footer */}
-      <div style={{
-        padding: '16px 20px',
-        borderTop: '1px solid var(--border)',
-      }}>
-        <div style={{
-          fontSize: 9, fontFamily: 'JetBrains Mono, monospace',
-          letterSpacing: '0.14em', color: '#C8C8C8',
-          lineHeight: 1.8,
-        }}>
-          MIHADA<br />
-          成分ロジック · v1.0
-        </div>
-      </div>
-    </nav>
+      {/* AI診断 CTA */}
+      <button
+        onClick={onChat}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 7,
+          padding: '9px 20px', borderRadius: 8, border: 'none',
+          background: screen === 'chat' ? '#333' : '#111',
+          color: '#fff', fontSize: 13, fontWeight: 500,
+          cursor: 'pointer', fontFamily: 'inherit',
+          letterSpacing: '0.02em',
+          boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
+          transition: 'all 0.14s ease',
+        }}
+      >
+        <Icon name="sparkle" size={12} color="#fff" />
+        AI 肌診断
+      </button>
+    </header>
   );
 }
 
@@ -160,8 +118,8 @@ export default function App() {
 
   return (
     <div className="app-shell">
-      {/* Desktop sidebar — hidden on mobile via CSS */}
-      <DesktopSidebar
+      {/* Desktop top header — hidden on mobile via CSS */}
+      <DesktopHeader
         screen={screen}
         lastDiagnosis={lastDiagnosis}
         onHome={goHome}
@@ -170,50 +128,52 @@ export default function App() {
       />
 
       {/* Main content */}
-      {screen === 'home' && (
-        <div key="home" className="skinr-screen">
-          <SkinrHome
-            isDesktop={isDesktop}
-            onStartChat={() => goChat(null)}
-            onSendInline={(msg) => goChat(msg)}
-            onOpenProduct={goProduct}
-            lastDiagnosis={lastDiagnosis}
-            onViewLastResult={goLastResult}
-            homeFilter={homeFilter}
-          />
-        </div>
-      )}
-      {screen === 'chat' && (
-        <div key="chat" className="skinr-screen">
-          <SkinrChat
-            key={chatSeed}
-            initialMessage={chatSeed}
-            onComplete={goResult}
-            onBack={goHome}
-          />
-        </div>
-      )}
-      {screen === 'result' && (
-        <div key="result" className="skinr-screen">
-          <SkinrResult
-            isDesktop={isDesktop}
-            diagnosis={diagnosis}
-            onBack={goHome}
-            onOpenProduct={goProduct}
-            onNewChat={() => goChat(null)}
-            onViewCategory={goHomeFiltered}
-          />
-        </div>
-      )}
-      {screen === 'product' && (
-        <div key="product" className="skinr-screen">
-          <SkinrProduct
-            isDesktop={isDesktop}
-            productId={productId}
-            onBack={goBack}
-          />
-        </div>
-      )}
+      <div className="skinr-content">
+        {screen === 'home' && (
+          <div key="home" className="skinr-screen">
+            <SkinrHome
+              isDesktop={isDesktop}
+              onStartChat={() => goChat(null)}
+              onSendInline={(msg) => goChat(msg)}
+              onOpenProduct={goProduct}
+              lastDiagnosis={lastDiagnosis}
+              onViewLastResult={goLastResult}
+              homeFilter={homeFilter}
+            />
+          </div>
+        )}
+        {screen === 'chat' && (
+          <div key="chat" className="skinr-screen">
+            <SkinrChat
+              key={chatSeed}
+              initialMessage={chatSeed}
+              onComplete={goResult}
+              onBack={goHome}
+            />
+          </div>
+        )}
+        {screen === 'result' && (
+          <div key="result" className="skinr-screen">
+            <SkinrResult
+              isDesktop={isDesktop}
+              diagnosis={diagnosis}
+              onBack={goHome}
+              onOpenProduct={goProduct}
+              onNewChat={() => goChat(null)}
+              onViewCategory={goHomeFiltered}
+            />
+          </div>
+        )}
+        {screen === 'product' && (
+          <div key="product" className="skinr-screen">
+            <SkinrProduct
+              isDesktop={isDesktop}
+              productId={productId}
+              onBack={goBack}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

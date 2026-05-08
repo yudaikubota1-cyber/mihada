@@ -323,13 +323,20 @@ export function ProductCard({ product, onClick }) {
           background: 'rgba(255,255,255,0.86)',
           backdropFilter: 'blur(8px)',
           WebkitBackdropFilter: 'blur(8px)',
-          padding: '3px 7px', borderRadius: 5,
-          display: 'flex', alignItems: 'center', gap: 3,
+          padding: '4px 7px', borderRadius: 5,
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1,
         }}>
-          <span style={{ fontSize: 9, color: '#D4A017' }}>★</span>
-          <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 8, color: '#444', letterSpacing: '0.06em' }}>
-            {product.review.score}
-          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+            <span style={{ fontSize: 9, color: '#D4A017' }}>★</span>
+            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 8, color: '#444', letterSpacing: '0.06em' }}>
+              {product.review.score}
+            </span>
+          </div>
+          {product.review.count && product.review.count !== '—' && (
+            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 7, color: '#999', letterSpacing: '0.04em' }}>
+              {product.review.count}
+            </span>
+          )}
         </div>
       </div>
 

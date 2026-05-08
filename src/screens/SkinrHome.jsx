@@ -119,127 +119,152 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
       )}
 
       {/* Hero — AI chat invite */}
-      <div style={{ padding: `${isDesktop ? '48px' : '40px'} ${px} 24px` }}>
-        <SkinrEyebrow>Ingredient Logic</SkinrEyebrow>
-        <h1 style={{
-          margin: '12px 0 10px',
-          fontSize: 28,
-          lineHeight: 1.25,
-          fontWeight: 400,
-          letterSpacing: '-0.03em',
-        }}>
-          「何が合うかわからない」<br />を終わりにする。
-        </h1>
-        <p style={{
-          fontSize: 13, lineHeight: 1.6, color: '#777',
-          margin: '0 0 20px',
-        }}>
-          悩みを入れるだけ。成分ロジックが一本に絞り込む。
-        </p>
-
-        {/* Inline chat starter */}
+      {isDesktop ? (
+        /* ── Desktop: 2-column hero ─────────────────── */
         <div style={{
-          border: '1px solid var(--border)',
-          borderRadius: 24,
-          overflow: 'hidden',
-          background: 'var(--bg)',
-          boxShadow: '0 16px 56px rgba(100,80,60,0.12)',
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '0 64px',
+          padding: '56px 48px 48px',
+          background: 'linear-gradient(135deg, var(--bg) 0%, var(--bg-soft) 100%)',
+          borderBottom: '1px solid var(--border)',
         }}>
-          {/* Input zone */}
-          <div style={{ padding: '18px 20px 12px' }}>
+          {/* Left: headline + chat */}
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <SkinrEyebrow>Ingredient Logic</SkinrEyebrow>
+            <h1 style={{
+              margin: '14px 0 12px',
+              fontSize: 36, lineHeight: 1.2,
+              fontWeight: 400, letterSpacing: '-0.03em',
+            }}>
+              「何が合うかわからない」<br />を終わりにする。
+            </h1>
+            <p style={{
+              fontSize: 14, lineHeight: 1.65, color: '#777',
+              margin: '0 0 28px', maxWidth: 380,
+            }}>
+              悩みを入れるだけ。成分ロジックが一本に絞り込む。
+            </p>
+            {/* Chat input */}
             <div style={{
-              display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12,
+              border: '1px solid var(--border)', borderRadius: 20,
+              overflow: 'hidden', background: 'var(--bg)',
+              boxShadow: '0 8px 40px rgba(100,80,60,0.10)',
             }}>
-              <div style={{
-                width: 16, height: 16, borderRadius: 4,
-                background: '#111', flexShrink: 0,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <Icon name="sparkle" size={9} color="#fff" />
+              <div style={{ padding: '16px 20px 10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
+                  <div style={{
+                    width: 16, height: 16, borderRadius: 4,
+                    background: '#111', flexShrink: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <Icon name="sparkle" size={9} color="#fff" />
+                  </div>
+                  <span style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.18em', color: '#ADADAD' }}>成分ロジック</span>
+                </div>
+                <textarea
+                  value={draft}
+                  onChange={(e) => { setDraft(e.target.value); e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 140) + 'px'; }}
+                  onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey && draft.trim()) { e.preventDefault(); onSendInline(draft.trim()); } }}
+                  placeholder={'今の肌の悩みを、そのまま教えてください…'}
+                  rows={2}
+                  style={{
+                    width: '100%', border: 'none', outline: 'none', resize: 'none',
+                    fontSize: 15, fontFamily: 'inherit', color: '#111',
+                    background: 'transparent', padding: '0', lineHeight: 1.7,
+                    overflowY: 'auto', minHeight: '48px',
+                  }}
+                />
               </div>
-              <span style={{
-                fontSize: 10, fontFamily: 'JetBrains Mono, monospace',
-                letterSpacing: '0.18em', color: '#ADADAD',
-              }}>成分ロジック</span>
+              <div style={{ background: 'var(--bg-soft)', borderTop: '1px solid var(--border)', padding: '10px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 10, color: '#C8C8C8', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.06em' }}>
+                  {draft.trim() ? 'ENTER で送信' : 'SHIFT+ENTER で改行'}
+                </span>
+                <button
+                  onClick={() => { if (draft.trim()) onSendInline(draft.trim()); else onStartChat(); }}
+                  style={{
+                    width: 40, height: 40, borderRadius: '50%', border: 'none',
+                    background: draft.trim() ? '#111' : '#E4E4E4',
+                    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    transition: 'all 0.18s ease', flexShrink: 0,
+                    boxShadow: draft.trim() ? '0 4px 16px rgba(0,0,0,0.22)' : 'none',
+                  }}
+                >
+                  <Icon name="arrowRight" size={15} color={draft.trim() ? '#fff' : '#BCBCBC'} />
+                </button>
+              </div>
             </div>
-            <textarea
-              value={draft}
-              onChange={(e) => {
-                setDraft(e.target.value);
-                e.target.style.height = 'auto';
-                e.target.style.height = Math.min(e.target.scrollHeight, 140) + 'px';
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey && draft.trim()) {
-                  e.preventDefault();
-                  onSendInline(draft.trim());
-                }
-              }}
-              placeholder={'今の肌の悩みを、そのまま教えてください…'}
-              rows={1}
-              style={{
-                width: '100%',
-                border: 'none', outline: 'none', resize: 'none',
-                fontSize: 15, fontFamily: 'inherit', color: '#111',
-                background: 'transparent',
-                padding: '0', lineHeight: 1.7, overflowY: 'auto',
-                minHeight: '26px',
-              }}
-            />
           </div>
 
-          {/* Action bar */}
-          <div style={{
-            background: 'var(--bg-soft)',
-            borderTop: '1px solid var(--border)',
-            padding: '10px 16px',
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          }}>
-            <span style={{
-              fontSize: 10, color: '#C8C8C8',
-              fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.06em',
-            }}>
-              {draft.trim() ? 'ENTER で送信' : 'SHIFT+ENTER で改行'}
-            </span>
-            <button
-              onClick={() => { if (draft.trim()) onSendInline(draft.trim()); else onStartChat(); }}
-              style={{
-                width: 42, height: 42, borderRadius: '50%',
-                border: 'none',
-                background: draft.trim() ? '#111' : '#E4E4E4',
-                cursor: 'pointer', display: 'flex',
-                alignItems: 'center', justifyContent: 'center',
-                transition: 'all 0.18s ease',
-                flexShrink: 0,
-                boxShadow: draft.trim() ? '0 4px 16px rgba(0,0,0,0.22)' : 'none',
-              }}
-            >
-              <Icon name="arrowRight" size={16} color={draft.trim() ? '#fff' : '#BCBCBC'} />
-            </button>
+          {/* Right: concern chips 2x4 grid */}
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+              <span style={{ fontSize: 10, color: '#B5B5B5', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.18em', whiteSpace: 'nowrap' }}>
+                悩みから選ぶ
+              </span>
+              <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+              {CONCERN_CHIPS.map((c, i) => (
+                <ConcernChip key={c.label} chip={c} onSend={onSendInline} index={i} />
+              ))}
+            </div>
           </div>
         </div>
-
-        {/* Quick replies — 悩み */}
-        <div style={{ marginTop: 20 }}>
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10,
-          }}>
-            <span style={{
-              fontSize: 10, color: '#B5B5B5',
-              fontFamily: 'JetBrains Mono, monospace',
-              letterSpacing: '0.18em', whiteSpace: 'nowrap',
-            }}>
-              悩みから選ぶ
-            </span>
-            <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+      ) : (
+        /* ── Mobile: single column hero ─────────────── */
+        <div style={{ padding: '40px 24px 24px' }}>
+          <SkinrEyebrow>Ingredient Logic</SkinrEyebrow>
+          <h1 style={{ margin: '12px 0 10px', fontSize: 28, lineHeight: 1.25, fontWeight: 400, letterSpacing: '-0.03em' }}>
+            「何が合うかわからない」<br />を終わりにする。
+          </h1>
+          <p style={{ fontSize: 13, lineHeight: 1.6, color: '#777', margin: '0 0 20px' }}>
+            悩みを入れるだけ。成分ロジックが一本に絞り込む。
+          </p>
+          {/* Chat input */}
+          <div style={{ border: '1px solid var(--border)', borderRadius: 24, overflow: 'hidden', background: 'var(--bg)', boxShadow: '0 16px 56px rgba(100,80,60,0.12)' }}>
+            <div style={{ padding: '18px 20px 12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
+                <div style={{ width: 16, height: 16, borderRadius: 4, background: '#111', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Icon name="sparkle" size={9} color="#fff" />
+                </div>
+                <span style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.18em', color: '#ADADAD' }}>成分ロジック</span>
+              </div>
+              <textarea
+                value={draft}
+                onChange={(e) => { setDraft(e.target.value); e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 140) + 'px'; }}
+                onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey && draft.trim()) { e.preventDefault(); onSendInline(draft.trim()); } }}
+                placeholder={'今の肌の悩みを、そのまま教えてください…'}
+                rows={1}
+                style={{ width: '100%', border: 'none', outline: 'none', resize: 'none', fontSize: 15, fontFamily: 'inherit', color: '#111', background: 'transparent', padding: '0', lineHeight: 1.7, overflowY: 'auto', minHeight: '26px' }}
+              />
+            </div>
+            <div style={{ background: 'var(--bg-soft)', borderTop: '1px solid var(--border)', padding: '10px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: 10, color: '#C8C8C8', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.06em' }}>
+                {draft.trim() ? 'ENTER で送信' : 'SHIFT+ENTER で改行'}
+              </span>
+              <button
+                onClick={() => { if (draft.trim()) onSendInline(draft.trim()); else onStartChat(); }}
+                style={{ width: 42, height: 42, borderRadius: '50%', border: 'none', background: draft.trim() ? '#111' : '#E4E4E4', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.18s ease', flexShrink: 0, boxShadow: draft.trim() ? '0 4px 16px rgba(0,0,0,0.22)' : 'none' }}
+              >
+                <Icon name="arrowRight" size={16} color={draft.trim() ? '#fff' : '#BCBCBC'} />
+              </button>
+            </div>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: isDesktop ? 'repeat(8, 1fr)' : 'repeat(4, 1fr)', gap: 10 }}>
-            {CONCERN_CHIPS.map((c, i) => (
-              <ConcernChip key={c.label} chip={c} onSend={onSendInline} index={i} />
-            ))}
+          {/* Quick replies */}
+          <div style={{ marginTop: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+              <span style={{ fontSize: 10, color: '#B5B5B5', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.18em', whiteSpace: 'nowrap' }}>悩みから選ぶ</span>
+              <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+              {CONCERN_CHIPS.map((c, i) => (
+                <ConcernChip key={c.label} chip={c} onSend={onSendInline} index={i} />
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Section break */}
       <div style={{ padding: `20px ${px} 0` }}>

@@ -142,6 +142,12 @@ textarea:focus:not(:focus-visible) {
 /* ───────────────────────────────────────────
    Desktop responsive (≥ 768 px)
 ─────────────────────────────────────────── */
+
+/* Top header — hidden on mobile */
+.skinr-desktop-header {
+  display: none;
+}
+
 @media (min-width: 768px) {
   body {
     background: var(--bg);
@@ -154,51 +160,50 @@ textarea:focus:not(:focus-visible) {
 
   .app-shell {
     display: flex;
-    flex-direction: row;
-    max-width: 100%;
+    flex-direction: column;
     width: 100%;
     height: auto;
     min-height: 100dvh;
     overflow: visible;
     box-shadow: none;
     padding-bottom: 0;
+    max-width: 100%;
   }
 
-  /* Screens expand to fill the content column */
+  /* Top header */
+  .skinr-desktop-header {
+    display: flex;
+    align-items: center;
+    height: 60px;
+    padding: 0 48px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    flex-shrink: 0;
+  }
+
+  /* Content area below header */
+  .skinr-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  /* Screens expand to fill */
   .skinr-screen {
     height: auto;
-    min-height: 100dvh;
     flex: 1;
     min-width: 0;
     overflow: visible;
   }
-}
 
-/* Desktop sidebar */
-.skinr-desktop-sidebar {
-  display: none;
-}
-@media (min-width: 768px) {
-  .skinr-desktop-sidebar {
-    display: flex;
-    flex-direction: column;
-    width: 220px;
-    flex-shrink: 0;
-    min-height: 100dvh;
-    border-right: 1px solid var(--border);
-    background: var(--bg);
-    position: sticky;
-    top: 0;
-    height: 100dvh;
-    overflow-y: auto;
-  }
-}
-
-/* Desktop scroll override — inner divs become normal flow */
-@media (min-width: 768px) {
+  /* Inner pages become normal flow */
   .skinr-page {
     height: auto !important;
     overflow-y: visible !important;
-    min-height: 100dvh;
+    min-height: calc(100dvh - 60px);
   }
 }

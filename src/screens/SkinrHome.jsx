@@ -9,26 +9,36 @@ import {
 const G = '#1DAB6A';   // メイングリーン（明るめ）
 const GD = '#178A55';  // ダークグリーン（ホバー用）
 
-const CHAT_FLOW_HOME = [
-  { delay: 600, ai: 'こんにちは！\n今、一番気になるお肌の悩みを教えてください。', quick: null },
-  { delay: 400, ai: null, // ステップ1はすぐ表示（遅延なし）
-    quick: [
-      { label: '乾燥・保湿',   sub: 'かさつき・バリアを整えたい' },
-      { label: '毛穴・黒ずみ', sub: '毛穴を引き締めたい' },
-      { label: 'ニキビ・赤み', sub: '炎症・肌荒れを抑えたい' },
-      { label: 'くすみ・シミ', sub: 'トーンアップしたい' },
-      { label: 'たるみ・ハリ', sub: 'リフトアップしたい' },
-    ],
-  },
-  { delay: 500, ai: (ans) => `「${ans}」ですね。\nお肌のタイプを教えてください。`,
-    quick: [
-      { label: '乾燥肌',   sub: 'かさつき・つっぱり感がある' },
-      { label: '脂性肌',   sub: 'テカリやすい' },
-      { label: '混合肌',   sub: 'Tゾーンのみテカる' },
-      { label: 'わからない', sub: '自分の肌質に自信がない' },
-    ],
-  },
+// キーワード分類マップ
+const CONCERN_KEYWORDS = {
+  '乾燥・保湿':   ['乾燥', 'かさつき', 'かさかさ', 'カサカサ', 'パサパサ', 'しっとり', '保湿', 'つっぱり', 'バリア', 'うるお', '乾いて'],
+  '毛穴・黒ずみ': ['毛穴', '黒ずみ', '黒ずん', 'つまり', 'ざらつき', '角栓', 'ポア', 'テカリ', 'テカ'],
+  'ニキビ・赤み': ['ニキビ', 'にきび', 'ぶつぶつ', '赤み', '赤く', '吹き出物', '炎症', '肌荒れ', 'アクネ', 'できもの', '荒れ'],
+  'くすみ・シミ': ['くすみ', 'くすん', 'シミ', 'しみ', 'トーン', '明るく', '透明感', '色素', '暗い', 'くっきり'],
+  'たるみ・ハリ': ['たるみ', 'たるん', 'ハリ', 'はり', '弾力', 'リフト', 'しわ', 'シワ', '引き締め', 'たぷ'],
+};
+
+const CONCERN_OPTIONS = [
+  { label: '乾燥・保湿',   sub: 'かさつき・バリアを整えたい' },
+  { label: '毛穴・黒ずみ', sub: '毛穴を引き締めたい' },
+  { label: 'ニキビ・赤み', sub: '炎症・肌荒れを抑えたい' },
+  { label: 'くすみ・シミ', sub: 'トーンアップしたい' },
+  { label: 'たるみ・ハリ', sub: 'リフトアップしたい' },
 ];
+
+const SKIN_TYPE_OPTIONS = [
+  { label: '乾燥肌',    sub: 'かさつき・つっぱり感がある' },
+  { label: '脂性肌',    sub: 'テカリやすい' },
+  { label: '混合肌',    sub: 'Tゾーンのみテカる' },
+  { label: 'わからない', sub: '自分の肌質に自信がない' },
+];
+
+function classifyConcern(text) {
+  for (const [concern, keywords] of Object.entries(CONCERN_KEYWORDS)) {
+    if (keywords.some(kw => text.includes(kw))) return concern;
+  }
+  return null;
+}
 
 const INGR_MAP = {
   '乾燥肌':  { base: ['ヒアルロン酸Na','セラミド','グリセリン'] },
@@ -52,74 +62,112 @@ function getIngredients(skinType, concern) {
 }
 
 function ChatDiagnosisCard({ onComplete }) {
-  const [messages, setMessages] = useState([]);
-  const [typing, setTyping]     = useState(false);
-  const [flowStep, setFlowStep] = useState(0);
-  const [answers, setAnswers]   = useState({});
-  const [done, setDone]         = useState(false);
+  // phase: 'init' | 'concern_input' | 'concern_followup' | 'skintype' | 'done'
+  const [messages, setMessages]   = useState([]);
+  const [typing, setTyping]       = useState(false);
+  const [phase, setPhase]         = useState('init');
+  const [concern, setConcern]     = useState(null);
+  const [skinType, setSkinType]   = useState(null);
+  const [inputText, setInputText] = useState('');
   const [showResult, setShowResult] = useState(false);
   const scrollRef = useRef(null);
+  const inputRef  = useRef(null);
 
-  // 初期メッセージ — 悩み質問をすぐ表示
+  // 初期メッセージ
   useEffect(() => {
-    const t1 = setTimeout(() => {
-      setMessages([
-        { role: 'ai', text: CHAT_FLOW_HOME[0].ai, isFirst: true },
-      ]);
-      setFlowStep(1); // すぐにクイックリプライを表示
+    const t = setTimeout(() => {
+      setMessages([{ role: 'ai', text: 'こんにちは！\n今、一番気になるお肌の悩みを教えてください。', isFirst: true }]);
+      setPhase('concern_input');
     }, 400);
-    return () => clearTimeout(t1);
+    return () => clearTimeout(t);
   }, []);
 
+  // Auto-scroll
   useEffect(() => {
     setTimeout(() => {
-      if (scrollRef.current) {
-        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-      }
+      if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }, 60);
   }, [messages, typing, showResult]);
 
-  const pick = (choice) => {
-    if (done) return;
-    setMessages(m => [...m, { role: 'user', text: choice.label }]);
-    const newAnswers = { ...answers };
-    if (flowStep === 1) newAnswers.concern  = choice.label;
-    if (flowStep === 2) newAnswers.skinType = choice.label;
-    setAnswers(newAnswers);
-
-    const nextStep = flowStep + 1;
-    if (nextStep < CHAT_FLOW_HOME.length) {
-      setFlowStep(0);
-      setTyping(true);
-      setTimeout(() => {
-        const aiText = typeof CHAT_FLOW_HOME[nextStep].ai === 'function'
-          ? CHAT_FLOW_HOME[nextStep].ai(choice.label)
-          : CHAT_FLOW_HOME[nextStep].ai;
-        setMessages(m => [...m, { role: 'ai', text: aiText }]);
-        setTyping(false);
-        setFlowStep(nextStep);
-      }, CHAT_FLOW_HOME[nextStep].delay + 200);
-    } else {
-      setFlowStep(0);
-      setDone(true);
-      setTyping(true);
-      setTimeout(() => {
-        setMessages(m => [...m, { role: 'ai', text: '分析が完了しました！\nあなたのお悩みと肌タイプに合った成分をまとめました。' }]);
-        setTyping(false);
-        setTimeout(() => setShowResult(true), 350);
-      }, 1200);
+  // Auto-focus input when phase is concern_input
+  useEffect(() => {
+    if (phase === 'concern_input' && inputRef.current) {
+      setTimeout(() => inputRef.current?.focus(), 100);
     }
+  }, [phase]);
+
+  // 自由記述の悩みを送信
+  const submitConcern = () => {
+    const text = inputText.trim();
+    if (!text) return;
+    setInputText('');
+    setMessages(m => [...m, { role: 'user', text }]);
+    setPhase('init');
+    setTyping(true);
+
+    const matched = classifyConcern(text);
+    setTimeout(() => {
+      if (matched) {
+        setConcern(matched);
+        setMessages(m => [...m, { role: 'ai', text: `「${matched}」のお悩みですね。\n次に、お肌のタイプを教えてください。` }]);
+        setTyping(false);
+        setPhase('skintype');
+      } else {
+        setMessages(m => [...m, { role: 'ai', text: 'ありがとうございます。\nお悩みをもう少し詳しく教えてください。どれに近いですか？' }]);
+        setTyping(false);
+        setPhase('concern_followup');
+      }
+    }, 900);
   };
 
-  const currentQuick = !typing && !done && flowStep > 0 ? CHAT_FLOW_HOME[flowStep]?.quick || [] : [];
-  const ingredients = done ? getIngredients(answers.skinType, answers.concern) : [];
-  const skinLabel   = answers.skinType === 'わからない' ? '肌タイプ未判定' : answers.skinType;
-  const resultNote  = answers.skinType === 'わからない'
+  // フォローアップ（選択式）でお悩みを確定
+  const pickConcernFollowup = (label) => {
+    setConcern(label);
+    setMessages(m => [...m, { role: 'user', text: label }]);
+    setPhase('init');
+    setTyping(true);
+    setTimeout(() => {
+      setMessages(m => [...m, { role: 'ai', text: `「${label}」ですね。\nお肌のタイプを教えてください。` }]);
+      setTyping(false);
+      setPhase('skintype');
+    }, 700);
+  };
+
+  // 肌タイプを選択
+  const pickSkinType = (label) => {
+    setSkinType(label);
+    setMessages(m => [...m, { role: 'user', text: label }]);
+    setPhase('init');
+    setTyping(true);
+    setTimeout(() => {
+      setMessages(m => [...m, { role: 'ai', text: '分析が完了しました！\nお悩みと肌タイプに合った成分をまとめました。' }]);
+      setTyping(false);
+      setPhase('done');
+      setTimeout(() => setShowResult(true), 350);
+    }, 1200);
+  };
+
+  // プログレス
+  const progressPct = phase === 'concern_input' ? 8 : phase === 'concern_followup' ? 30 : phase === 'skintype' ? 55 : phase === 'done' ? 100 : 0;
+
+  const ingredients = (concern && skinType) ? getIngredients(skinType, concern) : [];
+  const skinLabel   = skinType === 'わからない' ? '肌タイプ未判定' : skinType;
+  const resultNote  = skinType === 'わからない'
     ? '詳しい診断でさらに精度の高い提案ができます'
-    : `${skinLabel}の${answers.concern}には、この成分の組み合わせがおすすめです`;
+    : `${skinLabel}の${concern}には、この成分の組み合わせがおすすめです`;
+
+  // 選択ボタン共通スタイル生成
+  const optionButtonStyle = (wide) => ({
+    display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
+    padding: '10px 15px', borderRadius: 12,
+    border: '1.5px solid var(--border)', background: 'var(--bg)',
+    cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left',
+    transition: 'all 0.14s ease',
+    flex: wide ? '0 0 calc(50% - 4px)' : '1', minWidth: 0,
+  });
 
   return (
-    <div style={{ width: '100%', maxWidth: 540, margin: '0 auto' }}>
+    <div style={{ width: '100%' }}>
       <div style={{
         background: 'var(--bg)', borderRadius: 22, overflow: 'hidden',
         boxShadow: '0 16px 64px rgba(80,60,40,0.14), 0 2px 8px rgba(80,60,40,0.06)',
@@ -138,20 +186,22 @@ function ChatDiagnosisCard({ onComplete }) {
             </div>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: 9, fontFamily: 'JetBrains Mono, monospace', color: 'rgba(255,255,255,0.45)', letterSpacing: '0.1em' }}>STEP</div>
+            <div style={{ fontSize: 9, fontFamily: 'JetBrains Mono, monospace', color: 'rgba(255,255,255,0.45)', letterSpacing: '0.1em' }}>
+              {phase === 'done' ? 'DONE' : 'STEP'}
+            </div>
             <div style={{ fontSize: 16, fontWeight: 700, color: '#fff', fontFamily: 'JetBrains Mono, monospace', lineHeight: 1 }}>
-              {done ? '✓' : Math.min(flowStep, 2)}<span style={{ fontSize: 10, opacity: 0.5 }}>{done ? '' : '/2'}</span>
+              {phase === 'done' ? '✓' : (phase === 'skintype' || phase === 'concern_followup') ? '2' : '1'}
             </div>
           </div>
         </div>
 
         {/* プログレスバー */}
         <div style={{ height: 2, background: `rgba(29,171,106,0.12)` }}>
-          <div style={{ height: '100%', background: `linear-gradient(90deg, ${G}, ${GD})`, width: done ? '100%' : `${Math.max(6, (Math.max(0, flowStep - 1) / 2) * 100)}%`, transition: 'width 0.5s cubic-bezier(0.4,0,0.2,1)' }} />
+          <div style={{ height: '100%', background: `linear-gradient(90deg, ${G}, ${GD})`, width: `${progressPct}%`, transition: 'width 0.5s cubic-bezier(0.4,0,0.2,1)' }} />
         </div>
 
         {/* メッセージエリア */}
-        <div ref={scrollRef} className="skinr-scroll" style={{ padding: '20px 16px 16px', maxHeight: showResult ? 440 : 260, minHeight: 140, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 10, transition: 'max-height 0.5s cubic-bezier(0.4,0,0.2,1)' }}>
+        <div ref={scrollRef} className="skinr-scroll" style={{ padding: '20px 16px 16px', maxHeight: showResult ? 460 : 220, minHeight: 120, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 10, transition: 'max-height 0.5s cubic-bezier(0.4,0,0.2,1)' }}>
           {messages.map((msg, i) => (
             msg.role === 'ai' ? (
               <div key={i} style={{ display: 'flex', alignItems: 'flex-end', gap: 8, animation: 'skinrFadeIn 0.22s ease' }}>
@@ -189,7 +239,7 @@ function ChatDiagnosisCard({ onComplete }) {
                 <div style={{ width: 6, height: 6, borderRadius: '50%', background: G }} />
                 <span style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.18em', color: G, fontWeight: 600 }}>診断完了 — あなたへのご提案</span>
               </div>
-              <div style={{ fontSize: 13, color: '#1A1814', fontWeight: 600, marginBottom: 3 }}>{skinLabel} × {answers.concern}</div>
+              <div style={{ fontSize: 13, color: '#1A1814', fontWeight: 600, marginBottom: 3 }}>{skinLabel} × {concern}</div>
               <div style={{ fontSize: 11, color: '#7A706A', marginBottom: 14 }}>{resultNote}</div>
               <div style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.14em', color: '#AAA098', marginBottom: 10 }}>注目すべき成分</div>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
@@ -200,7 +250,7 @@ function ChatDiagnosisCard({ onComplete }) {
                 ))}
               </div>
               <button
-                onClick={() => onComplete && onComplete(answers)}
+                onClick={() => onComplete && onComplete({ concern, skinType })}
                 style={{ width: '100%', padding: '12px', borderRadius: 10, border: 'none', background: `linear-gradient(135deg, ${G} 0%, ${GD} 100%)`, color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', letterSpacing: '0.02em', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, boxShadow: `0 4px 16px rgba(29,171,106,0.30)`, transition: 'all 0.15s ease' }}
                 onMouseEnter={e => e.currentTarget.style.boxShadow = `0 6px 24px rgba(29,171,106,0.40)`}
                 onMouseLeave={e => e.currentTarget.style.boxShadow = `0 4px 16px rgba(29,171,106,0.30)`}
@@ -212,14 +262,72 @@ function ChatDiagnosisCard({ onComplete }) {
           )}
         </div>
 
-        {/* クイックリプライ */}
-        {currentQuick.length > 0 && (
-          <div style={{ padding: '0 16px 16px', borderTop: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 8, animation: 'skinrSlideUp 0.22s ease' }}>
-            <div style={{ paddingTop: 12, fontSize: 10, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.14em', color: '#AAA098' }}>選択してください</div>
+        {/* ── 自由記述入力（悩みステップ） ── */}
+        {phase === 'concern_input' && (
+          <div style={{ padding: '12px 14px 14px', borderTop: '1px solid var(--border)', animation: 'skinrSlideUp 0.22s ease' }}>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
+              <input
+                ref={inputRef}
+                value={inputText}
+                onChange={e => setInputText(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submitConcern(); } }}
+                placeholder="例：ぶつぶつが気になる、乾燥してかさかさ…"
+                style={{
+                  flex: 1, padding: '11px 14px', borderRadius: 12,
+                  border: '1.5px solid var(--border)', background: 'var(--bg-soft)',
+                  fontSize: 13, fontFamily: 'inherit', color: '#1A1814',
+                  outline: 'none', transition: 'border-color 0.15s ease',
+                }}
+                onFocus={e => e.currentTarget.style.borderColor = G}
+                onBlur={e => e.currentTarget.style.borderColor = 'var(--border)'}
+              />
+              <button
+                onClick={submitConcern}
+                disabled={!inputText.trim()}
+                style={{
+                  padding: '11px 18px', borderRadius: 12, border: 'none', flexShrink: 0,
+                  background: inputText.trim() ? `linear-gradient(135deg, ${G} 0%, ${GD} 100%)` : 'var(--bg-soft)',
+                  color: inputText.trim() ? '#fff' : '#C8B8A8',
+                  fontSize: 13, fontWeight: 600,
+                  cursor: inputText.trim() ? 'pointer' : 'default',
+                  fontFamily: 'inherit', transition: 'all 0.15s ease',
+                  boxShadow: inputText.trim() ? '0 2px 12px rgba(29,171,106,0.28)' : 'none',
+                }}
+              >送信</button>
+            </div>
+            <div style={{ marginTop: 8, fontSize: 10, color: '#C8C0B8', letterSpacing: '0.02em' }}>
+              気になることを自由に入力してください · Enter で送信
+            </div>
+          </div>
+        )}
+
+        {/* ── フォローアップ選択（キーワード未一致時） ── */}
+        {phase === 'concern_followup' && (
+          <div style={{ padding: '0 14px 14px', borderTop: '1px solid var(--border)', animation: 'skinrSlideUp 0.22s ease' }}>
+            <div style={{ paddingTop: 12, fontSize: 10, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.14em', color: '#AAA098', marginBottom: 8 }}>近いものを選んでください</div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {currentQuick.map(q => (
-                <button key={q.label} onClick={() => pick(q)}
-                  style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: '10px 15px', borderRadius: 12, border: '1.5px solid var(--border)', background: 'var(--bg)', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left', transition: 'all 0.14s ease', flex: currentQuick.length > 3 ? '0 0 calc(50% - 4px)' : '1', minWidth: 0 }}
+              {CONCERN_OPTIONS.map(q => (
+                <button key={q.label} onClick={() => pickConcernFollowup(q.label)}
+                  style={optionButtonStyle(true)}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = G; e.currentTarget.style.background = `rgba(29,171,106,0.04)`; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'var(--bg)'; e.currentTarget.style.transform = 'none'; }}
+                >
+                  <span style={{ fontSize: 13, fontWeight: 500, color: '#1A1814', letterSpacing: '-0.01em' }}>{q.label}</span>
+                  {q.sub && <span style={{ fontSize: 10, color: '#AAA098', marginTop: 2 }}>{q.sub}</span>}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── 肌タイプ選択 ── */}
+        {phase === 'skintype' && (
+          <div style={{ padding: '0 14px 14px', borderTop: '1px solid var(--border)', animation: 'skinrSlideUp 0.22s ease' }}>
+            <div style={{ paddingTop: 12, fontSize: 10, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.14em', color: '#AAA098', marginBottom: 8 }}>肌タイプを選んでください</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {SKIN_TYPE_OPTIONS.map(q => (
+                <button key={q.label} onClick={() => pickSkinType(q.label)}
+                  style={optionButtonStyle(true)}
                   onMouseEnter={e => { e.currentTarget.style.borderColor = G; e.currentTarget.style.background = `rgba(29,171,106,0.04)`; e.currentTarget.style.transform = 'translateY(-1px)'; }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'var(--bg)'; e.currentTarget.style.transform = 'none'; }}
                 >
@@ -391,7 +499,7 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
               fontSize: 14, lineHeight: 1.85, color: '#999',
               margin: '0 0 32px', maxWidth: 300,
             }}>
-              2つの質問に答えるだけ。<br />
+              気になる悩みを伝えるだけ。<br />
               成分ロジックがあなたに合う<br />
               ケアを一本に絞り込みます。
             </p>
@@ -399,7 +507,7 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
             <div style={{ display: 'flex', gap: 28 }}>
               {[
                 { num: '72', label: '取扱商品' },
-                { num: '2問', label: '診断ステップ' },
+                { num: 'AI', label: '成分診断' },
                 { num: '無料', label: '完全無料' },
               ].map(s => (
                 <div key={s.label}>
@@ -417,9 +525,9 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
 
           {/* 右: チャットカード */}
           <div style={{ flex: 1, minWidth: 0 }}>
-            <ChatDiagnosisCard onComplete={(answers) => {
-              const skin = answers.skinType === 'わからない' ? '' : `肌タイプは${answers.skinType}で、`;
-              const msg  = `${skin}${answers.concern}に悩んでいます。`;
+            <ChatDiagnosisCard onComplete={({ concern, skinType }) => {
+              const skin = skinType === 'わからない' ? '' : `肌タイプは${skinType}で、`;
+              const msg  = `${skin}${concern}に悩んでいます。`;
               onSendInline(msg);
             }} />
           </div>
@@ -436,11 +544,11 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
             「何が合うか<br />わからない」を<br />終わりにする。
           </h1>
           <p style={{ fontSize: 12, lineHeight: 1.65, color: '#999', margin: '0 0 20px' }}>
-            2つの質問で、あなたの肌に合う成分を絞り込みます。
+            気になる悩みを入力するだけ。あなたの肌に合う成分を絞り込みます。
           </p>
-          <ChatDiagnosisCard onComplete={(answers) => {
-            const skin = answers.skinType === 'わからない' ? '' : `肌タイプは${answers.skinType}で、`;
-            const msg  = `${skin}${answers.concern}に悩んでいます。`;
+          <ChatDiagnosisCard onComplete={({ concern, skinType }) => {
+            const skin = skinType === 'わからない' ? '' : `肌タイプは${skinType}で、`;
+            const msg  = `${skin}${concern}に悩んでいます。`;
             onSendInline(msg);
           }} />
         </div>

@@ -353,8 +353,8 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
   const [activeFilterIds, setActiveFilterIds] = useState(homeFilter?.productIds || null);
   const activeFilterLabel = homeFilter?.label || null;
 
-  const scrollRow = (brand, dir) => {
-    const el = scrollRowRefs.current[brand];
+  const scrollRow = (key, dir) => {
+    const el = scrollRowRefs.current[key];
     if (el) el.scrollBy({ left: dir * (isDesktop ? 640 : 320), behavior: 'smooth' });
   };
 
@@ -398,14 +398,21 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
   // フィルターが何も掛かっていない = ブランド別表示モード
   const isBrandMode = cat === 'all' && !skinFilter && !query && !activeFilterIds;
 
-  // ブランド別グループ（順序を保持）
+  // ブランド → ライン別グループ（順序を保持）
   const brandGroups = isBrandMode ? (() => {
-    const map = new Map();
+    const brandMap = new Map();
     PRODUCTS.forEach(p => {
-      if (!map.has(p.brand)) map.set(p.brand, []);
-      map.get(p.brand).push(p);
+      if (!brandMap.has(p.brand)) brandMap.set(p.brand, new Map());
+      const lineKey = p.line || '—';
+      const lm = brandMap.get(p.brand);
+      if (!lm.has(lineKey)) lm.set(lineKey, []);
+      lm.get(lineKey).push(p);
     });
-    return [...map.entries()].map(([brand, products]) => ({ brand, products }));
+    return [...brandMap.entries()].map(([brand, lm]) => ({
+      brand,
+      total: [...lm.values()].reduce((s, ps) => s + ps.length, 0),
+      lines: [...lm.entries()].map(([line, products]) => ({ line, products })),
+    }));
   })() : null;
 
   return (
@@ -655,107 +662,71 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
         )}
       </div>
 
-      {/* ── ブランド別横スクロール（Netflixスタイル） ── */}
+      {/* ── ブランド → ライン別横スクロール（Netflixスタイル） ── */}
       {isBrandMode ? (
         <div style={{ padding: `8px 0 32px` }}>
-          {brandGroups.map(({ brand, products }) => (
-            <div key={brand} style={{ marginBottom: 4 }}>
+          {brandGroups.map(({ brand, total, lines }) => (
+            <div key={brand} style={{ marginBottom: 8 }}>
               {/* ブランドヘッダー */}
               <div style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: `20px ${px} 12px`,
+                padding: `24px ${px} 4px`,
               }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
-                  <span style={{
-                    fontSize: isDesktop ? 16 : 14,
-                    fontWeight: 600, color: '#1A1814', letterSpacing: '-0.02em',
-                  }}>{brand}</span>
-                  <span style={{
-                    fontSize: 10, color: '#C5C5C5',
-                    fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.1em',
-                  }}>{products.length} ITEMS</span>
+                  <span style={{ fontSize: isDesktop ? 17 : 15, fontWeight: 700, color: '#1A1814', letterSpacing: '-0.02em' }}>{brand}</span>
+                  <span style={{ fontSize: 10, color: '#C5C5C5', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.1em' }}>{total} ITEMS</span>
                 </div>
-                <button
-                  onClick={() => { setQuery(brand); setActiveFilterIds(null); }}
-                  style={{
-                    background: 'none', border: 'none', cursor: 'pointer',
-                    fontSize: 11, color: '#1DAB6A', fontWeight: 500,
-                    fontFamily: 'inherit', padding: '4px 0',
-                  }}
-                >
+                <button onClick={() => { setQuery(brand); setActiveFilterIds(null); }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, color: '#1DAB6A', fontWeight: 500, fontFamily: 'inherit', padding: '4px 0' }}>
                   全件 →
                 </button>
               </div>
 
-              {/* 横スクロール行 + 左右ボタン */}
-              <div style={{ position: 'relative' }}>
-                {/* 左ボタン */}
-                <button
-                  onClick={() => scrollRow(brand, -1)}
-                  style={{
-                    position: 'absolute', left: 8, top: '50%',
-                    transform: 'translateY(-50%)',
-                    zIndex: 2,
-                    width: 36, height: 36, borderRadius: '50%',
-                    border: '1.5px solid var(--border-strong)',
-                    background: 'rgba(255,254,251,0.95)',
-                    backdropFilter: 'blur(6px)',
-                    cursor: 'pointer',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    boxShadow: '0 2px 12px rgba(80,60,40,0.14)',
-                    transition: 'all 0.15s ease',
-                  }}
-                  onMouseEnter={e => { e.currentTarget.style.background = '#1DAB6A'; e.currentTarget.style.borderColor = '#1DAB6A'; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,254,251,0.95)'; e.currentTarget.style.borderColor = 'var(--border-strong)'; }}
-                >
-                  <Icon name="arrowRight" size={13} color="#555"
-                    style={{ transform: 'rotate(180deg)', display: 'block' }}
-                  />
-                </button>
+              {/* ライン別行 */}
+              {lines.map(({ line, products }) => {
+                const rowKey = brand + '::' + line;
+                return (
+                  <div key={rowKey} style={{ marginTop: 12 }}>
+                    {/* ラインラベル */}
+                    {line !== '—' && (
+                      <div style={{ padding: `0 ${px} 8px`, display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.12em', color: '#B0A898' }}>{line.toUpperCase()}</span>
+                        <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+                      </div>
+                    )}
+                    {/* 横スクロール行 + 左右ボタン */}
+                    <div style={{ position: 'relative' }}>
+                      <button onClick={() => scrollRow(rowKey, -1)}
+                        style={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)', zIndex: 2, width: 34, height: 34, borderRadius: '50%', border: '1.5px solid var(--border-strong)', background: 'rgba(255,254,251,0.95)', backdropFilter: 'blur(6px)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 12px rgba(80,60,40,0.14)', transition: 'all 0.15s ease' }}
+                        onMouseEnter={e => { e.currentTarget.style.background = '#1DAB6A'; e.currentTarget.style.borderColor = '#1DAB6A'; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,254,251,0.95)'; e.currentTarget.style.borderColor = 'var(--border-strong)'; }}
+                      >
+                        <Icon name="arrowRight" size={12} color="#555" style={{ transform: 'rotate(180deg)', display: 'block' }} />
+                      </button>
 
-                {/* スクロール行 */}
-                <div
-                  ref={el => { scrollRowRefs.current[brand] = el; }}
-                  className="skinr-scroll"
-                  style={{
-                    display: 'flex', gap: isDesktop ? 16 : 12,
-                    overflowX: 'auto', overflowY: 'visible',
-                    padding: `4px ${px} 16px`,
-                    scrollbarWidth: 'none',
-                  }}
-                >
-                  {products.map(p => (
-                    <div key={p.id} style={{ width: isDesktop ? 200 : 160, flexShrink: 0 }}>
-                      <ProductCard product={p} onClick={() => onOpenProduct(p.id)} />
+                      <div ref={el => { scrollRowRefs.current[rowKey] = el; }} className="skinr-scroll"
+                        style={{ display: 'flex', gap: isDesktop ? 16 : 12, overflowX: 'auto', overflowY: 'visible', padding: `4px ${px} 16px`, scrollbarWidth: 'none' }}>
+                        {products.map(p => (
+                          <div key={p.id} style={{ width: isDesktop ? 200 : 160, flexShrink: 0 }}>
+                            <ProductCard product={p} onClick={() => onOpenProduct(p.id)} />
+                          </div>
+                        ))}
+                      </div>
+
+                      <button onClick={() => scrollRow(rowKey, 1)}
+                        style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', zIndex: 2, width: 34, height: 34, borderRadius: '50%', border: '1.5px solid var(--border-strong)', background: 'rgba(255,254,251,0.95)', backdropFilter: 'blur(6px)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 12px rgba(80,60,40,0.14)', transition: 'all 0.15s ease' }}
+                        onMouseEnter={e => { e.currentTarget.style.background = '#1DAB6A'; e.currentTarget.style.borderColor = '#1DAB6A'; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,254,251,0.95)'; e.currentTarget.style.borderColor = 'var(--border-strong)'; }}
+                      >
+                        <Icon name="arrowRight" size={12} color="#555" />
+                      </button>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                );
+              })}
 
-                {/* 右ボタン */}
-                <button
-                  onClick={() => scrollRow(brand, 1)}
-                  style={{
-                    position: 'absolute', right: 8, top: '50%',
-                    transform: 'translateY(-50%)',
-                    zIndex: 2,
-                    width: 36, height: 36, borderRadius: '50%',
-                    border: '1.5px solid var(--border-strong)',
-                    background: 'rgba(255,254,251,0.95)',
-                    backdropFilter: 'blur(6px)',
-                    cursor: 'pointer',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    boxShadow: '0 2px 12px rgba(80,60,40,0.14)',
-                    transition: 'all 0.15s ease',
-                  }}
-                  onMouseEnter={e => { e.currentTarget.style.background = '#1DAB6A'; e.currentTarget.style.borderColor = '#1DAB6A'; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,254,251,0.95)'; e.currentTarget.style.borderColor = 'var(--border-strong)'; }}
-                >
-                  <Icon name="arrowRight" size={13} color="#555" />
-                </button>
-              </div>
-
-              {/* セパレーター */}
-              <div style={{ margin: `4px ${px} 0`, height: 1, background: 'var(--border)' }} />
+              {/* ブランドセパレーター */}
+              <div style={{ margin: `12px ${px} 0`, height: 1, background: 'var(--border-strong)' }} />
             </div>
           ))}
         </div>

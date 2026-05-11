@@ -111,7 +111,7 @@ function LayoutA() {
                 <span style={{ fontSize: 14, fontWeight: 600, color: '#1A1814' }}>{brand}</span>
                 <span style={{ fontSize: 10, color: '#C5C5C5', fontFamily: 'JetBrains Mono, monospace' }}>{prods.length} ITEMS</span>
               </div>
-              <span style={{ fontSize: 11, color: G, fontWeight: 500 }}>全件 →</span>
+              <span style={{ fontSize: 11, color: G, fontWeight: 500 }}>もっと見る →</span>
             </div>
             <div style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 20px 18px', scrollbarWidth: 'none' }}>
               {prods.map(p => (

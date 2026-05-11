@@ -520,7 +520,7 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
         }}>
           <SkinrEyebrow>Ingredient Logic AI</SkinrEyebrow>
           <h1 style={{ margin: '10px 0 6px', fontSize: 26, lineHeight: 1.25, fontWeight: 400, letterSpacing: '-0.03em' }}>
-            「何が合うか<br />わからない」を<br />終わりにする。
+            「何が合うかわからない」を終わりにする。
           </h1>
           <p style={{ fontSize: 12, lineHeight: 1.65, color: '#999', margin: '0 0 20px' }}>
             気になる悩みを入力するだけ。あなたの肌に合う成分を絞り込みます。

@@ -675,9 +675,16 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
                     fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.1em',
                   }}>{products.length} ITEMS</span>
                 </div>
-                <span style={{ fontSize: 11, color: '#1DAB6A', fontWeight: 500, cursor: 'default' }}>
+                <button
+                  onClick={() => { setQuery(brand); setActiveFilterIds(null); }}
+                  style={{
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    fontSize: 11, color: '#1DAB6A', fontWeight: 500,
+                    fontFamily: 'inherit', padding: '4px 0',
+                  }}
+                >
                   全件 →
-                </span>
+                </button>
               </div>
 
               {/* 横スクロール行 + 左右ボタン */}

@@ -235,23 +235,20 @@ function ChatDiagnosisCard({ onComplete }) {
   );
 }
 
-const BRAND_INITIAL = 4; // ブランドセクションの初期表示数
-
 export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSendInline, lastDiagnosis, onViewLastResult, homeFilter }) {
   const [cat, setCat] = useState(homeFilter?.cat || 'all');
-  const [skinFilter, setSkinFilter] = useState(null); // 肌タイプ絞り込み
+  const [skinFilter, setSkinFilter] = useState(null);
   const [query, setQuery] = useState('');
   const [searchFocused, setSearchFocused] = useState(false);
-  const [expandedBrands, setExpandedBrands] = useState(new Set());
+  const scrollRowRefs = useRef({});
   // 診断フィルター（結果画面の「すべて見る」から来た場合）
   const [activeFilterIds, setActiveFilterIds] = useState(homeFilter?.productIds || null);
   const activeFilterLabel = homeFilter?.label || null;
 
-  const toggleBrand = (brand) => setExpandedBrands(prev => {
-    const next = new Set(prev);
-    next.has(brand) ? next.delete(brand) : next.add(brand);
-    return next;
-  });
+  const scrollRow = (brand, dir) => {
+    const el = scrollRowRefs.current[brand];
+    if (el) el.scrollBy({ left: dir * (isDesktop ? 640 : 320), behavior: 'smooth' });
+  };
 
   const clearFilter = () => {
     setActiveFilterIds(null);
@@ -570,86 +567,102 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
         )}
       </div>
 
-      {/* ── ブランド別表示 ── */}
+      {/* ── ブランド別横スクロール（Netflixスタイル） ── */}
       {isBrandMode ? (
-        <div style={{ padding: `8px 0 24px` }}>
-          {brandGroups.map(({ brand, products }) => {
-            const expanded = expandedBrands.has(brand);
-            const visible = expanded ? products : products.slice(0, BRAND_INITIAL);
-            const hasMore = products.length > BRAND_INITIAL;
-            return (
-              <div key={brand} style={{ marginBottom: 8 }}>
-                {/* ブランドヘッダー */}
-                <div style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  padding: `20px ${px} 14px`,
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{
-                      fontSize: isDesktop ? 16 : 14,
-                      fontWeight: 600, color: '#1A1814', letterSpacing: '-0.02em',
-                    }}>{brand}</span>
-                    <span style={{
-                      fontSize: 10, color: '#B5B5B5',
-                      fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.1em',
-                    }}>{products.length} ITEMS</span>
-                  </div>
-                  {hasMore && (
-                    <button
-                      onClick={() => toggleBrand(brand)}
-                      style={{
-                        display: 'flex', alignItems: 'center', gap: 4,
-                        background: 'none', border: 'none', cursor: 'pointer',
-                        fontSize: 12, color: '#1DAB6A', fontWeight: 500,
-                        fontFamily: 'inherit', padding: '4px 0',
-                        letterSpacing: '-0.01em',
-                      }}
-                    >
-                      {expanded ? '閉じる' : `すべて見る (${products.length})`}
-                      <Icon name="arrowRight" size={11} color="#1DAB6A"
-                        style={{ transform: expanded ? 'rotate(270deg)' : 'rotate(90deg)', transition: 'transform 0.2s' }}
-                      />
-                    </button>
-                  )}
+        <div style={{ padding: `8px 0 32px` }}>
+          {brandGroups.map(({ brand, products }) => (
+            <div key={brand} style={{ marginBottom: 4 }}>
+              {/* ブランドヘッダー */}
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: `20px ${px} 12px`,
+              }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+                  <span style={{
+                    fontSize: isDesktop ? 16 : 14,
+                    fontWeight: 600, color: '#1A1814', letterSpacing: '-0.02em',
+                  }}>{brand}</span>
+                  <span style={{
+                    fontSize: 10, color: '#C5C5C5',
+                    fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.1em',
+                  }}>{products.length} ITEMS</span>
                 </div>
-                {/* 商品グリッド */}
-                <div style={{
-                  padding: `0 ${px}`,
-                  display: 'grid',
-                  gridTemplateColumns: isDesktop
-                    ? 'repeat(auto-fill, minmax(190px, 1fr))'
-                    : 'repeat(2, 1fr)',
-                  gap: isDesktop ? '28px 20px' : '24px 14px',
-                }}>
-                  {visible.map(p => (
-                    <ProductCard key={p.id} product={p} onClick={() => onOpenProduct(p.id)} />
+                <span style={{ fontSize: 11, color: '#1DAB6A', fontWeight: 500, cursor: 'default' }}>
+                  全件 →
+                </span>
+              </div>
+
+              {/* 横スクロール行 + 左右ボタン */}
+              <div style={{ position: 'relative' }}>
+                {/* 左ボタン */}
+                <button
+                  onClick={() => scrollRow(brand, -1)}
+                  style={{
+                    position: 'absolute', left: 8, top: '50%',
+                    transform: 'translateY(-50%)',
+                    zIndex: 2,
+                    width: 36, height: 36, borderRadius: '50%',
+                    border: '1.5px solid var(--border-strong)',
+                    background: 'rgba(255,254,251,0.95)',
+                    backdropFilter: 'blur(6px)',
+                    cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    boxShadow: '0 2px 12px rgba(80,60,40,0.14)',
+                    transition: 'all 0.15s ease',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = '#1DAB6A'; e.currentTarget.style.borderColor = '#1DAB6A'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,254,251,0.95)'; e.currentTarget.style.borderColor = 'var(--border-strong)'; }}
+                >
+                  <Icon name="arrowRight" size={13} color="#555"
+                    style={{ transform: 'rotate(180deg)', display: 'block' }}
+                  />
+                </button>
+
+                {/* スクロール行 */}
+                <div
+                  ref={el => { scrollRowRefs.current[brand] = el; }}
+                  className="skinr-scroll"
+                  style={{
+                    display: 'flex', gap: isDesktop ? 16 : 12,
+                    overflowX: 'auto', overflowY: 'visible',
+                    padding: `4px ${px} 16px`,
+                    scrollbarWidth: 'none',
+                  }}
+                >
+                  {products.map(p => (
+                    <div key={p.id} style={{ width: isDesktop ? 200 : 160, flexShrink: 0 }}>
+                      <ProductCard product={p} onClick={() => onOpenProduct(p.id)} />
+                    </div>
                   ))}
                 </div>
-                {/* もっと見るボタン（展開前のみ） */}
-                {hasMore && !expanded && (
-                  <div style={{ padding: `16px ${px} 4px`, textAlign: 'center' }}>
-                    <button
-                      onClick={() => toggleBrand(brand)}
-                      style={{
-                        width: '100%', padding: '11px',
-                        borderRadius: 10, border: '1.5px solid var(--border)',
-                        background: 'var(--bg)', cursor: 'pointer',
-                        fontSize: 12, fontWeight: 500, color: '#555',
-                        fontFamily: 'inherit', letterSpacing: '-0.01em',
-                        transition: 'all 0.14s ease',
-                      }}
-                      onMouseEnter={e => { e.currentTarget.style.borderColor = '#1DAB6A'; e.currentTarget.style.color = '#1DAB6A'; }}
-                      onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = '#555'; }}
-                    >
-                      {brand} の商品をもっと見る — あと {products.length - BRAND_INITIAL} 点
-                    </button>
-                  </div>
-                )}
-                {/* セパレーター */}
-                <div style={{ margin: `20px ${px} 0`, height: 1, background: 'var(--border)' }} />
+
+                {/* 右ボタン */}
+                <button
+                  onClick={() => scrollRow(brand, 1)}
+                  style={{
+                    position: 'absolute', right: 8, top: '50%',
+                    transform: 'translateY(-50%)',
+                    zIndex: 2,
+                    width: 36, height: 36, borderRadius: '50%',
+                    border: '1.5px solid var(--border-strong)',
+                    background: 'rgba(255,254,251,0.95)',
+                    backdropFilter: 'blur(6px)',
+                    cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    boxShadow: '0 2px 12px rgba(80,60,40,0.14)',
+                    transition: 'all 0.15s ease',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = '#1DAB6A'; e.currentTarget.style.borderColor = '#1DAB6A'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,254,251,0.95)'; e.currentTarget.style.borderColor = 'var(--border-strong)'; }}
+                >
+                  <Icon name="arrowRight" size={13} color="#555" />
+                </button>
               </div>
-            );
-          })}
+
+              {/* セパレーター */}
+              <div style={{ margin: `4px ${px} 0`, height: 1, background: 'var(--border)' }} />
+            </div>
+          ))}
         </div>
       ) : (
         /* ── フィルター中: フラットグリッド ── */

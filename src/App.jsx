@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import InputPreview from './screens/InputPreview.jsx';
 import SkinrHome from './screens/SkinrHome.jsx';
 import SkinrChat from './screens/SkinrChat.jsx';
 import SkinrResult from './screens/SkinrResult.jsx';
@@ -65,7 +66,7 @@ function DesktopHeader({ screen, lastDiagnosis, onHome, onChat, onResult }) {
         style={{
           display: 'flex', alignItems: 'center', gap: 7,
           padding: '9px 20px', borderRadius: 8, border: 'none',
-          background: screen === 'chat' ? '#155239' : '#1A6644',
+          background: screen === 'chat' ? '#178A55' : '#1DAB6A',
           color: '#fff', fontSize: 13, fontWeight: 500,
           cursor: 'pointer', fontFamily: 'inherit',
           letterSpacing: '0.02em',
@@ -82,7 +83,7 @@ function DesktopHeader({ screen, lastDiagnosis, onHome, onChat, onResult }) {
 
 // ─── App ─────────────────────────────────────────────────
 export default function App() {
-  const [screen, setScreen] = useState('home');
+  const [screen, setScreen] = useState(new URLSearchParams(location.search).get('preview') ? 'preview' : 'home');
   const [prevScreen, setPrevScreen] = useState('home');
   const [productId, setProductId] = useState('anua-toner');
   const [chatSeed, setChatSeed] = useState(null);
@@ -129,6 +130,7 @@ export default function App() {
 
       {/* Main content */}
       <div className="skinr-content">
+        {screen === 'preview' && <InputPreview />}
         {screen === 'home' && (
           <div key="home" className="skinr-screen">
             <SkinrHome

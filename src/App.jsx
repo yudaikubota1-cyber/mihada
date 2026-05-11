@@ -44,16 +44,8 @@ function HeaderNavLink({ label, active, onClick }) {
 
 function DesktopHeader({ screen, lastDiagnosis, onHome, onChat, onResult }) {
   return (
-    <header className="skinr-desktop-header">
-      {/* Logo */}
-      <button onClick={onHome} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0 }}>
-        <SkinrLogo size={15} />
-      </button>
-
-      {/* Divider */}
-      <div style={{ width: 1, height: 20, background: 'var(--border)', margin: '0 28px 0 32px', flexShrink: 0 }} />
-
-      {/* Nav links */}
+    <header className="skinr-desktop-header" style={{ position: 'relative' }}>
+      {/* 左: ナビリンク */}
       <nav style={{ display: 'flex', alignItems: 'center', gap: 2, flex: 1 }}>
         <HeaderNavLink label="商品一覧" active={screen === 'home'} onClick={onHome} />
         {lastDiagnosis && (
@@ -61,7 +53,25 @@ function DesktopHeader({ screen, lastDiagnosis, onHome, onChat, onResult }) {
         )}
       </nav>
 
-      {/* AI診断 CTA */}
+      {/* 中央: ブランド名（絶対配置で真ん中固定） */}
+      <button
+        onClick={onHome}
+        style={{
+          position: 'absolute', left: '50%', top: '50%',
+          transform: 'translate(-50%, -50%)',
+          background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+          display: 'flex', alignItems: 'center', gap: 7,
+        }}
+      >
+        <span style={{ fontSize: 11, letterSpacing: '0.06em', color: '#AAA098' }}>🕯</span>
+        <span style={{
+          fontSize: 14, fontWeight: 600, letterSpacing: '0.18em',
+          color: '#1A1814', fontFamily: 'inherit', textTransform: 'uppercase',
+        }}>mihada</span>
+        <span style={{ fontSize: 11, letterSpacing: '0.06em', color: '#AAA098' }}>🕯</span>
+      </button>
+
+      {/* 右: AI診断 CTA */}
       <button
         onClick={onChat}
         style={{
@@ -73,6 +83,7 @@ function DesktopHeader({ screen, lastDiagnosis, onHome, onChat, onResult }) {
           letterSpacing: '0.02em',
           boxShadow: '0 2px 16px rgba(26,102,68,0.30)',
           transition: 'all 0.14s ease',
+          flex: 'none',
         }}
       >
         <Icon name="sparkle" size={12} color="#fff" />

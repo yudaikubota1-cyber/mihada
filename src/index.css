@@ -51,8 +51,17 @@ body {
   background: var(--bg);
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
   /* iOSノッチ・ホームバー対応 */
   padding-bottom: env(safe-area-inset-bottom);
+}
+
+.skinr-content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 /* フォーカス時のアウトラインをリセット（キーボード操作は保持） */

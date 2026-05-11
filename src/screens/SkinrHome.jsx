@@ -140,14 +140,14 @@ function ChatDiagnosisCard({ onComplete }) {
           <div style={{ textAlign: 'right' }}>
             <div style={{ fontSize: 9, fontFamily: 'JetBrains Mono, monospace', color: 'rgba(255,255,255,0.45)', letterSpacing: '0.1em' }}>STEP</div>
             <div style={{ fontSize: 16, fontWeight: 700, color: '#fff', fontFamily: 'JetBrains Mono, monospace', lineHeight: 1 }}>
-              {done ? '✓' : Math.max(0, flowStep - 1)}<span style={{ fontSize: 10, opacity: 0.5 }}>{done ? '' : '/3'}</span>
+              {done ? '✓' : Math.min(flowStep, 2)}<span style={{ fontSize: 10, opacity: 0.5 }}>{done ? '' : '/2'}</span>
             </div>
           </div>
         </div>
 
         {/* プログレスバー */}
         <div style={{ height: 2, background: `rgba(29,171,106,0.12)` }}>
-          <div style={{ height: '100%', background: `linear-gradient(90deg, ${G}, ${GD})`, width: done ? '100%' : `${Math.max(6, (Math.max(0, flowStep - 1) / 3) * 100)}%`, transition: 'width 0.5s cubic-bezier(0.4,0,0.2,1)' }} />
+          <div style={{ height: '100%', background: `linear-gradient(90deg, ${G}, ${GD})`, width: done ? '100%' : `${Math.max(6, (Math.max(0, flowStep - 1) / 2) * 100)}%`, transition: 'width 0.5s cubic-bezier(0.4,0,0.2,1)' }} />
         </div>
 
         {/* メッセージエリア */}
@@ -239,7 +239,6 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
   const [cat, setCat] = useState(homeFilter?.cat || 'all');
   const [skinFilter, setSkinFilter] = useState(null); // 肌タイプ絞り込み
   const [query, setQuery] = useState('');
-  const [draft, setDraft] = useState('');
   const [searchFocused, setSearchFocused] = useState(false);
   // 診断フィルター（結果画面の「すべて見る」から来た場合）
   const [activeFilterIds, setActiveFilterIds] = useState(homeFilter?.productIds || null);
@@ -360,23 +359,41 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
           alignItems: 'center', gap: 80,
         }}>
           {/* 左: コピー */}
-          <div style={{ flex: '0 0 auto', maxWidth: 380 }}>
+          <div style={{ flex: '0 0 auto', maxWidth: 400 }}>
             <SkinrEyebrow>Ingredient Logic AI</SkinrEyebrow>
             <h1 style={{
-              margin: '20px 0 16px',
-              fontSize: 48, lineHeight: 1.15,
+              margin: '20px 0 18px',
+              fontSize: 52, lineHeight: 1.1,
               fontWeight: 400, letterSpacing: '-0.04em',
             }}>
               「何が合うか<br />わからない」を<br />終わりにする。
             </h1>
             <p style={{
-              fontSize: 14, lineHeight: 1.8, color: '#999',
-              margin: '0 0 0', maxWidth: 320,
+              fontSize: 14, lineHeight: 1.85, color: '#999',
+              margin: '0 0 32px', maxWidth: 300,
             }}>
-              3つの質問に答えるだけ。<br />
+              2つの質問に答えるだけ。<br />
               成分ロジックがあなたに合う<br />
-              ケアを導き出します。
+              ケアを一本に絞り込みます。
             </p>
+            {/* スタッツ */}
+            <div style={{ display: 'flex', gap: 28 }}>
+              {[
+                { num: '72', label: '取扱商品' },
+                { num: '2問', label: '診断ステップ' },
+                { num: '無料', label: '完全無料' },
+              ].map(s => (
+                <div key={s.label}>
+                  <div style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em', color: '#1A1814' }}>{s.num}</div>
+                  <div style={{ fontSize: 10, color: '#B5B5B5', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.1em', marginTop: 2 }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
+            {/* スクロールヒント */}
+            <div style={{ marginTop: 48, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ width: 1, height: 28, background: 'var(--border-strong)' }} />
+              <span style={{ fontSize: 10, color: '#C5C5C5', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.14em' }}>SCROLL TO BROWSE</span>
+            </div>
           </div>
 
           {/* 右: チャットカード */}
@@ -389,57 +406,24 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
           </div>
         </div>
       ) : (
-        /* ── Mobile: single column hero ─────────────── */
-        <div style={{ padding: '40px 24px 24px' }}>
-          <SkinrEyebrow>Ingredient Logic</SkinrEyebrow>
-          <h1 style={{ margin: '12px 0 10px', fontSize: 28, lineHeight: 1.25, fontWeight: 400, letterSpacing: '-0.03em' }}>
-            「何が合うかわからない」<br />を終わりにする。
+        /* ── Mobile: chat card hero ─────────────── */
+        <div style={{
+          padding: '32px 20px 28px',
+          background: 'linear-gradient(160deg, var(--bg-warm) 0%, var(--bg-soft) 60%, var(--bg) 100%)',
+          borderBottom: '1px solid var(--border-strong)',
+        }}>
+          <SkinrEyebrow>Ingredient Logic AI</SkinrEyebrow>
+          <h1 style={{ margin: '10px 0 6px', fontSize: 26, lineHeight: 1.25, fontWeight: 400, letterSpacing: '-0.03em' }}>
+            「何が合うか<br />わからない」を<br />終わりにする。
           </h1>
-          <p style={{ fontSize: 13, lineHeight: 1.6, color: '#777', margin: '0 0 20px' }}>
-            悩みを入れるだけ。成分ロジックが一本に絞り込む。
+          <p style={{ fontSize: 12, lineHeight: 1.65, color: '#999', margin: '0 0 20px' }}>
+            2つの質問で、あなたの肌に合う成分を絞り込みます。
           </p>
-          {/* Chat input */}
-          <div style={{ border: '1px solid var(--border)', borderRadius: 24, overflow: 'hidden', background: 'var(--bg)', boxShadow: '0 16px 56px rgba(100,80,60,0.12)' }}>
-            <div style={{ padding: '18px 20px 12px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
-                <div style={{ width: 16, height: 16, borderRadius: 4, background: '#111', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Icon name="sparkle" size={9} color="#fff" />
-                </div>
-                <span style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.18em', color: '#ADADAD' }}>成分ロジック</span>
-              </div>
-              <textarea
-                value={draft}
-                onChange={(e) => { setDraft(e.target.value); e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 140) + 'px'; }}
-                onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey && draft.trim()) { e.preventDefault(); onSendInline(draft.trim()); } }}
-                placeholder={'今の肌の悩みを、そのまま教えてください…'}
-                rows={1}
-                style={{ width: '100%', border: 'none', outline: 'none', resize: 'none', fontSize: 15, fontFamily: 'inherit', color: '#111', background: 'transparent', padding: '0', lineHeight: 1.7, overflowY: 'auto', minHeight: '26px' }}
-              />
-            </div>
-            <div style={{ background: 'var(--bg-soft)', borderTop: '1px solid var(--border)', padding: '10px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 10, color: '#C8C8C8', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.06em' }}>
-                {draft.trim() ? 'ENTER で送信' : 'SHIFT+ENTER で改行'}
-              </span>
-              <button
-                onClick={() => { if (draft.trim()) onSendInline(draft.trim()); else onStartChat(); }}
-                style={{ width: 42, height: 42, borderRadius: '50%', border: 'none', background: draft.trim() ? '#1DAB6A' : '#E4E4E4', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.18s ease', flexShrink: 0, boxShadow: draft.trim() ? '0 4px 16px rgba(0,0,0,0.22)' : 'none' }}
-              >
-                <Icon name="arrowRight" size={16} color={draft.trim() ? '#fff' : '#BCBCBC'} />
-              </button>
-            </div>
-          </div>
-          {/* Quick replies */}
-          <div style={{ marginTop: 20 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-              <span style={{ fontSize: 10, color: '#B5B5B5', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.18em', whiteSpace: 'nowrap' }}>悩みから選ぶ</span>
-              <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
-              {CONCERN_CHIPS.map((c, i) => (
-                <ConcernChip key={c.label} chip={c} onSend={onSendInline} index={i} />
-              ))}
-            </div>
-          </div>
+          <ChatDiagnosisCard onComplete={(answers) => {
+            const skin = answers.skinType === 'わからない' ? '' : `肌タイプは${answers.skinType}で、`;
+            const msg  = `${skin}${answers.concern}に悩んでいます。`;
+            onSendInline(msg);
+          }} />
         </div>
       )}
 

@@ -42,7 +42,7 @@ function HeaderNavLink({ label, active, onClick }) {
   );
 }
 
-function DesktopHeader({ screen, lastDiagnosis, onHome, onChat, onResult }) {
+function DesktopHeader({ screen, lastDiagnosis, onHome, onResult }) {
   return (
     <header className="skinr-desktop-header" style={{ position: 'relative' }}>
       {/* 左: ナビリンク */}
@@ -71,24 +71,8 @@ function DesktopHeader({ screen, lastDiagnosis, onHome, onChat, onResult }) {
         <span style={{ fontSize: 11, letterSpacing: '0.06em', color: '#AAA098' }}>🕯</span>
       </button>
 
-      {/* 右: AI診断 CTA */}
-      <button
-        onClick={onChat}
-        style={{
-          display: 'flex', alignItems: 'center', gap: 7,
-          padding: '9px 20px', borderRadius: 8, border: 'none',
-          background: screen === 'chat' ? '#178A55' : '#1DAB6A',
-          color: '#fff', fontSize: 13, fontWeight: 500,
-          cursor: 'pointer', fontFamily: 'inherit',
-          letterSpacing: '0.02em',
-          boxShadow: '0 2px 16px rgba(26,102,68,0.30)',
-          transition: 'all 0.14s ease',
-          flex: 'none',
-        }}
-      >
-        <Icon name="sparkle" size={12} color="#fff" />
-        AI 肌診断
-      </button>
+      {/* 右: スペーサー（左ナビと対称にするため） */}
+      <div style={{ flex: 1 }} />
     </header>
   );
 }
@@ -137,7 +121,6 @@ export default function App() {
         screen={screen}
         lastDiagnosis={lastDiagnosis}
         onHome={goHome}
-        onChat={() => goChat(null)}
         onResult={goLastResult}
       />
 

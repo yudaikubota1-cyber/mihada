@@ -235,14 +235,23 @@ function ChatDiagnosisCard({ onComplete }) {
   );
 }
 
+const BRAND_INITIAL = 4; // ブランドセクションの初期表示数
+
 export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSendInline, lastDiagnosis, onViewLastResult, homeFilter }) {
   const [cat, setCat] = useState(homeFilter?.cat || 'all');
   const [skinFilter, setSkinFilter] = useState(null); // 肌タイプ絞り込み
   const [query, setQuery] = useState('');
   const [searchFocused, setSearchFocused] = useState(false);
+  const [expandedBrands, setExpandedBrands] = useState(new Set());
   // 診断フィルター（結果画面の「すべて見る」から来た場合）
   const [activeFilterIds, setActiveFilterIds] = useState(homeFilter?.productIds || null);
   const activeFilterLabel = homeFilter?.label || null;
+
+  const toggleBrand = (brand) => setExpandedBrands(prev => {
+    const next = new Set(prev);
+    next.has(brand) ? next.delete(brand) : next.add(brand);
+    return next;
+  });
 
   const clearFilter = () => {
     setActiveFilterIds(null);
@@ -280,6 +289,19 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
   });
 
   const px = isDesktop ? '40px' : '24px';
+
+  // フィルターが何も掛かっていない = ブランド別表示モード
+  const isBrandMode = cat === 'all' && !skinFilter && !query && !activeFilterIds;
+
+  // ブランド別グループ（順序を保持）
+  const brandGroups = isBrandMode ? (() => {
+    const map = new Map();
+    PRODUCTS.forEach(p => {
+      if (!map.has(p.brand)) map.set(p.brand, []);
+      map.get(p.brand).push(p);
+    });
+    return [...map.entries()].map(([brand, products]) => ({ brand, products }));
+  })() : null;
 
   return (
     <div className={`skinr-scroll${isDesktop ? ' skinr-page' : ''}`} style={{
@@ -548,41 +570,125 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
         )}
       </div>
 
-      {/* Product grid */}
-      <div style={{
-        padding: `16px ${px} 24px`,
-        display: 'grid',
-        gridTemplateColumns: isDesktop
-          ? 'repeat(auto-fill, minmax(190px, 1fr))'
-          : 'repeat(2, 1fr)',
-        gap: isDesktop ? '28px 20px' : '24px 14px',
-      }}>
-        {filtered.map(p => (
-          <ProductCard key={p.id} product={p} onClick={() => onOpenProduct(p.id)} />
-        ))}
-      </div>
-
-      {filtered.length === 0 && (
-        <div style={{ padding: `48px ${px}`, textAlign: 'center', animation: 'skinrFadeIn 0.3s ease both' }}>
-          <div style={{ fontSize: 28, marginBottom: 12 }}>🔍</div>
-          <div style={{ fontSize: 13, fontWeight: 500, color: '#333', marginBottom: 6 }}>
-            該当する商品が見つかりません
-          </div>
-          <div style={{ fontSize: 12, color: '#ABABAB', lineHeight: 1.6, marginBottom: 20 }}>
-            別のキーワードか、AIに相談してみてください
-          </div>
-          <button
-            onClick={() => { setQuery(''); setCat('all'); }}
-            style={{
-              padding: '9px 18px', borderRadius: 999,
-              border: '1px solid var(--border)', background: 'var(--bg)',
-              fontSize: 12, fontFamily: 'inherit', fontWeight: 500, color: '#555',
-              cursor: 'pointer',
-            }}
-          >
-            フィルターをリセット
-          </button>
+      {/* ── ブランド別表示 ── */}
+      {isBrandMode ? (
+        <div style={{ padding: `8px 0 24px` }}>
+          {brandGroups.map(({ brand, products }) => {
+            const expanded = expandedBrands.has(brand);
+            const visible = expanded ? products : products.slice(0, BRAND_INITIAL);
+            const hasMore = products.length > BRAND_INITIAL;
+            return (
+              <div key={brand} style={{ marginBottom: 8 }}>
+                {/* ブランドヘッダー */}
+                <div style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  padding: `20px ${px} 14px`,
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{
+                      fontSize: isDesktop ? 16 : 14,
+                      fontWeight: 600, color: '#1A1814', letterSpacing: '-0.02em',
+                    }}>{brand}</span>
+                    <span style={{
+                      fontSize: 10, color: '#B5B5B5',
+                      fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.1em',
+                    }}>{products.length} ITEMS</span>
+                  </div>
+                  {hasMore && (
+                    <button
+                      onClick={() => toggleBrand(brand)}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 4,
+                        background: 'none', border: 'none', cursor: 'pointer',
+                        fontSize: 12, color: '#1DAB6A', fontWeight: 500,
+                        fontFamily: 'inherit', padding: '4px 0',
+                        letterSpacing: '-0.01em',
+                      }}
+                    >
+                      {expanded ? '閉じる' : `すべて見る (${products.length})`}
+                      <Icon name="arrowRight" size={11} color="#1DAB6A"
+                        style={{ transform: expanded ? 'rotate(270deg)' : 'rotate(90deg)', transition: 'transform 0.2s' }}
+                      />
+                    </button>
+                  )}
+                </div>
+                {/* 商品グリッド */}
+                <div style={{
+                  padding: `0 ${px}`,
+                  display: 'grid',
+                  gridTemplateColumns: isDesktop
+                    ? 'repeat(auto-fill, minmax(190px, 1fr))'
+                    : 'repeat(2, 1fr)',
+                  gap: isDesktop ? '28px 20px' : '24px 14px',
+                }}>
+                  {visible.map(p => (
+                    <ProductCard key={p.id} product={p} onClick={() => onOpenProduct(p.id)} />
+                  ))}
+                </div>
+                {/* もっと見るボタン（展開前のみ） */}
+                {hasMore && !expanded && (
+                  <div style={{ padding: `16px ${px} 4px`, textAlign: 'center' }}>
+                    <button
+                      onClick={() => toggleBrand(brand)}
+                      style={{
+                        width: '100%', padding: '11px',
+                        borderRadius: 10, border: '1.5px solid var(--border)',
+                        background: 'var(--bg)', cursor: 'pointer',
+                        fontSize: 12, fontWeight: 500, color: '#555',
+                        fontFamily: 'inherit', letterSpacing: '-0.01em',
+                        transition: 'all 0.14s ease',
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = '#1DAB6A'; e.currentTarget.style.color = '#1DAB6A'; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = '#555'; }}
+                    >
+                      {brand} の商品をもっと見る — あと {products.length - BRAND_INITIAL} 点
+                    </button>
+                  </div>
+                )}
+                {/* セパレーター */}
+                <div style={{ margin: `20px ${px} 0`, height: 1, background: 'var(--border)' }} />
+              </div>
+            );
+          })}
         </div>
+      ) : (
+        /* ── フィルター中: フラットグリッド ── */
+        <>
+          <div style={{
+            padding: `16px ${px} 24px`,
+            display: 'grid',
+            gridTemplateColumns: isDesktop
+              ? 'repeat(auto-fill, minmax(190px, 1fr))'
+              : 'repeat(2, 1fr)',
+            gap: isDesktop ? '28px 20px' : '24px 14px',
+          }}>
+            {filtered.map(p => (
+              <ProductCard key={p.id} product={p} onClick={() => onOpenProduct(p.id)} />
+            ))}
+          </div>
+          {filtered.length === 0 && (
+            <div style={{ padding: `48px ${px}`, textAlign: 'center', animation: 'skinrFadeIn 0.3s ease both' }}>
+              <div style={{ fontSize: 28, marginBottom: 12 }}>🔍</div>
+              <div style={{ fontSize: 13, fontWeight: 500, color: '#333', marginBottom: 6 }}>
+                該当する商品が見つかりません
+              </div>
+              <div style={{ fontSize: 12, color: '#ABABAB', lineHeight: 1.6, marginBottom: 20 }}>
+                別のキーワードか、AIに相談してみてください
+              </div>
+              <button
+                onClick={() => { setQuery(''); setCat('all'); }}
+                style={{
+                  padding: '9px 18px', borderRadius: 999,
+                  border: '1px solid var(--border)', background: 'var(--bg)',
+                  fontSize: 12, fontFamily: 'inherit', fontWeight: 500, color: '#555',
+                  cursor: 'pointer',
+                }}
+              >
+                フィルターをリセット
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       {/* Footer */}

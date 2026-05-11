@@ -283,61 +283,69 @@ export function ProductCard({ product, onClick }) {
         ) : (
           <div style={{
             position: 'absolute', inset: 0,
-            background: product.swatch,
-            backgroundImage: `repeating-linear-gradient(135deg, ${product.swatch} 0px, ${product.swatch} 14px, ${shade(product.swatch, -3)} 14px, ${shade(product.swatch, -3)} 15px)`,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexDirection: 'column', gap: 8,
+            background: `linear-gradient(150deg, ${product.swatch || '#EDE5DA'} 0%, ${shade(product.swatch || '#EDE5DA', -6)} 100%)`,
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            gap: 10,
           }}>
-            <div style={{
-              width: '38%', aspectRatio: '1 / 1.6',
-              background: shade(product.swatch, -8),
-              borderRadius: 4,
-            }} />
+            <span style={{
+              fontSize: 44, fontWeight: 100, lineHeight: 1,
+              color: product.accent || '#555',
+              opacity: 0.18,
+              letterSpacing: '-0.04em',
+              userSelect: 'none',
+            }}>
+              {(product.brand || '?').charAt(0)}
+            </span>
             <span style={{
               fontFamily: 'JetBrains Mono, monospace',
-              fontSize: 9, letterSpacing: '0.18em',
-              color: product.accent, opacity: 0.6,
+              fontSize: 7, letterSpacing: '0.22em',
+              color: product.accent || '#555', opacity: 0.35,
+              textTransform: 'uppercase',
             }}>
-              {product.brand.split(' ')[0].toUpperCase()}
+              {(product.brand || '').split(' ')[0]}
             </span>
           </div>
         )}
 
         {/* Category badge — frosted glass */}
-        <div style={{
-          position: 'absolute', top: 8, left: 8,
-          background: 'rgba(255,255,255,0.86)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
-          padding: '3px 8px', borderRadius: 5,
-          fontFamily: 'JetBrains Mono, monospace',
-          fontSize: 7, letterSpacing: '0.18em',
-          color: '#444',
-        }}>
-          {(product.categoryLabel || '').toUpperCase()}
-        </div>
+        {product.categoryLabel && (
+          <div style={{
+            position: 'absolute', top: 8, left: 8,
+            background: 'rgba(255,255,255,0.88)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            padding: '3px 8px', borderRadius: 6,
+            fontFamily: 'JetBrains Mono, monospace',
+            fontSize: 9, letterSpacing: '0.14em',
+            color: '#333', fontWeight: 500,
+          }}>
+            {product.categoryLabel}
+          </div>
+        )}
 
         {/* Rating badge — top right */}
-        <div style={{
-          position: 'absolute', top: 8, right: 8,
-          background: 'rgba(255,255,255,0.86)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
-          padding: '4px 7px', borderRadius: 5,
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1,
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-            <span style={{ fontSize: 9, color: '#D4A017' }}>★</span>
-            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 8, color: '#444', letterSpacing: '0.06em' }}>
-              {product.review.score}
-            </span>
+        {product.review?.score && (
+          <div style={{
+            position: 'absolute', top: 8, right: 8,
+            background: 'rgba(255,255,255,0.88)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            padding: '4px 7px', borderRadius: 6,
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+              <span style={{ fontSize: 9, color: '#E8A020' }}>★</span>
+              <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: '#333', letterSpacing: '0.04em', fontWeight: 600 }}>
+                {product.review.score}
+              </span>
+            </div>
+            {product.review.count && product.review.count !== '—' && (
+              <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 7, color: '#AAA', letterSpacing: '0.04em' }}>
+                {product.review.count}
+              </span>
+            )}
           </div>
-          {product.review.count && product.review.count !== '—' && (
-            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 7, color: '#999', letterSpacing: '0.04em' }}>
-              {product.review.count}
-            </span>
-          )}
-        </div>
+        )}
       </div>
 
       {/* Product info */}
@@ -345,8 +353,8 @@ export function ProductCard({ product, onClick }) {
         {/* Brand */}
         <div style={{
           fontFamily: 'JetBrains Mono, monospace',
-          fontSize: 8, letterSpacing: '0.15em',
-          color: '#B8B8B8', marginBottom: 4,
+          fontSize: 9, letterSpacing: '0.12em',
+          color: '#C0B8B0', marginBottom: 4,
           textTransform: 'uppercase',
         }}>
           {product.brand}
@@ -355,13 +363,13 @@ export function ProductCard({ product, onClick }) {
         {/* Product name */}
         <div style={{
           fontSize: 12, fontWeight: 500,
-          lineHeight: 1.45, color: '#111',
+          lineHeight: 1.5, color: '#1A1814',
           marginBottom: 7,
           display: '-webkit-box',
           WebkitLineClamp: 2,
           WebkitBoxOrient: 'vertical',
           overflow: 'hidden',
-          minHeight: '35px',
+          minHeight: '36px',
         }}>
           {product.nameJa}
         </div>
@@ -386,12 +394,12 @@ export function ProductCard({ product, onClick }) {
         {/* Price + 購入ボタン */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
           <div style={{
-            fontSize: 13, fontWeight: 600,
-            letterSpacing: '-0.01em', color: '#111',
+            fontSize: 13, fontWeight: 700,
+            letterSpacing: '-0.02em', color: '#1A1814',
           }}>
-            {product.price}
+            {product.price || '—'}
           </div>
-          {product.url && (
+          {product.url ? (
             <a
               href={product.url}
               target="_blank"
@@ -404,14 +412,18 @@ export function ProductCard({ product, onClick }) {
                 fontSize: 10, fontWeight: 600,
                 textDecoration: 'none', letterSpacing: '0.03em',
                 whiteSpace: 'nowrap', flexShrink: 0,
-                boxShadow: '0 2px 8px rgba(29,171,106,0.30)',
+                boxShadow: '0 2px 8px rgba(29,171,106,0.28)',
                 transition: 'opacity 0.15s',
               }}
-              onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
+              onMouseEnter={e => e.currentTarget.style.opacity = '0.82'}
               onMouseLeave={e => e.currentTarget.style.opacity = '1'}
             >
-              購入 →
+              楽天 →
             </a>
+          ) : (
+            <span style={{ fontSize: 9, color: '#CCC', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.1em' }}>
+              準備中
+            </span>
           )}
         </div>
       </div>

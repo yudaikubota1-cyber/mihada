@@ -343,6 +343,69 @@ function ChatDiagnosisCard({ onComplete }) {
   );
 }
 
+// ─── BrandDirectoryRow ───────────────────────────────────────────────────────
+function BrandDirectoryRow({ brand, total, lines, px, isDesktop, delay = 0, onClick }) {
+  const [hovered, setHovered] = React.useState(false);
+  const filteredLines = lines.filter(({ line }) => line !== '—');
+  return (
+    <div
+      style={{
+        borderBottom: '1px solid var(--border)',
+        background: hovered ? 'var(--bg-warm)' : 'transparent',
+        transition: 'background 0.15s ease',
+        animation: `skinrFadeIn 0.3s ${delay}s ease both`,
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `16px ${px} 14px` }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 8 }}>
+            <span style={{ fontSize: isDesktop ? 16 : 14, fontWeight: 700, color: '#1A1814', letterSpacing: '-0.02em' }}>{brand}</span>
+            <span style={{ fontSize: 9, color: '#C5C5C5', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.12em' }}>{total} ITEMS</span>
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px 6px' }}>
+            {filteredLines.slice(0, 4).map(({ line, products }) => (
+              <span key={line} style={{
+                fontSize: 10, color: '#9A9087',
+                background: 'var(--bg-soft)',
+                border: '1px solid var(--border)',
+                borderRadius: 4,
+                padding: '2px 7px',
+                letterSpacing: '0.01em',
+                lineHeight: 1.6,
+              }}>
+                {line}
+                <span style={{ fontSize: 9, color: '#C5C5C5', marginLeft: 4 }}>{products.length}</span>
+              </span>
+            ))}
+            {filteredLines.length > 4 && (
+              <span style={{ fontSize: 10, color: '#C5C5C5', padding: '2px 0', lineHeight: 1.6 }}>+{filteredLines.length - 4}</span>
+            )}
+          </div>
+        </div>
+        <button
+          onClick={onClick}
+          style={{
+            background: hovered ? '#1DAB6A' : 'none',
+            border: '1px solid ' + (hovered ? '#1DAB6A' : 'var(--border-strong)'),
+            borderRadius: 8, cursor: 'pointer',
+            fontSize: 11, color: hovered ? '#fff' : '#555',
+            fontWeight: 600, fontFamily: 'inherit',
+            padding: '7px 14px', whiteSpace: 'nowrap',
+            flexShrink: 0, marginLeft: 14,
+            transition: 'all 0.15s ease',
+            display: 'flex', alignItems: 'center', gap: 4,
+          }}
+        >
+          もっと見る
+          <Icon name="arrowRight" size={10} color={hovered ? '#fff' : '#999'} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSendInline, lastDiagnosis, onViewLastResult, homeFilter }) {
   const [cat, setCat] = useState(homeFilter?.cat || 'all');
   const [skinFilter, setSkinFilter] = useState(null);
@@ -519,7 +582,7 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
           background: 'linear-gradient(160deg, var(--bg-warm) 0%, var(--bg-soft) 60%, var(--bg) 100%)',
           borderBottom: '1px solid var(--border-strong)',
           display: 'flex', flexDirection: 'row',
-          alignItems: 'center', gap: 80,
+          alignItems: 'center', gap: 'clamp(32px, 5vw, 80px)',
         }}>
           {/* 左: コピー */}
           <div style={{ flex: '0 0 auto', maxWidth: 360 }}>
@@ -574,34 +637,43 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
         <Divider label="商品を探す" />
       </div>
 
-      {/* Self-search */}
+      {/* Self-search header */}
       <div style={{ padding: `20px ${px} 8px`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <p style={{ fontSize: 13, fontWeight: 500, color: '#111', margin: 0 }}>
-            {activeFilterIds
-              ? `${activeFilterLabel || ''} · 診断結果`
-              : skinFilter
-              ? `${skinFilter} · 絞り込み`
-              : (query || cat !== 'all' ? '検索結果' : '全商品')}
-          </p>
-          {activeFilterIds && (
+          {activeFilterIds ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+              <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#1DAB6A', boxShadow: '0 0 6px rgba(29,171,106,0.5)' }} />
+              <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1814', margin: 0 }}>
+                {activeFilterLabel || 'AI診断'} の おすすめ
+              </p>
+            </div>
+          ) : skinFilter ? (
+            <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1814', margin: 0 }}>
+              {skinFilter} 向け
+            </p>
+          ) : (query || cat !== 'all') ? (
+            <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1814', margin: 0 }}>検索結果</p>
+          ) : (
+            <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1814', margin: 0 }}>ブランド一覧</p>
+          )}
+          {(activeFilterIds || skinFilter || query || cat !== 'all') && (
             <button
               onClick={clearFilter}
               style={{
                 display: 'flex', alignItems: 'center', gap: 3,
-                padding: '3px 8px', borderRadius: 999,
+                padding: '3px 9px', borderRadius: 999,
                 border: '1px solid var(--border)', background: 'var(--bg)',
                 fontSize: 10, color: '#888', cursor: 'pointer',
                 fontFamily: 'inherit', fontWeight: 500,
               }}
             >
-              <Icon name="close" size={9} color="#ABABAB" />
-              解除
+              <Icon name="close" size={8} color="#ABABAB" />
+              リセット
             </button>
           )}
         </div>
-        <span style={{ fontSize: 11, color: '#B5B5B5', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.1em' }}>
-          {filtered.length} / {PRODUCTS.length} ITEMS
+        <span style={{ fontSize: 10, color: '#C5C5C5', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.1em' }}>
+          {isBrandMode ? `${PRODUCTS.length} ITEMS` : `${filtered.length} ITEMS`}
         </span>
       </div>
 
@@ -692,27 +764,18 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
 
       {/* ── ① ブランドディレクトリ（フィルターなし） ── */}
       {isBrandMode ? (
-        <div style={{ padding: `8px 0 32px` }}>
-          {brandGroups.map(({ brand, total, lines }) => (
-            <div key={brand} style={{ borderBottom: '1px solid var(--border)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `18px ${px} 10px` }}>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 6 }}>
-                    <span style={{ fontSize: isDesktop ? 17 : 15, fontWeight: 700, color: '#1A1814', letterSpacing: '-0.02em' }}>{brand}</span>
-                    <span style={{ fontSize: 10, color: '#C5C5C5', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.1em' }}>{total} ITEMS</span>
-                  </div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 8px' }}>
-                    {lines.filter(({ line }) => line !== '—').map(({ line }) => (
-                      <span key={line} style={{ fontSize: 10, color: '#B0A898', letterSpacing: '0.02em' }}>{line}</span>
-                    ))}
-                  </div>
-                </div>
-                <button onClick={() => { setActiveBrand(brand); }}
-                  style={{ background: 'none', border: '1px solid #1DAB6A', borderRadius: 6, cursor: 'pointer', fontSize: 11, color: '#1DAB6A', fontWeight: 500, fontFamily: 'inherit', padding: '6px 12px', whiteSpace: 'nowrap', flexShrink: 0, marginLeft: 12 }}>
-                  もっと見る →
-                </button>
-              </div>
-            </div>
+        <div style={{ padding: `4px 0 40px` }}>
+          {brandGroups.map(({ brand, total, lines }, bi) => (
+            <BrandDirectoryRow
+              key={brand}
+              brand={brand}
+              total={total}
+              lines={lines}
+              px={px}
+              isDesktop={isDesktop}
+              delay={bi * 0.03}
+              onClick={() => setActiveBrand(brand)}
+            />
           ))}
         </div>
 
@@ -748,18 +811,25 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
 
           {/* ライン別セクション */}
           {activeBrandLines.lines.map(({ line, products }, li) => (
-            <div key={line} style={{ marginTop: 32, animation: `skinrFadeIn 0.25s ${li * 0.05}s ease both` }}>
-              {/* ラインヘッダー */}
-              <div style={{ padding: `0 ${px} 14px`, display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ width: 3, height: 22, borderRadius: 2, background: 'linear-gradient(180deg, #1DAB6A 0%, #178A55 100%)', flexShrink: 0 }} />
-                <div>
-                  <div style={{ fontSize: isDesktop ? 14 : 13, fontWeight: 700, color: '#1A1814', letterSpacing: '-0.01em' }}>
+            <div key={line} style={{ marginTop: 28, animation: `skinrFadeIn 0.3s ${li * 0.06}s ease both` }}>
+              {/* ラインヘッダー帯 */}
+              <div style={{
+                margin: `0 0 16px`,
+                padding: `10px ${px}`,
+                background: 'var(--bg-warm)',
+                borderTop: '1px solid var(--border)',
+                borderBottom: '1px solid var(--border)',
+                display: 'flex', alignItems: 'center', gap: 10,
+              }}>
+                <div style={{ width: 3, height: 18, borderRadius: 2, background: 'linear-gradient(180deg, #1DAB6A 0%, #178A55 100%)', flexShrink: 0 }} />
+                <div style={{ flex: 1 }}>
+                  <span style={{ fontSize: isDesktop ? 13 : 12, fontWeight: 700, color: '#1A1814', letterSpacing: '-0.01em' }}>
                     {line === '—' ? 'その他' : line}
-                  </div>
-                  <div style={{ fontSize: 9, fontFamily: 'JetBrains Mono, monospace', color: '#C5C5C5', letterSpacing: '0.12em', marginTop: 1 }}>
-                    {products.length} PRODUCTS
-                  </div>
+                  </span>
                 </div>
+                <span style={{ fontSize: 9, fontFamily: 'JetBrains Mono, monospace', color: '#C5C5C5', letterSpacing: '0.12em' }}>
+                  {products.length} ITEMS
+                </span>
               </div>
 
               {/* 商品グリッド */}
@@ -769,16 +839,15 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
                 gridTemplateColumns: isDesktop
                   ? 'repeat(auto-fill, minmax(180px, 1fr))'
                   : 'repeat(2, 1fr)',
-                gap: isDesktop ? '20px 16px' : '16px 12px',
+                gap: isDesktop ? '20px 16px' : '18px 12px',
               }}>
                 {products.map(p => (
                   <ProductCard key={p.id} product={p} onClick={() => onOpenProduct(p.id)} />
                 ))}
               </div>
 
-              {/* ライン区切り */}
               {li < activeBrandLines.lines.length - 1 && (
-                <div style={{ margin: `28px ${px} 0`, height: 1, background: 'var(--border)' }} />
+                <div style={{ margin: `24px ${px} 0`, height: 0 }} />
               )}
             </div>
           ))}
@@ -823,13 +892,22 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
             </div>
           ))}
           {filteredBrandGroups.length === 0 && (
-            <div style={{ padding: `48px ${px}`, textAlign: 'center', animation: 'skinrFadeIn 0.3s ease both' }}>
-              <div style={{ fontSize: 28, marginBottom: 12 }}>🔍</div>
-              <div style={{ fontSize: 13, fontWeight: 500, color: '#333', marginBottom: 6 }}>該当する商品が見つかりません</div>
-              <div style={{ fontSize: 12, color: '#ABABAB', lineHeight: 1.6, marginBottom: 20 }}>別のキーワードか、AIに相談してみてください</div>
+            <div style={{ padding: `64px ${px} 48px`, textAlign: 'center', animation: 'skinrFadeIn 0.4s ease both' }}>
+              <div style={{
+                width: 56, height: 56, borderRadius: '50%',
+                background: 'var(--bg-soft)', border: '1px solid var(--border)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                margin: '0 auto 20px', fontSize: 22,
+              }}>🔍</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: '#1A1814', marginBottom: 8, letterSpacing: '-0.01em' }}>
+                該当する商品が見つかりません
+              </div>
+              <div style={{ fontSize: 12, color: '#ABABAB', lineHeight: 1.7, marginBottom: 24, maxWidth: 260, margin: '0 auto 24px' }}>
+                別のキーワードか、AIに相談してみてください
+              </div>
               <button onClick={() => { setQuery(''); setCat('all'); setSkinFilter(null); setActiveFilterIds(null); }}
-                style={{ padding: '9px 18px', borderRadius: 999, border: '1px solid var(--border)', background: 'var(--bg)', fontSize: 12, fontFamily: 'inherit', fontWeight: 500, color: '#555', cursor: 'pointer' }}>
-                フィルターをリセット
+                style={{ padding: '10px 22px', borderRadius: 999, border: '1.5px solid var(--border-strong)', background: 'var(--bg)', fontSize: 12, fontFamily: 'inherit', fontWeight: 600, color: '#555', cursor: 'pointer' }}>
+                リセット
               </button>
             </div>
           )}

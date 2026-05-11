@@ -383,12 +383,36 @@ export function ProductCard({ product, onClick }) {
           </div>
         )}
 
-        {/* Price */}
-        <div style={{
-          fontSize: 13, fontWeight: 600,
-          letterSpacing: '-0.01em', color: '#111',
-        }}>
-          {product.price}
+        {/* Price + 購入ボタン */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
+          <div style={{
+            fontSize: 13, fontWeight: 600,
+            letterSpacing: '-0.01em', color: '#111',
+          }}>
+            {product.price}
+          </div>
+          {product.url && (
+            <a
+              href={product.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={e => e.stopPropagation()}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 3,
+                padding: '5px 10px', borderRadius: 99,
+                background: '#1DAB6A', color: '#fff',
+                fontSize: 10, fontWeight: 600,
+                textDecoration: 'none', letterSpacing: '0.03em',
+                whiteSpace: 'nowrap', flexShrink: 0,
+                boxShadow: '0 2px 8px rgba(29,171,106,0.30)',
+                transition: 'opacity 0.15s',
+              }}
+              onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
+              onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+            >
+              購入 →
+            </a>
+          )}
         </div>
       </div>
     </div>

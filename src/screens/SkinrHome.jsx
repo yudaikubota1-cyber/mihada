@@ -410,7 +410,8 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
 
   return (
     <div className={`skinr-scroll${isDesktop ? ' skinr-page' : ''}`} style={{
-      height: isDesktop ? 'auto' : '100%',
+      flex: isDesktop ? 'none' : 1,
+      minHeight: 0,
       overflowY: isDesktop ? 'visible' : 'auto',
       background: 'var(--bg)',
     }}>

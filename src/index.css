@@ -89,7 +89,10 @@ textarea:focus:not(:focus-visible) {
 /* Screen entrance */
 .skinr-screen {
   animation: skinrScreenIn 0.22s ease;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Animations */

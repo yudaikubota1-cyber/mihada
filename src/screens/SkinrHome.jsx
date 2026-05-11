@@ -486,36 +486,15 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
           alignItems: 'center', gap: 80,
         }}>
           {/* 左: コピー */}
-          <div style={{ flex: '0 0 auto', maxWidth: 400 }}>
+          <div style={{ flex: '0 0 auto', maxWidth: 360 }}>
             <SkinrEyebrow>Ingredient Logic AI</SkinrEyebrow>
             <h1 style={{
-              margin: '20px 0 18px',
+              margin: '20px 0 0',
               fontSize: 52, lineHeight: 1.1,
               fontWeight: 400, letterSpacing: '-0.04em',
             }}>
               「何が合うか<br />わからない」を<br />終わりにする。
             </h1>
-            <p style={{
-              fontSize: 14, lineHeight: 1.85, color: '#999',
-              margin: '0 0 32px', maxWidth: 300,
-            }}>
-              気になる悩みを伝えるだけ。<br />
-              成分ロジックがあなたに合う<br />
-              ケアを一本に絞り込みます。
-            </p>
-            {/* スタッツ */}
-            <div style={{ display: 'flex', gap: 28 }}>
-              {[
-                { num: '72', label: '取扱商品' },
-                { num: 'AI', label: '成分診断' },
-                { num: '無料', label: '完全無料' },
-              ].map(s => (
-                <div key={s.label}>
-                  <div style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em', color: '#1A1814' }}>{s.num}</div>
-                  <div style={{ fontSize: 10, color: '#B5B5B5', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.1em', marginTop: 2 }}>{s.label}</div>
-                </div>
-              ))}
-            </div>
             {/* スクロールヒント */}
             <div style={{ marginTop: 48, display: 'flex', alignItems: 'center', gap: 8 }}>
               <div style={{ width: 1, height: 28, background: 'var(--border-strong)' }} />

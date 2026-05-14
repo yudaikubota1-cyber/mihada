@@ -344,9 +344,21 @@ function ChatDiagnosisCard({ onComplete }) {
 }
 
 // ─── BrandDirectoryRow ───────────────────────────────────────────────────────
-function BrandDirectoryRow({ brand, total, lines, px, isDesktop, delay = 0, onClick }) {
+function BrandDirectoryRow({ brand, total, lines, products, px, isDesktop, delay = 0, onClick }) {
   const [hovered, setHovered] = React.useState(false);
+  const scrollRef = React.useRef(null);
   const filteredLines = lines.filter(({ line }) => line !== '—');
+
+  // 画像つき商品を優先して最大20枚
+  const imageProducts = React.useMemo(() => {
+    const withImg = products.filter(p => p.image);
+    const withoutImg = products.filter(p => !p.image);
+    return [...withImg, ...withoutImg].slice(0, 20);
+  }, [products]);
+
+  const cardW = isDesktop ? 110 : 96;
+  const cardH = isDesktop ? 110 : 96;
+
   return (
     <div
       style={{
@@ -358,29 +370,30 @@ function BrandDirectoryRow({ brand, total, lines, px, isDesktop, delay = 0, onCl
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `16px ${px} 14px` }}>
+      {/* ブランド名 + もっと見るボタン */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `16px ${px} 10px` }}>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 6 }}>
             <span style={{ fontSize: isDesktop ? 16 : 14, fontWeight: 700, color: '#1A1814', letterSpacing: '-0.02em' }}>{brand}</span>
             <span style={{ fontSize: 9, color: '#C5C5C5', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.12em' }}>{total} ITEMS</span>
           </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px 6px' }}>
-            {filteredLines.slice(0, 4).map(({ line, products }) => (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 5px' }}>
+            {filteredLines.slice(0, 3).map(({ line, products: lp }) => (
               <span key={line} style={{
                 fontSize: 10, color: '#9A9087',
                 background: 'var(--bg-soft)',
                 border: '1px solid var(--border)',
                 borderRadius: 4,
-                padding: '2px 7px',
+                padding: '2px 6px',
                 letterSpacing: '0.01em',
                 lineHeight: 1.6,
               }}>
                 {line}
-                <span style={{ fontSize: 9, color: '#C5C5C5', marginLeft: 4 }}>{products.length}</span>
+                <span style={{ fontSize: 9, color: '#C5C5C5', marginLeft: 3 }}>{lp.length}</span>
               </span>
             ))}
-            {filteredLines.length > 4 && (
-              <span style={{ fontSize: 10, color: '#C5C5C5', padding: '2px 0', lineHeight: 1.6 }}>+{filteredLines.length - 4}</span>
+            {filteredLines.length > 3 && (
+              <span style={{ fontSize: 10, color: '#C5C5C5', padding: '2px 0', lineHeight: 1.6 }}>+{filteredLines.length - 3}</span>
             )}
           </div>
         </div>
@@ -401,6 +414,111 @@ function BrandDirectoryRow({ brand, total, lines, px, isDesktop, delay = 0, onCl
           もっと見る
           <Icon name="arrowRight" size={10} color={hovered ? '#fff' : '#999'} />
         </button>
+      </div>
+
+      {/* 横スクロール商品ストリップ */}
+      <div style={{ position: 'relative', paddingBottom: 14 }}>
+        <div
+          ref={scrollRef}
+          style={{
+            display: 'flex',
+            gap: 8,
+            overflowX: 'auto',
+            paddingLeft: px,
+            paddingRight: px,
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            WebkitOverflowScrolling: 'touch',
+          }}
+          onScroll={e => e.stopPropagation()}
+        >
+          {imageProducts.map((p, i) => (
+            <button
+              key={p.id}
+              onClick={onClick}
+              style={{
+                flexShrink: 0,
+                width: cardW,
+                background: 'none',
+                border: 'none',
+                padding: 0,
+                cursor: 'pointer',
+                textAlign: 'left',
+                borderRadius: 10,
+                overflow: 'hidden',
+              }}
+            >
+              {/* 画像ボックス */}
+              <div style={{
+                width: cardW,
+                height: cardH,
+                borderRadius: 10,
+                overflow: 'hidden',
+                background: p.swatch || '#F0EDE8',
+                border: '1px solid var(--border)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: 5,
+              }}>
+                {p.image ? (
+                  <img
+                    src={p.image}
+                    alt={p.nameJa || p.name}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    onError={e => { e.target.style.display = 'none'; e.target.parentNode.dataset.noimg = '1'; }}
+                    loading="lazy"
+                  />
+                ) : (
+                  <span style={{ fontSize: 28, fontWeight: 100, color: p.accent || '#888', opacity: 0.22 }}>
+                    {(p.brand || '?').charAt(0)}
+                  </span>
+                )}
+              </div>
+              {/* 商品名 */}
+              <div style={{
+                fontSize: 10,
+                color: '#6B6560',
+                lineHeight: 1.35,
+                overflow: 'hidden',
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                letterSpacing: '-0.01em',
+                paddingRight: 2,
+              }}>
+                {p.nameJa || p.name}
+              </div>
+              {/* 価格 */}
+              <div style={{ fontSize: 10, fontWeight: 700, color: '#1A1814', marginTop: 2 }}>
+                {p.price || '—'}
+              </div>
+            </button>
+          ))}
+          {/* 末尾:もっと見るカード */}
+          <button
+            onClick={onClick}
+            style={{
+              flexShrink: 0,
+              width: cardW,
+              height: cardH,
+              borderRadius: 10,
+              border: '1px dashed var(--border-strong)',
+              background: hovered ? 'rgba(29,171,106,0.04)' : 'transparent',
+              cursor: 'pointer',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 4,
+              transition: 'background 0.15s',
+              alignSelf: 'flex-start',
+            }}
+          >
+            <span style={{ fontSize: 18, color: '#1DAB6A' }}>→</span>
+            <span style={{ fontSize: 9, color: '#1DAB6A', fontWeight: 600, letterSpacing: '0.05em' }}>全部見る</span>
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -477,6 +595,7 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
       brand,
       total: [...lm.values()].reduce((s, ps) => s + ps.length, 0),
       lines: [...lm.entries()].map(([line, products]) => ({ line, products })),
+      products: [...lm.values()].flat(),
     }));
   })() : null;
 
@@ -765,12 +884,13 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
       {/* ── ① ブランドディレクトリ（フィルターなし） ── */}
       {isBrandMode ? (
         <div style={{ padding: `4px 0 40px` }}>
-          {brandGroups.map(({ brand, total, lines }, bi) => (
+          {brandGroups.map(({ brand, total, lines, products }, bi) => (
             <BrandDirectoryRow
               key={brand}
               brand={brand}
               total={total}
               lines={lines}
+              products={products}
               px={px}
               isDesktop={isDesktop}
               delay={bi * 0.03}

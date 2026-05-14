@@ -356,8 +356,8 @@ function BrandDirectoryRow({ brand, total, lines, products, px, isDesktop, delay
     return [...withImg, ...withoutImg].slice(0, 20);
   }, [products]);
 
-  const cardW = isDesktop ? 110 : 96;
-  const cardH = isDesktop ? 110 : 96;
+  const cardW = isDesktop ? 160 : 130;
+  const cardH = isDesktop ? 160 : 130;
 
   return (
     <div
@@ -422,7 +422,7 @@ function BrandDirectoryRow({ brand, total, lines, products, px, isDesktop, delay
           ref={scrollRef}
           style={{
             display: 'flex',
-            gap: 8,
+            gap: 14,
             overflowX: 'auto',
             paddingLeft: px,
             paddingRight: px,
@@ -435,7 +435,10 @@ function BrandDirectoryRow({ brand, total, lines, products, px, isDesktop, delay
           {imageProducts.map((p, i) => (
             <button
               key={p.id}
-              onClick={onClick}
+              onClick={() => {
+                if (p.url) window.open(p.url, '_blank', 'noopener');
+                else window.open(`https://search.rakuten.co.jp/search/mall/${encodeURIComponent(p.nameJa || p.name)}/`, '_blank', 'noopener');
+              }}
               style={{
                 flexShrink: 0,
                 width: cardW,
@@ -477,21 +480,24 @@ function BrandDirectoryRow({ brand, total, lines, products, px, isDesktop, delay
               </div>
               {/* 商品名 */}
               <div style={{
-                fontSize: 10,
+                fontSize: isDesktop ? 11 : 10,
                 color: '#6B6560',
-                lineHeight: 1.35,
+                lineHeight: 1.4,
                 overflow: 'hidden',
                 display: '-webkit-box',
                 WebkitLineClamp: 2,
                 WebkitBoxOrient: 'vertical',
                 letterSpacing: '-0.01em',
-                paddingRight: 2,
+                marginTop: 6,
               }}>
                 {p.nameJa || p.name}
               </div>
               {/* 価格 */}
-              <div style={{ fontSize: 10, fontWeight: 700, color: '#1A1814', marginTop: 2 }}>
+              <div style={{ fontSize: isDesktop ? 11 : 10, fontWeight: 700, color: '#1A1814', marginTop: 3 }}>
                 {p.price || '—'}
+              </div>
+              <div style={{ fontSize: 9, color: '#BF0000', marginTop: 2, fontWeight: 600, letterSpacing: '0.02em' }}>
+                楽天
               </div>
             </button>
           ))}

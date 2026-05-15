@@ -90,8 +90,7 @@ export default function App() {
 
   // スクロール位置を保存するref（画面名 → scrollTop）
   const scrollPositions = useRef({});
-  const isPopState = useRef(false);
-  const contentRef = useRef(null);
+  const pendingRestore = useRef(null); // 復元待ちの画面名
 
   const isDesktop = useIsDesktop(768);
 
@@ -101,15 +100,28 @@ export default function App() {
     if (el) scrollPositions.current[screenName] = el.scrollTop;
   }, []);
 
-  // スクロール位置を復元
-  const restoreScrollPos = useCallback((screenName) => {
-    requestAnimationFrame(() => {
-      const el = document.querySelector('.skinr-content');
-      if (el && scrollPositions.current[screenName] != null) {
-        el.scrollTop = scrollPositions.current[screenName];
+  // 画面レンダリング後にスクロール位置を復元
+  useEffect(() => {
+    if (pendingRestore.current) {
+      const target = pendingRestore.current;
+      pendingRestore.current = null;
+      // React render完了後に復元（複数フレーム待つことで確実に）
+      const savedPos = scrollPositions.current[target];
+      if (savedPos != null) {
+        const tryRestore = (attempts) => {
+          const el = document.querySelector('.skinr-content');
+          if (el) {
+            el.scrollTop = savedPos;
+            // 確認：まだ0ならもう一度試す
+            if (el.scrollTop === 0 && savedPos > 0 && attempts < 5) {
+              requestAnimationFrame(() => tryRestore(attempts + 1));
+            }
+          }
+        };
+        requestAnimationFrame(() => tryRestore(0));
       }
-    });
-  }, []);
+    }
+  }, [screen]);
 
   // 画面遷移（ブラウザ履歴にpush）
   const navigate = useCallback((newScreen, extras = {}) => {
@@ -123,6 +135,7 @@ export default function App() {
       if (k === 'homeFilter') setHomeFilter(v);
       if (k === 'diagnosis') { setDiagnosis(v); saveDiagnosis(v); setLastDiagnosis(v); }
     });
+    pendingRestore.current = null; // 新規遷移ではスクロール復元しない
     setScreen(newScreen);
     // 新規遷移時はトップへスクロール
     requestAnimationFrame(() => {
@@ -136,23 +149,18 @@ export default function App() {
     const handlePopState = (e) => {
       const state = e.state;
       if (state && state.screen) {
-        isPopState.current = true;
-        setScreen(state.screen);
         if (state.productId) setProductId(state.productId);
         if (state.homeFilter !== undefined) setHomeFilter(state.homeFilter);
         if (state.diagnosis) { setDiagnosis(state.diagnosis); }
-        // 戻ったときスクロール位置を復元
-        restoreScrollPos(state.screen);
+        pendingRestore.current = state.screen; // レンダリング後に復元
+        setScreen(state.screen);
       } else {
-        // 履歴の最初→ホームへ
-        isPopState.current = true;
+        pendingRestore.current = 'home';
         setScreen('home');
         setHomeFilter(null);
-        restoreScrollPos('home');
       }
     };
     window.addEventListener('popstate', handlePopState);
-    // 初期状態をhistoryに保存
     history.replaceState({ screen }, '', '');
     return () => window.removeEventListener('popstate', handlePopState);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps

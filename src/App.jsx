@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import InputPreview from './screens/InputPreview.jsx';
 import ProductPreview from './screens/ProductPreview.jsx';
 import SkinrHome from './screens/SkinrHome.jsx';
@@ -82,37 +82,96 @@ export default function App() {
   const params = new URLSearchParams(location.search);
   const [screen, setScreen] = useState(params.get('products') ? 'products' : params.get('preview') ? 'preview' : 'home');
   const [prevScreen, setPrevScreen] = useState('home');
-  const [productId, setProductId] = useState('anua-toner');
+  const [productId, setProductId] = useState(null);
   const [chatSeed, setChatSeed] = useState(null);
   const [diagnosis, setDiagnosis] = useState(null);
   const [lastDiagnosis, setLastDiagnosis] = useState(loadDiagnosis);
   const [homeFilter, setHomeFilter] = useState(null);
 
+  // スクロール位置を保存するref（画面名 → scrollTop）
+  const scrollPositions = useRef({});
+  const isPopState = useRef(false);
+  const contentRef = useRef(null);
+
   const isDesktop = useIsDesktop(768);
 
-  const goHome = () => { setPrevScreen(screen); setHomeFilter(null); setScreen('home'); };
+  // スクロール位置を保存
+  const saveScrollPos = useCallback((screenName) => {
+    const el = document.querySelector('.skinr-content');
+    if (el) scrollPositions.current[screenName] = el.scrollTop;
+  }, []);
+
+  // スクロール位置を復元
+  const restoreScrollPos = useCallback((screenName) => {
+    requestAnimationFrame(() => {
+      const el = document.querySelector('.skinr-content');
+      if (el && scrollPositions.current[screenName] != null) {
+        el.scrollTop = scrollPositions.current[screenName];
+      }
+    });
+  }, []);
+
+  // 画面遷移（ブラウザ履歴にpush）
+  const navigate = useCallback((newScreen, extras = {}) => {
+    saveScrollPos(screen);
+    const state = { screen: newScreen, ...extras };
+    history.pushState(state, '', '');
+    setPrevScreen(screen);
+    Object.entries(extras).forEach(([k, v]) => {
+      if (k === 'productId') setProductId(v);
+      if (k === 'chatSeed') setChatSeed(v);
+      if (k === 'homeFilter') setHomeFilter(v);
+      if (k === 'diagnosis') { setDiagnosis(v); saveDiagnosis(v); setLastDiagnosis(v); }
+    });
+    setScreen(newScreen);
+    // 新規遷移時はトップへスクロール
+    requestAnimationFrame(() => {
+      const el = document.querySelector('.skinr-content');
+      if (el) el.scrollTop = 0;
+    });
+  }, [screen, saveScrollPos]);
+
+  // ブラウザの戻る/進むボタン
+  useEffect(() => {
+    const handlePopState = (e) => {
+      const state = e.state;
+      if (state && state.screen) {
+        isPopState.current = true;
+        setScreen(state.screen);
+        if (state.productId) setProductId(state.productId);
+        if (state.homeFilter !== undefined) setHomeFilter(state.homeFilter);
+        if (state.diagnosis) { setDiagnosis(state.diagnosis); }
+        // 戻ったときスクロール位置を復元
+        restoreScrollPos(state.screen);
+      } else {
+        // 履歴の最初→ホームへ
+        isPopState.current = true;
+        setScreen('home');
+        setHomeFilter(null);
+        restoreScrollPos('home');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    // 初期状態をhistoryに保存
+    history.replaceState({ screen }, '', '');
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const goHome = () => navigate('home', { homeFilter: null });
   const goHomeFiltered = (cat, productIds, label) => {
-    setPrevScreen(screen);
-    setHomeFilter({ cat, productIds, label });
-    setScreen('home');
+    navigate('home', { homeFilter: { cat, productIds, label } });
   };
-  const goChat = (msg = null) => { setPrevScreen(screen); setChatSeed(msg); setScreen('chat'); };
+  const goChat = (msg = null) => navigate('chat', { chatSeed: msg });
   const goResult = (diagnosisData) => {
-    setPrevScreen(screen);
-    setDiagnosis(diagnosisData);
-    saveDiagnosis(diagnosisData);
-    setLastDiagnosis(diagnosisData);
-    setScreen('result');
+    navigate('result', { diagnosis: diagnosisData });
   };
   const goLastResult = () => {
     if (lastDiagnosis) {
-      setPrevScreen('home');
-      setDiagnosis(lastDiagnosis);
-      setScreen('result');
+      navigate('result', { diagnosis: lastDiagnosis });
     }
   };
-  const goProduct = (id) => { setPrevScreen(screen); setProductId(id); setScreen('product'); };
-  const goBack = () => { setScreen(prevScreen); setPrevScreen('home'); };
+  const goProduct = (id) => navigate('product', { productId: id });
+  const goBack = () => history.back();
 
   return (
     <div className="app-shell">

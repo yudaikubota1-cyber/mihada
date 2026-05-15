@@ -439,7 +439,7 @@ function BrandDirectoryRow({ brand, total, lines, products, px, isDesktop, delay
             >
               {/* 画像（クリックで詳細） */}
               <div
-                onClick={() => onOpenProduct ? onOpenProduct(p) : onClick()}
+                onClick={() => onOpenProduct ? onOpenProduct(p.id) : onClick()}
                 style={{
                   width: cardW, height: cardH,
                   borderRadius: 10, overflow: 'hidden',
@@ -479,7 +479,7 @@ function BrandDirectoryRow({ brand, total, lines, products, px, isDesktop, delay
               {/* 詳細・購入ボタン */}
               <div style={{ display: 'flex', gap: 4, marginTop: 6 }}>
                 <button
-                  onClick={() => onOpenProduct ? onOpenProduct(p) : onClick()}
+                  onClick={() => onOpenProduct ? onOpenProduct(p.id) : onClick()}
                   style={{
                     flex: 1, padding: '4px 0', fontSize: 9, fontWeight: 600,
                     fontFamily: 'inherit', cursor: 'pointer',

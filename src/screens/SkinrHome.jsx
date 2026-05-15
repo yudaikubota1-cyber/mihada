@@ -5,6 +5,26 @@ import {
   Chip, Divider, ProductCard,
 } from '../components/shared.jsx';
 
+// ── 公式ショップURL ─────────────────────────────────────────────
+const BRAND_STORE_URL = {
+  'ANUA': 'https://www.rakuten.co.jp/anuajapan/',
+  'MEDICUBE': 'https://www.rakuten.co.jp/apr-japan/',
+  'Numbuzin': 'https://www.rakuten.co.jp/numbuzin/',
+  'Dr.G': 'https://www.rakuten.co.jp/drg-japan/',
+  'dalba': 'https://www.rakuten.co.jp/dalba/',
+  'VT COSMETICS': 'https://www.rakuten.co.jp/vtcosmetic-official/',
+  'COSRX': 'https://www.rakuten.co.jp/cosrx-official/',
+  'SKIN1004': 'https://www.rakuten.co.jp/skin1004-official/',
+  'BIOHEAL BOH': 'https://www.rakuten.co.jp/biohealboh/',
+  '魔女工場': 'https://www.rakuten.co.jp/manyo-official/',
+  'innisfree': 'https://www.rakuten.co.jp/innisfree-official/',
+  'Abib': 'https://www.rakuten.co.jp/abibofficial/',
+  'Torriden': 'https://www.rakuten.co.jp/torriden-official/',
+  'Centellian24': 'https://www.rakuten.co.jp/dongkook/',
+  'ファンケル': 'https://www.rakuten.co.jp/fancl-shop/',
+  'Goodal': 'https://www.rakuten.co.jp/cliojapan/',
+};
+
 // ── AI 肌診断チャットカード ─────────────────────────────────────
 const G = '#1DAB6A';   // メイングリーン（明るめ）
 const GD = '#178A55';  // ダークグリーン（ホバー用）
@@ -937,6 +957,28 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
                 </div>
               )}
             </div>
+            {/* 公式ショップリンク */}
+            {BRAND_STORE_URL[activeBrand] && (
+              <button
+                onClick={() => window.open(BRAND_STORE_URL[activeBrand], '_blank', 'noopener')}
+                style={{
+                  marginLeft: 'auto', flexShrink: 0,
+                  background: '#BF0000', border: 'none', borderRadius: 8,
+                  padding: '7px 14px', cursor: 'pointer',
+                  fontSize: 11, fontWeight: 700, fontFamily: 'inherit',
+                  color: '#fff', whiteSpace: 'nowrap',
+                  display: 'flex', alignItems: 'center', gap: 5,
+                  letterSpacing: '0.02em',
+                }}
+              >
+                公式ショップ
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                  <polyline points="15 3 21 3 21 9" />
+                  <line x1="10" y1="14" x2="21" y2="3" />
+                </svg>
+              </button>
+            )}
           </div>
 
           {/* ライン別セクション */}

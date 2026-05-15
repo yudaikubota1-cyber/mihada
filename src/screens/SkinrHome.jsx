@@ -922,7 +922,7 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
               onClick={() => setActiveBrand(null)}
               style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '6px 8px 6px 0', display: 'flex', alignItems: 'center' }}
             >
-              <Icon name="arrowRight" size={14} color="#888" style={{ transform: 'rotate(180deg)', display: 'block' }} />
+              <Icon name="arrowLeft" size={14} color="#888" />
             </button>
             <div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>

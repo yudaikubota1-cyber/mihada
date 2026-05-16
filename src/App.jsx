@@ -42,15 +42,12 @@ function HeaderNavLink({ label, active, onClick }) {
   );
 }
 
-function DesktopHeader({ screen, lastDiagnosis, onHome, onResult }) {
+function DesktopHeader({ screen, onHome }) {
   return (
     <header className="skinr-desktop-header" style={{ position: 'relative' }}>
       {/* 左: ナビリンク */}
       <nav style={{ display: 'flex', alignItems: 'center', gap: 2, flex: 1 }}>
         <HeaderNavLink label="商品一覧" active={screen === 'home'} onClick={onHome} />
-        {lastDiagnosis && (
-          <HeaderNavLink label="診断結果" active={screen === 'result'} onClick={onResult} />
-        )}
       </nav>
 
       {/* 中央: ブランド名（絶対配置で真ん中固定） */}
@@ -183,9 +180,7 @@ export default function App() {
       {/* Desktop top header — hidden on mobile via CSS */}
       <DesktopHeader
         screen={screen}
-        lastDiagnosis={lastDiagnosis}
         onHome={goHome}
-        onResult={goLastResult}
       />
 
       {/* Main content */}

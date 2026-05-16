@@ -676,50 +676,6 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
       </div>
       )}
 
-      {/* 前回の診断バナー */}
-      {lastDiagnosis && (
-        <button
-          onClick={onViewLastResult}
-          className="skinr-tappable"
-          style={{
-            width: '100%', background: 'none', border: 'none',
-            borderBottom: '1px solid var(--border)',
-            padding: '12px 24px',
-            display: 'flex', alignItems: 'center', gap: 12,
-            cursor: 'pointer', fontFamily: 'inherit',
-            textAlign: 'left',
-            animation: 'skinrFadeIn 0.4s ease both',
-          }}
-        >
-          <div style={{
-            width: 36, height: 36, borderRadius: 4,
-            background: 'var(--bg-soft)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0,
-          }}>
-            <Icon name="sparkle" size={15} color="#555" />
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{
-              fontSize: 10, color: '#B5B5B5',
-              fontFamily: 'JetBrains Mono, monospace',
-              letterSpacing: '0.14em', marginBottom: 2,
-            }}>前回の絞り込み結果</div>
-            <div style={{
-              fontSize: 12, fontWeight: 500, color: '#333',
-              whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-            }}>
-              {lastDiagnosis.skin_type}
-              {lastDiagnosis.concerns?.length > 0 && (
-                <span style={{ color: '#999', fontWeight: 400 }}>
-                  {' · '}{lastDiagnosis.concerns.slice(0, 2).join(' · ')}
-                </span>
-              )}
-            </div>
-          </div>
-          <Icon name="arrowRight" size={14} color="#C0C0C0" />
-        </button>
-      )}
 
       {/* Hero — AI Chat Diagnosis Card */}
       {isDesktop ? (

@@ -198,6 +198,7 @@ export default function App() {
               isDesktop={isDesktop}
               onStartChat={() => goChat(null)}
               onSendInline={(msg) => goChat(msg)}
+              onQuickDiagnosis={goResult}
               onOpenProduct={goProduct}
               lastDiagnosis={lastDiagnosis}
               onViewLastResult={goLastResult}

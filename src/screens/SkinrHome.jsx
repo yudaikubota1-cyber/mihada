@@ -555,7 +555,16 @@ function BrandDirectoryRow({ brand, total, lines, products, px, isDesktop, delay
   );
 }
 
-export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSendInline, lastDiagnosis, onViewLastResult, homeFilter }) {
+// ホームカードのconcernラベル → 結果画面用concerns
+const QUICK_CONCERN_MAP = {
+  '乾燥・保湿':   ['乾燥'],
+  '毛穴・黒ずみ': ['毛穴の開き', '黒ずみ'],
+  'ニキビ・赤み': ['赤ニキビ', '肌荒れ'],
+  'くすみ・シミ': ['くすみ', 'シミ'],
+  'たるみ・ハリ': ['たるみ'],
+};
+
+export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSendInline, onQuickDiagnosis, lastDiagnosis, onViewLastResult, homeFilter }) {
   const [cat, setCat] = useState(homeFilter?.cat || 'all');
   const [skinFilter, setSkinFilter] = useState(null);
   const [query, setQuery] = useState('');
@@ -710,9 +719,14 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
           {/* 右: チャットカード */}
           <div style={{ flex: 1, minWidth: 0 }}>
             <ChatDiagnosisCard onComplete={({ concern, skinType }) => {
-              const skin = skinType === 'わからない' ? '' : `肌タイプは${skinType}で、`;
-              const msg  = `${skin}${concern}に悩んでいます。`;
-              onSendInline(msg);
+              const st = skinType === 'わからない' ? '混合肌' : skinType;
+              const concerns = QUICK_CONCERN_MAP[concern] || ['乾燥'];
+              onQuickDiagnosis({
+                status: 'confirmed',
+                skin_type: st,
+                concerns,
+                message: `${st}で${concern}のお悩みですね。成分ロジックからあなたに最適な商品を選びました。`,
+              });
             }} />
           </div>
         </div>
@@ -731,9 +745,14 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
             気になる悩みを入力するだけ。あなたの肌に合う成分を絞り込みます。
           </p>
           <ChatDiagnosisCard onComplete={({ concern, skinType }) => {
-            const skin = skinType === 'わからない' ? '' : `肌タイプは${skinType}で、`;
-            const msg  = `${skin}${concern}に悩んでいます。`;
-            onSendInline(msg);
+            const st = skinType === 'わからない' ? '混合肌' : skinType;
+            const concerns = QUICK_CONCERN_MAP[concern] || ['乾燥'];
+            onQuickDiagnosis({
+              status: 'confirmed',
+              skin_type: st,
+              concerns,
+              message: `${st}で${concern}のお悩みですね。成分ロジックからあなたに最適な商品を選びました。`,
+            });
           }} />
         </div>
       )}

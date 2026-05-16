@@ -88,31 +88,22 @@ export default function App() {
   const [lastDiagnosis, setLastDiagnosis] = useState(loadDiagnosis);
   const [homeFilter, setHomeFilter] = useState(null);
 
-  // スクロール位置を保存するref（画面名 → scrollTop）
-  const scrollPositions = useRef({});
-  const pendingRestore = useRef(null); // 復元待ちの画面名
-
   const isDesktop = useIsDesktop(768);
 
-  // スクロール位置を保存
-  const saveScrollPos = useCallback((screenName) => {
-    const el = document.querySelector('.skinr-content');
-    if (el) scrollPositions.current[screenName] = el.scrollTop;
-  }, []);
+  // スクロール位置の保存・復元
+  const scrollPositions = useRef({});
+  const isGoingBack = useRef(false);
 
-  // 画面レンダリング後にスクロール位置を復元
+  // 画面切り替え時：戻る時は復元、進む時はトップへ
   useEffect(() => {
-    if (pendingRestore.current) {
-      const target = pendingRestore.current;
-      pendingRestore.current = null;
-      // React render完了後に復元（複数フレーム待つことで確実に）
-      const savedPos = scrollPositions.current[target];
+    if (isGoingBack.current) {
+      isGoingBack.current = false;
+      const savedPos = scrollPositions.current[screen];
       if (savedPos != null) {
         const tryRestore = (attempts) => {
           const el = document.querySelector('.skinr-content');
           if (el) {
             el.scrollTop = savedPos;
-            // 確認：まだ0ならもう一度試す
             if (el.scrollTop === 0 && savedPos > 0 && attempts < 5) {
               requestAnimationFrame(() => tryRestore(attempts + 1));
             }
@@ -120,10 +111,22 @@ export default function App() {
         };
         requestAnimationFrame(() => tryRestore(0));
       }
+    } else {
+      // 新規遷移はトップへ
+      requestAnimationFrame(() => {
+        const el = document.querySelector('.skinr-content');
+        if (el) el.scrollTop = 0;
+      });
     }
   }, [screen]);
 
-  // 画面遷移（ブラウザ履歴にpush）
+  // スクロール位置を保存
+  const saveScrollPos = useCallback((screenName) => {
+    const el = document.querySelector('.skinr-content');
+    if (el) scrollPositions.current[screenName] = el.scrollTop;
+  }, []);
+
+  // 画面遷移（ブラウザ履歴にpush）— 遷移前にスクロール位置を保存
   const navigate = useCallback((newScreen, extras = {}) => {
     saveScrollPos(screen);
     const state = { screen: newScreen, ...extras };
@@ -135,27 +138,21 @@ export default function App() {
       if (k === 'homeFilter') setHomeFilter(v);
       if (k === 'diagnosis') { setDiagnosis(v); saveDiagnosis(v); setLastDiagnosis(v); }
     });
-    pendingRestore.current = null; // 新規遷移ではスクロール復元しない
+    isGoingBack.current = false;
     setScreen(newScreen);
-    // 新規遷移時はトップへスクロール
-    requestAnimationFrame(() => {
-      const el = document.querySelector('.skinr-content');
-      if (el) el.scrollTop = 0;
-    });
   }, [screen, saveScrollPos]);
 
-  // ブラウザの戻る/進むボタン
+  // ブラウザの戻る/進むボタン — 戻る時はスクロール復元フラグを立てる
   useEffect(() => {
     const handlePopState = (e) => {
       const state = e.state;
+      isGoingBack.current = true;
       if (state && state.screen) {
         if (state.productId) setProductId(state.productId);
         if (state.homeFilter !== undefined) setHomeFilter(state.homeFilter);
         if (state.diagnosis) { setDiagnosis(state.diagnosis); }
-        pendingRestore.current = state.screen; // レンダリング後に復元
         setScreen(state.screen);
       } else {
-        pendingRestore.current = 'home';
         setScreen('home');
         setHomeFilter(null);
       }

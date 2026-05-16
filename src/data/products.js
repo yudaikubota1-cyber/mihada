@@ -14,14 +14,18 @@ export const CATEGORIES = [
 ];
 
 export const CONCERN_CHIPS = [
-  {label:'乾燥・保湿',  message:'乾燥や保湿について相談したいです。'},
-  {label:'毛穴・黒ずみ',message:'毛穴や黒ずみが気になります。'},
-  {label:'ニキビ・赤み',message:'ニキビや赤みに悩んでいます。'},
-  {label:'くすみ・シミ',message:'くすみやシミが気になります。'},
-  {label:'たるみ・ハリ',message:'たるみやハリ不足が気になります。'},
-  {label:'敏感肌ケア',  message:'敏感肌向けのケアを探しています。'},
-  {label:'オイリー肌',  message:'脂性肌のケア方法を知りたいです。'},
-  {label:'バリア強化',  message:'肌バリアを強化したいです。'},
+  {label:'乾燥・保湿',      message:'乾燥や保湿について相談したいです。'},
+  {label:'毛穴・黒ずみ',    message:'毛穴や黒ずみが気になります。'},
+  {label:'ニキビ・赤み',    message:'ニキビや赤みに悩んでいます。'},
+  {label:'くすみ・シミ',    message:'くすみやシミが気になります。'},
+  {label:'美白・トーンアップ', message:'肌を明るくしたい、トーンアップしたいです。'},
+  {label:'たるみ・ハリ',    message:'たるみやハリ不足が気になります。'},
+  {label:'シワ・エイジング', message:'シワや年齢サインが気になります。'},
+  {label:'ニキビ跡',        message:'ニキビ跡の赤みや色素沈着が残っています。'},
+  {label:'皮脂・テカリ',    message:'皮脂やテカリが気になります。'},
+  {label:'敏感肌ケア',      message:'敏感肌向けのケアを探しています。'},
+  {label:'バリア強化',      message:'肌バリアを強化したいです。'},
+  {label:'肌荒れ・ゆらぎ',  message:'最近肌荒れやゆらぎ肌に悩んでいます。'},
 ];
 
 export const SKIN_TYPE_FILTER_CHIPS = [

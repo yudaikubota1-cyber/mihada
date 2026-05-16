@@ -5,6 +5,7 @@ import SkinrHome from './screens/SkinrHome.jsx';
 import SkinrChat from './screens/SkinrChat.jsx';
 import SkinrResult from './screens/SkinrResult.jsx';
 import SkinrProduct from './screens/SkinrProduct.jsx';
+import SkinrArticle from './screens/SkinrArticle.jsx';
 import { SkinrLogo, Icon } from './components/shared.jsx';
 import { useIsDesktop } from './lib/useIsDesktop.js';
 
@@ -77,9 +78,13 @@ function DesktopHeader({ screen, onHome }) {
 // ─── App ─────────────────────────────────────────────────
 export default function App() {
   const params = new URLSearchParams(location.search);
-  const [screen, setScreen] = useState(params.get('products') ? 'products' : params.get('preview') ? 'preview' : 'home');
+  const articleSlug = params.get('article');
+  const [screen, setScreen] = useState(
+    params.get('products') ? 'products' : params.get('preview') ? 'preview' : articleSlug ? 'article' : 'home'
+  );
   const [prevScreen, setPrevScreen] = useState('home');
   const [productId, setProductId] = useState(null);
+  const [currentArticle, setCurrentArticle] = useState(articleSlug);
   const [chatSeed, setChatSeed] = useState(null);
   const [diagnosis, setDiagnosis] = useState(null);
   const [lastDiagnosis, setLastDiagnosis] = useState(loadDiagnosis);
@@ -137,6 +142,7 @@ export default function App() {
       if (k === 'productId') setProductId(v);
       if (k === 'chatSeed') setChatSeed(v);
       if (k === 'homeFilter') setHomeFilter(v);
+      if (k === 'articleSlug') setCurrentArticle(v);
       if (k === 'diagnosis') { setDiagnosis(v); saveDiagnosis(v); setLastDiagnosis(v); }
     });
     isGoingBack.current = false;
@@ -178,6 +184,7 @@ export default function App() {
     }
   };
   const goProduct = (id) => navigate('product', { productId: id });
+  const goArticle = (slug) => navigate('article', { articleSlug: slug });
   const goBack = () => history.back();
 
   return (
@@ -200,6 +207,7 @@ export default function App() {
               onSendInline={(msg) => goChat(msg)}
               onQuickDiagnosis={goResult}
               onOpenProduct={goProduct}
+              onOpenArticle={goArticle}
               lastDiagnosis={lastDiagnosis}
               onViewLastResult={goLastResult}
               homeFilter={homeFilter}
@@ -234,6 +242,16 @@ export default function App() {
               isDesktop={isDesktop}
               productId={productId}
               onBack={goBack}
+            />
+          </div>
+        )}
+        {screen === 'article' && (
+          <div key="article" className="skinr-screen">
+            <SkinrArticle
+              slug={currentArticle}
+              onBack={goBack}
+              onOpenProduct={goProduct}
+              onStartChat={() => goChat(null)}
             />
           </div>
         )}

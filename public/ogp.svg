@@ -1,0 +1,21 @@
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#FDFCFA"/>
+  <rect x="0" y="0" width="1200" height="4" fill="#1A1814"/>
+
+  <!-- Brand -->
+  <text x="600" y="240" text-anchor="middle" font-family="system-ui, sans-serif" font-size="22" letter-spacing="6" fill="#B5B0A8">INGREDIENT LOGIC AI</text>
+
+  <!-- Title -->
+  <text x="600" y="310" text-anchor="middle" font-family="system-ui, sans-serif" font-size="52" font-weight="600" fill="#1A1814">miHada</text>
+
+  <!-- Subtitle -->
+  <text x="600" y="380" text-anchor="middle" font-family="system-ui, sans-serif" font-size="26" fill="#888">
+    成分ロジックで選ぶ韓国スキンケア
+  </text>
+
+  <!-- Tags -->
+  <text x="600" y="450" text-anchor="middle" font-family="monospace" font-size="16" letter-spacing="2" fill="#C0C0C0">AI DIAGNOSIS  ·  318 PRODUCTS  ·  KOREAN SKINCARE</text>
+
+  <!-- Bottom bar -->
+  <rect x="0" y="620" width="1200" height="10" fill="#1A1814"/>
+</svg>

@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { PRODUCTS } from '../data/products.js';
 import { INGREDIENT_DICT } from '../data/knowledge.js';
 import { buildRakutenSearchUrl, buildProductUrl, searchRakutenProducts } from '../lib/rakuten.js';
+import { generateShareImage, shareOrDownload } from '../lib/shareCard.js';
 import {
   SkinrLogo, SkinrEyebrow, ProductImage, Icon,
   Divider, PrimaryButton,
@@ -383,6 +384,7 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
   const skinType = diagnosis?.skin_type || '混合肌';
   const concerns = diagnosis?.concerns || ['乾燥', '毛穴の開き', 'くすみ'];
   const aiMessage = diagnosis?.message;
+  const [sharing, setSharing] = useState(false);
 
   const today = new Date();
   const dateStr = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
@@ -637,6 +639,42 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
         <div style={{ fontSize: 11, color: '#B5B5B5', textAlign: 'center', marginBottom: 6, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.1em' }}>
           診断結果は成分ロジックに基づいています
         </div>
+
+        {/* シェアボタン */}
+        <button
+          onClick={async () => {
+            setSharing(true);
+            try {
+              const canvas = await generateShareImage({
+                skinType,
+                concerns,
+                ingredients: ingredients.map(i => ({ name: i.name, category: i.category })),
+                message: aiMessage,
+              });
+              await shareOrDownload(canvas);
+            } catch (e) { console.error(e); }
+            setSharing(false);
+          }}
+          disabled={sharing}
+          className="skinr-tappable"
+          style={{
+            width: '100%', padding: '14px',
+            background: '#1A1814', color: '#fff',
+            border: 'none', borderRadius: 4,
+            cursor: sharing ? 'default' : 'pointer',
+            fontFamily: 'inherit', fontSize: 13, fontWeight: 600,
+            letterSpacing: '0.02em',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            opacity: sharing ? 0.6 : 1,
+          }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          </svg>
+          {sharing ? '生成中...' : '診断結果をシェア'}
+        </button>
+
         <PrimaryButton full onClick={onNewChat} icon={<Icon name="sparkle" size={14} color="#fff" />}>
           もう一度絞り込む
         </PrimaryButton>

@@ -564,7 +564,7 @@ const QUICK_CONCERN_MAP = {
   'たるみ・ハリ': ['たるみ'],
 };
 
-export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSendInline, onQuickDiagnosis, lastDiagnosis, onViewLastResult, homeFilter }) {
+export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSendInline, onQuickDiagnosis, onOpenArticle, lastDiagnosis, onViewLastResult, homeFilter }) {
   const [cat, setCat] = useState(homeFilter?.cat || 'all');
   const [skinFilter, setSkinFilter] = useState(null);
   const [query, setQuery] = useState('');
@@ -1062,6 +1062,42 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
           )}
         </div>
       ) : null}
+
+      {/* 記事セクション */}
+      {onOpenArticle && (
+        <div style={{ padding: `20px ${px} 0` }}>
+          <Divider label="成分ガイド" />
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: isDesktop ? 'repeat(3, 1fr)' : 'repeat(2, 1fr)',
+            gap: 12, padding: '16px 0 24px',
+          }}>
+            {[
+              { slug: 'dry-skin', label: '乾燥肌ケア', sub: 'セラミド・ヒアルロン酸' },
+              { slug: 'pore-care', label: '毛穴ケア', sub: 'BHA・ナイアシンアミド' },
+              { slug: 'acne', label: 'ニキビケア', sub: 'CICA・ドクダミ' },
+              { slug: 'brightening', label: '美白・くすみ', sub: 'ビタミンC・トラネキサム酸' },
+              { slug: 'anti-aging', label: 'シワ・たるみ', sub: 'レチノール・ペプチド' },
+              { slug: 'sensitive', label: '敏感肌ケア', sub: 'マデカソシド・パンテノール' },
+            ].map(a => (
+              <button
+                key={a.slug}
+                onClick={() => onOpenArticle(a.slug)}
+                className="skinr-tappable"
+                style={{
+                  padding: '14px 12px', borderRadius: 10,
+                  border: '1px solid var(--border)', background: 'var(--bg)',
+                  cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left',
+                  display: 'flex', flexDirection: 'column', gap: 3,
+                }}
+              >
+                <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1814' }}>{a.label}</span>
+                <span style={{ fontSize: 10, color: '#B5B5B5' }}>{a.sub}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <div style={{

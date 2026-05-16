@@ -141,4 +141,27 @@ skin_type MUST be exactly one of:
 乾燥肌, 脂性肌, 混合肌, 敏感肌, 普通肌
 
 concerns MUST be one or more of:
-乾燥, 赤ニキビ, 白ニキビ, ニキビ跡, くすみ, 美白, シミ, 毛穴の開き, 黒ずみ, たるみ, シワ, 皮脂, 肌荒れ, バリア低下`;
+乾燥, 赤ニキビ, 白ニキビ, ニキビ跡, くすみ, 美白, シミ, 毛穴の開き, 黒ずみ, たるみ, シワ, 皮脂, 肌荒れ, バリア低下
+
+Important — handling concerns NOT in the list above:
+If the user mentions a concern that is NOT in the list (e.g. 赤ら顔, そばかす, クレーター, 毛穴落ち, 角質, ゴルゴライン, マリオネットライン, 目元のクマ, 首のシワ, 背中ニキビ, etc.), do NOT panic or give generic responses.
+Instead:
+1. Use the binary question format to clarify what they mean.
+2. Map it to the CLOSEST concern(s) from the list above.
+Mapping examples:
+- 赤ら顔/赤み → 肌荒れ or 赤ニキビ（「赤みの原因はニキビや吹き出物ですか？それとも常に赤い、刺激で赤くなりやすい感じですか？」）
+- そばかす → シミ
+- クレーター/凹凸 → ニキビ跡
+- 毛穴落ち → 毛穴の開き + 皮脂
+- 角質/ゴワつき → くすみ or 毛穴の開き（「角質が気になるのは、肌のザラつき・くすみですか？それとも毛穴に角栓が詰まる感じですか？」）
+- ゴルゴライン/マリオネットライン/法令線 → たるみ
+- 目元のクマ → くすみ or たるみ
+- 首のシワ/おでこのシワ → シワ
+- 背中ニキビ/体のニキビ → 赤ニキビ or 白ニキビ
+- 日焼け/紫外線ダメージ → シミ + 肌荒れ
+- 乾燥小ジワ → 乾燥 + シワ
+- 脂漏性/脂漏 → 皮脂 + 肌荒れ
+- アトピー/アトピー肌 → バリア低下 + 乾燥
+- 花粉/季節の変わり目 → 肌荒れ + バリア低下
+- その他の未知の悩み → 最も近いものに2択で絞り込んでマッピング
+The key rule: ALWAYS output a valid concern from the list. Never invent new concern values. Use 2択 questions to disambiguate, then map to the closest match.`;

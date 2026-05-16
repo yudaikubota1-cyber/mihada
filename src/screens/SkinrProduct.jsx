@@ -66,21 +66,6 @@ function ProductBody({ product, px, openRakuten }) {
         ))}
       </div>
 
-      {/* Use timing */}
-      <Divider />
-      <div style={{ padding: '16px 0', display: 'flex', gap: 10, marginBottom: 4 }}>
-        {['朝', '夜'].map(t => {
-          const active = (product.timing || []).includes(t);
-          return (
-            <div key={t} style={{ flex: 1, padding: '16px', border: '1px solid ' + (active ? '#111' : 'var(--border)'), borderRadius: 8, opacity: active ? 1 : 0.38, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, background: active ? 'var(--bg-soft)' : 'var(--bg)' }}>
-              <Icon name={t === '朝' ? 'sun' : 'moon'} size={20} />
-              <span style={{ fontSize: 13, fontWeight: 500 }}>{t}に使用</span>
-              {active && <SkinrEyebrow size={8}>RECOMMENDED</SkinrEyebrow>}
-            </div>
-          );
-        })}
-      </div>
-
       {/* Ingredients */}
       <Divider label="主要成分" />
       <div style={{ padding: '20px 0 24px' }}>

@@ -123,11 +123,15 @@ export default function App() {
     if (el) scrollPositions.current[screenName] = el.scrollTop;
   }, []);
 
-  // 画面遷移（ブラウザ履歴にpush）— 遷移前にスクロール位置を保存
-  const navigate = useCallback((newScreen, extras = {}) => {
+  // 画面遷移（ブラウザ履歴にpush or replace）— 遷移前にスクロール位置を保存
+  const navigate = useCallback((newScreen, extras = {}, { replace = false } = {}) => {
     saveScrollPos(screen);
     const state = { screen: newScreen, ...extras };
-    history.pushState(state, '', '');
+    if (replace) {
+      history.replaceState(state, '', '');
+    } else {
+      history.pushState(state, '', '');
+    }
     setPrevScreen(screen);
     Object.entries(extras).forEach(([k, v]) => {
       if (k === 'productId') setProductId(v);
@@ -165,7 +169,8 @@ export default function App() {
   };
   const goChat = (msg = null) => navigate('chat', { chatSeed: msg });
   const goResult = (diagnosisData) => {
-    navigate('result', { diagnosis: diagnosisData });
+    // チャット→結果はreplaceで、戻るボタンでチャットをスキップしてホームに直接戻る
+    navigate('result', { diagnosis: diagnosisData }, { replace: true });
   };
   const goLastResult = () => {
     if (lastDiagnosis) {

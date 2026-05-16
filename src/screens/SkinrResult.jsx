@@ -55,10 +55,39 @@ function normalizeIngredients(arr) {
   return arr.map(i => i.name || '').filter(Boolean);
 }
 
+// AIが未知のconcernを返した場合のファジーマッチ用
+const FUZZY_CONCERN_MAP = {
+  '赤ら顔': ['肌荒れ'], '赤み': ['肌荒れ', 'ニキビ'], 'そばかす': ['シミ'],
+  'クレーター': ['ニキビ跡'], '凹凸': ['ニキビ跡'], '毛穴落ち': ['毛穴の開き', '皮脂'],
+  '角質': ['くすみ', '毛穴の開き'], 'ゴワつき': ['くすみ'],
+  'ゴルゴライン': ['たるみ'], 'マリオネットライン': ['たるみ'], '法令線': ['たるみ'],
+  'ほうれい線': ['たるみ'], 'クマ': ['くすみ', 'たるみ'], '日焼け': ['シミ', '肌荒れ'],
+  '小ジワ': ['シワ', '乾燥'], '脂漏': ['皮脂', '肌荒れ'],
+  'アトピー': ['バリア低下', '乾燥'], '花粉': ['肌荒れ', 'バリア低下'],
+  'エイジング': ['たるみ', 'シワ'], 'ハリ不足': ['たるみ'],
+  'ニキビ': ['赤ニキビ'], 'テカリ': ['皮脂'], 'トーンアップ': ['美白'],
+  '色素沈着': ['シミ', 'ニキビ跡'], '敏感': ['バリア低下', '肌荒れ'],
+};
+
+function resolveConcern(concern) {
+  if (CONCERN_MAP[concern]) return concern;
+  // ファジーマッチ: FUZZY_CONCERN_MAP → 部分一致
+  if (FUZZY_CONCERN_MAP[concern]) return FUZZY_CONCERN_MAP[concern][0];
+  for (const [key, mapped] of Object.entries(FUZZY_CONCERN_MAP)) {
+    if (concern.includes(key) || key.includes(concern)) return mapped[0];
+  }
+  // 最終フォールバック: CONCERN_MAPのキーに部分一致
+  for (const key of Object.keys(CONCERN_MAP)) {
+    if (concern.includes(key) || key.includes(concern)) return key;
+  }
+  return concern;
+}
+
 function scoreProduct(product, concerns, skinType) {
   let score = 0;
   for (const concern of concerns) {
-    const keywords = CONCERN_MAP[concern] || [concern];
+    const resolved = resolveConcern(concern);
+    const keywords = CONCERN_MAP[resolved] || [concern, resolved];
     for (const kw of keywords) {
       if (product.concerns.some(c => c.includes(kw) || kw.includes(c))) score += 2;
     }

@@ -153,18 +153,20 @@ function ChatDiagnosisCard({ onComplete }) {
     }, 700);
   };
 
-  // 肌タイプを選択
+  // 肌タイプを選択 → 自動で結果画面へ遷移
   const pickSkinType = (label) => {
     setSkinType(label);
     setMessages(m => [...m, { role: 'user', text: label }]);
     setPhase('init');
     setTyping(true);
     setTimeout(() => {
-      setMessages(m => [...m, { role: 'ai', text: '分析が完了しました！\nお悩みと肌タイプに合った成分をまとめました。' }]);
       setTyping(false);
       setPhase('done');
-      setTimeout(() => setShowResult(true), 350);
-    }, 1200);
+      // 直接onCompleteを呼んで結果画面へ
+      if (onComplete) {
+        onComplete({ concern, skinType: label });
+      }
+    }, 800);
   };
 
   // プログレス

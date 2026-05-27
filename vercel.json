@@ -1,6 +1,5 @@
 {
   "rewrites": [
-    { "source": "/slides/(.*)", "destination": "/slides/$1" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/((?!slides/).*)", "destination": "/index.html" }
   ]
 }

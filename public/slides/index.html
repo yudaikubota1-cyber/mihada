@@ -1349,6 +1349,43 @@ async function dlAll() {
   }
   showToast('全スライド保存完了！');
 }
+
+// ─── 商品画像のフォールバック ───────────────────────────────
+// Rakuten CDNはホットリンク保護があるため、3段階で画像取得を試みる:
+//   1) /api/img プロキシ（Vercelサーバー側でRakuten Refererを付与）
+//   2) images.weserv.nl（公開画像プロキシ）
+//   3) 失敗時はブランド名のテキストプレースホルダーを表示
+function rakutenFromProxy(src) {
+  const m = src.match(/[?&]url=([^&]+)/);
+  if (!m) return null;
+  try { return decodeURIComponent(m[1]); } catch { return null; }
+}
+document.querySelectorAll('img.prod-img, img.prod-img-sm').forEach(img => {
+  img.setAttribute('crossorigin', 'anonymous');
+  let stage = 0;
+  img.addEventListener('error', function onErr() {
+    const rakutenUrl = rakutenFromProxy(img.dataset.rakuten || img.src) ||
+                       (img.dataset.rakuten || '');
+    if (stage === 0 && rakutenUrl) {
+      // → weserv.nl にフォールバック
+      stage = 1;
+      const stripped = rakutenUrl.replace(/^https?:\/\//, '');
+      img.src = 'https://images.weserv.nl/?url=' + encodeURIComponent(stripped) + '&w=400&h=400&fit=contain&output=jpg';
+    } else if (stage <= 1) {
+      // → テキストプレースホルダー
+      stage = 2;
+      img.removeEventListener('error', onErr);
+      const ph = document.createElement('div');
+      ph.style.cssText = img.className.includes('-sm')
+        ? 'position:absolute;right:72px;top:100px;width:240px;height:240px;border-radius:16px;background:linear-gradient(145deg,#C9A96E,#E8C88A);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:30px;color:#1A1814;text-align:center;padding:20px'
+        : 'position:absolute;right:72px;top:80px;width:300px;height:300px;border-radius:20px;background:linear-gradient(145deg,#C9A96E,#E8C88A);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:36px;color:#1A1814;text-align:center;padding:24px';
+      ph.textContent = img.alt || 'PRODUCT';
+      img.replaceWith(ph);
+    }
+  });
+  // 元のRakuten URLを保存（フォールバック用）
+  img.dataset.rakuten = rakutenFromProxy(img.src) || img.src;
+});
 </script>
 </body>
 </html>

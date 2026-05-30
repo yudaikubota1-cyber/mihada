@@ -1,5 +1,5 @@
 {
   "rewrites": [
-    { "source": "/((?!slides/).*)", "destination": "/index.html" }
+    { "source": "/((?!slides/|api/).*)", "destination": "/index.html" }
   ]
 }

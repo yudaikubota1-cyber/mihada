@@ -5,6 +5,7 @@
 <title>miHada — Instagram スライド素材 v2</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 :root{--dark:#1A1814;--light:#FAF8F5;--cream:#F0EDE8;--gold:#C9A96E;--gold2:#E8C88A;--muted:#AAA098;--white:#FFFFFF;--S:1080px;--k:0.42}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -1317,32 +1318,63 @@ function dl(id, filename) {
 async function dlPost(postNum) {
   const slides = postMap[postNum];
   if (!slides) return;
-  showToast('Post ' + postNum + ' を保存中...');
-  for (let i = 0; i < slides.length; i++) {
-    await new Promise(resolve => {
-      const [id, fname] = slides[i];
-      const el = document.getElementById(id);
-      if (!el) { resolve(); return; }
-      captureSlide(el).then(canvas => {
-        try {
-          const a = document.createElement('a');
-          a.href = canvas.toDataURL('image/png');
-          a.download = fname;
-          a.click();
-        } catch(e) {}
-        setTimeout(resolve, 400);
-      }).catch(() => resolve());
-    });
+  if (slides.length === 1) {
+    // 1枚だけなら直接ダウンロード
+    const [id, fname] = slides[0];
+    const el = document.getElementById(id);
+    if (!el) return;
+    showToast('保存中...');
+    const canvas = await captureSlide(el);
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = fname;
+    a.click();
+    showToast('Post ' + postNum + ' 保存完了！');
+    return;
   }
-  showToast('Post ' + postNum + ' 保存完了！');
+  // 複数枚はZIPにまとめて1ファイルダウンロード
+  showToast('Post ' + postNum + ' を準備中...');
+  const zip = new JSZip();
+  for (let i = 0; i < slides.length; i++) {
+    const [id, fname] = slides[i];
+    const el = document.getElementById(id);
+    if (!el) continue;
+    showToast((i + 1) + ' / ' + slides.length + ' 枚処理中...');
+    const canvas = await captureSlide(el);
+    const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+    zip.file(fname, blob);
+  }
+  showToast('ZIPを生成中...');
+  const content = await zip.generateAsync({ type: 'blob' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(content);
+  a.download = 'mihada_post' + postNum + '.zip';
+  a.click();
+  showToast('Post ' + postNum + ' 保存完了！ (ZIP)');
 }
 
 async function dlAll() {
-  showToast('全スライドを保存中...');
+  showToast('全スライドを準備中...');
+  const zip = new JSZip();
   for (const postNum of Object.keys(postMap)) {
-    await dlPost(parseInt(postNum));
-    await new Promise(r => setTimeout(r, 300));
+    const slides = postMap[parseInt(postNum)];
+    for (let i = 0; i < slides.length; i++) {
+      const [id, fname] = slides[i];
+      const el = document.getElementById(id);
+      if (!el) continue;
+      showToast('Post ' + postNum + ' — ' + (i + 1) + '/' + slides.length + ' 枚処理中...');
+      const canvas = await captureSlide(el);
+      const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+      const folder = 'post' + postNum + '/';
+      zip.file(folder + fname, blob);
+    }
   }
+  showToast('ZIP生成中...');
+  const content = await zip.generateAsync({ type: 'blob' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(content);
+  a.download = 'mihada_all_slides.zip';
+  a.click();
   showToast('全スライド保存完了！');
 }
 

@@ -1286,20 +1286,24 @@ function showToast(msg) {
   t._timer = setTimeout(() => { t.style.display = 'none'; }, 2500);
 }
 
+function captureSlide(el) {
+  // CSSのscale(0.42)を一時解除してフル1080×1080でキャプチャ
+  el.style.transform = 'scale(1)';
+  el.style.transformOrigin = 'top left';
+  return html2canvas(el, {
+    scale: 2, useCORS: true, allowTaint: true, logging: false,
+    width: 1080, height: 1080, windowWidth: 1080, windowHeight: 1080
+  }).finally(() => {
+    el.style.transform = '';
+    el.style.transformOrigin = '';
+  });
+}
+
 function dl(id, filename) {
   const el = document.getElementById(id);
   if (!el) return;
   showToast('保存中: ' + filename);
-  html2canvas(el, {
-    scale: 2,
-    useCORS: true,
-    allowTaint: true,
-    width: 1080,
-    height: 1080,
-    windowWidth: 1080,
-    windowHeight: 1080,
-    logging: false
-  }).then(canvas => {
+  captureSlide(el).then(canvas => {
     try {
       const a = document.createElement('a');
       a.href = canvas.toDataURL('image/png');
@@ -1309,10 +1313,7 @@ function dl(id, filename) {
     } catch(e) {
       showToast('スクリーンショットで保存してください');
     }
-  }).catch(err => {
-    showToast('エラーが発生しました');
-    console.error(err);
-  });
+  }).catch(() => showToast('エラーが発生しました'));
 }
 
 async function dlPost(postNum) {
@@ -1324,16 +1325,13 @@ async function dlPost(postNum) {
       const [id, fname] = slides[i];
       const el = document.getElementById(id);
       if (!el) { resolve(); return; }
-      html2canvas(el, {
-        scale: 2, useCORS: true, allowTaint: true, logging: false,
-        width: 1080, height: 1080, windowWidth: 1080, windowHeight: 1080
-      }).then(canvas => {
+      captureSlide(el).then(canvas => {
         try {
           const a = document.createElement('a');
           a.href = canvas.toDataURL('image/png');
           a.download = fname;
           a.click();
-        } catch(e) { /* tainted canvas fallback */ }
+        } catch(e) {}
         setTimeout(resolve, 400);
       }).catch(() => resolve());
     });

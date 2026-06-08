@@ -43,11 +43,12 @@ body{font-family:'Inter',sans-serif;background:#E8E4DF;padding:48px 40px;color:v
 .divider-sm{width:40px;height:3px;background:var(--gold);border-radius:3px;margin:20px 0}
 .ghost{position:absolute;font-weight:900;line-height:1;pointer-events:none;user-select:none}
 .ghost-lt{color:rgba(0,0,0,.04)}.ghost-dk{color:rgba(255,255,255,.04)}
-.eyebrow{font-size:20px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:24px}
-.check{display:flex;align-items:flex-start;gap:20px;margin-bottom:28px}
-.check-icon{width:48px;height:48px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;color:var(--dark);font-weight:900}
-.check-text{font-size:30px;font-weight:500;color:var(--dark);line-height:1.45;padding-top:6px}
-.check-text strong{font-weight:800}
+.eyebrow{font-size:22px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:28px}
+.check{display:flex;align-items:center;gap:24px;margin-bottom:32px}
+.check-icon{width:52px;height:52px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;color:var(--dark);font-weight:900}
+.check-text{font-size:36px;font-weight:800;color:var(--dark);line-height:1.25}
+.check-text strong{font-weight:900;color:var(--dark)}
+.check-sub{font-size:22px;font-weight:400;color:var(--muted);margin-top:4px;line-height:1.4}
 .stat-num{font-size:200px;font-weight:900;line-height:.9;letter-spacing:-.06em;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 /* slide layouts */
 .cover-dk{background:var(--dark);display:flex;flex-direction:column;justify-content:center;padding:80px;position:relative}
@@ -148,7 +149,7 @@ body{font-family:'Inter',sans-serif;background:#E8E4DF;padding:48px 40px;color:v
           <img class="prod-img" src="/api/img?url=https%3A%2F%2Fthumbnail.image.rakuten.co.jp%2F%400_mall%2Fanuajapan%2Fcabinet%2Fanua00077%2F11089652%2Fmain_thumbnail_em.jpg%3F_ex%3D400x400" alt="ANUA ドクダミクレンジングオイル">
           <div class="prod-tag">
             <div class="prod-tag-brand">ANUA</div>
-            <div class="prod-tag-name">ドクダミポアコントロール<br>クレンジングオイル</div>
+            <div class="prod-tag-name">ドクダミ BHA<br>クレンジングオイル</div>
           </div>
           <div class="eyebrow">成分 No.3</div>
           <div class="ing-display">BHA</div>
@@ -202,12 +203,13 @@ body{font-family:'Inter',sans-serif;background:#E8E4DF;padding:48px 40px;color:v
           <div class="eyebrow" style="display:flex;align-items:center;gap:12px"><span>🥇</span> 成分 No.1</div>
           <div class="divider"></div>
           <div class="cover-h" style="font-size:120px;background:linear-gradient(135deg,#C9A96E,#E8C88A);-webkit-background-clip:text;-webkit-text-fill-color:transparent">レチノール</div>
-          <div class="cover-sub" style="margin-top:28px">Retinol</div>
-          <div style="margin-top:36px;display:flex;flex-wrap:wrap;gap:0">
+          <div class="cover-sub" style="margin-top:16px">Retinol — 最強のエイジングケア成分</div>
+          <div style="margin-top:28px;display:flex;flex-wrap:wrap;gap:0">
             <span class="pill-sm">毛穴縮小</span>
             <span class="pill-sm">皮脂コントロール</span>
             <span class="pill-sm">くすみ改善</span>
           </div>
+          <div style="margin-top:32px;font-size:26px;font-weight:400;color:var(--muted);line-height:1.7;max-width:680px">肌のターンオーバーを促進し<br>毛穴・シワ・くすみを同時に攻略</div>
           <div class="foot">
             <span class="logo logo-dk">🕯 mihada</span>
             <span class="foot-tag" style="color:rgba(250,248,245,.3)">4 / 5</span>
@@ -306,18 +308,18 @@ body{font-family:'Inter',sans-serif;background:#E8E4DF;padding:48px 40px;color:v
               <div style="font-size:20px;font-weight:400;color:var(--muted);margin-top:12px">Dry Skin</div>
             </div>
             <div class="split-right">
-              <div style="font-size:26px;font-weight:700;letter-spacing:.1em;color:var(--gold);margin-bottom:32px">乾燥肌への効果</div>
+              <div style="font-size:26px;font-weight:700;letter-spacing:.1em;color:var(--gold);margin-bottom:36px">乾燥肌への効果</div>
               <div class="check">
                 <div class="check-icon">✓</div>
-                <div class="check-text"><strong>くすみ改善</strong><br>メラニン生成を抑制し<br>透明感アップ</div>
+                <div><div class="check-text">くすみ改善</div><div class="check-sub">透明感アップ・肌トーンが均一に</div></div>
               </div>
               <div class="check">
                 <div class="check-icon">✓</div>
-                <div class="check-text"><strong>バリア強化</strong><br>セラミド産生を促し<br>水分を逃さない</div>
+                <div><div class="check-text">バリア強化</div><div class="check-sub">セラミド産生を促し水分キープ</div></div>
               </div>
               <div class="check">
                 <div class="check-icon">✓</div>
-                <div class="check-text"><strong>低刺激</strong><br>敏感な乾燥肌にも<br>安心して使える</div>
+                <div><div class="check-text">低刺激で使いやすい</div><div class="check-sub">敏感な乾燥肌にも安心</div></div>
               </div>
             </div>
           </div>
@@ -342,18 +344,18 @@ body{font-family:'Inter',sans-serif;background:#E8E4DF;padding:48px 40px;color:v
               <div style="font-size:20px;font-weight:400;color:rgba(26,24,20,.55);margin-top:12px">Oily Skin</div>
             </div>
             <div class="split-right">
-              <div style="font-size:26px;font-weight:700;letter-spacing:.1em;color:var(--gold);margin-bottom:32px">脂性肌への効果</div>
+              <div style="font-size:26px;font-weight:700;letter-spacing:.1em;color:var(--gold);margin-bottom:36px">脂性肌への効果</div>
               <div class="check">
                 <div class="check-icon">✓</div>
-                <div class="check-text"><strong>皮脂抑制</strong><br>過剰な皮脂分泌を<br>コントロール</div>
+                <div><div class="check-text">皮脂を抑える</div><div class="check-sub">テカりを根本からコントロール</div></div>
               </div>
               <div class="check">
                 <div class="check-icon">✓</div>
-                <div class="check-text"><strong>毛穴縮小</strong><br>開き毛穴を引き締め<br>なめらかな肌へ</div>
+                <div><div class="check-text">毛穴が目立たなくなる</div><div class="check-sub">開き毛穴を引き締める</div></div>
               </div>
               <div class="check">
                 <div class="check-icon">✓</div>
-                <div class="check-text"><strong>ニキビ跡</strong><br>色素沈着を薄め<br>肌トーンを均一に</div>
+                <div><div class="check-text">ニキビ跡が薄くなる</div><div class="check-sub">色素沈着・肌トーンを整える</div></div>
               </div>
             </div>
           </div>
@@ -378,18 +380,18 @@ body{font-family:'Inter',sans-serif;background:#E8E4DF;padding:48px 40px;color:v
               <div style="font-size:20px;font-weight:400;color:var(--muted);margin-top:12px">Sensitive Skin</div>
             </div>
             <div class="split-right">
-              <div style="font-size:26px;font-weight:700;letter-spacing:.1em;color:var(--gold);margin-bottom:32px">敏感肌への効果</div>
+              <div style="font-size:26px;font-weight:700;letter-spacing:.1em;color:var(--gold);margin-bottom:36px">敏感肌への効果</div>
               <div class="check">
                 <div class="check-icon">✓</div>
-                <div class="check-text"><strong>低刺激</strong><br>pHが穏やかで<br>刺激が少ない</div>
+                <div><div class="check-text">肌に優しい</div><div class="check-sub">pH穏やかで刺激が少ない</div></div>
               </div>
               <div class="check">
                 <div class="check-icon">✓</div>
-                <div class="check-text"><strong>赤み改善</strong><br>炎症を鎮め<br>肌トーンを整える</div>
+                <div><div class="check-text">赤みが落ち着く</div><div class="check-sub">炎症を抑えてトーンを整える</div></div>
               </div>
               <div class="check">
                 <div class="check-icon">✓</div>
-                <div class="check-text"><strong>全肌タイプ</strong><br>乾燥〜脂性まで<br>幅広く対応</div>
+                <div><div class="check-text">どの肌タイプでも◎</div><div class="check-sub">乾燥・脂性・混合すべてOK</div></div>
               </div>
             </div>
           </div>
@@ -580,15 +582,15 @@ body{font-family:'Inter',sans-serif;background:#E8E4DF;padding:48px 40px;color:v
           <div style="margin-top:8px">
             <div class="check">
               <div class="check-icon">✓</div>
-              <div class="check-text"><strong>配合量を明記</strong><br>何%入ってるか分かる</div>
+              <div><div class="check-text">何%配合か明記</div><div class="check-sub">成分量が全部わかる</div></div>
             </div>
             <div class="check">
               <div class="check-icon">✓</div>
-              <div class="check-text"><strong>成分説明が詳細</strong><br>なぜ効くかを語ってくれる</div>
+              <div><div class="check-text">なぜ効くか説明してくれる</div><div class="check-sub">成分の根拠がちゃんとある</div></div>
             </div>
             <div class="check">
               <div class="check-icon">✓</div>
-              <div class="check-text"><strong>科学的根拠あり</strong><br>論文ベースの処方設計</div>
+              <div><div class="check-text">論文ベースの処方</div><div class="check-sub">科学的に設計されたスキンケア</div></div>
             </div>
           </div>
           <div class="foot">
@@ -1168,11 +1170,11 @@ body{font-family:'Inter',sans-serif;background:#E8E4DF;padding:48px 40px;color:v
           <div style="margin-top:16px">
             <div class="check">
               <div class="check-icon">1</div>
-              <div class="check-text"><strong>BHA配合オイル</strong>で<br>くるくる1分マッサージ</div>
+              <div><div class="check-text">BHA配合オイルでくるくる</div><div class="check-sub">1分間やさしくマッサージ</div></div>
             </div>
             <div class="check">
               <div class="check-icon">2</div>
-              <div class="check-text"><strong>ぬるま湯で</strong><br>やさしく乳化&洗い流す</div>
+              <div><div class="check-text">ぬるま湯で乳化して洗い流す</div><div class="check-sub">強くこすらずやさしく</div></div>
             </div>
           </div>
           <div class="foot">
@@ -1200,7 +1202,7 @@ body{font-family:'Inter',sans-serif;background:#E8E4DF;padding:48px 40px;color:v
           <div class="divider-sm"></div>
           <div class="check" style="max-width:560px">
             <div class="check-icon">✓</div>
-            <div class="check-text"><strong>ナイアシンアミド</strong>で<br>肌トーン均一に整える</div>
+            <div><div class="check-text">肌トーンが均一になる</div><div class="check-sub">ナイアシンアミドで毛穴・くすみをケア</div></div>
           </div>
           <div class="foot">
             <span class="logo logo-lt">🕯 mihada</span>
@@ -1227,7 +1229,7 @@ body{font-family:'Inter',sans-serif;background:#E8E4DF;padding:48px 40px;color:v
           <div class="divider-sm"></div>
           <div class="check" style="max-width:560px">
             <div class="check-icon">✓</div>
-            <div class="check-text"><strong>3種セラミド</strong>で<br>翌朝もちもち肌をキープ</div>
+            <div><div class="check-text">翌朝もちもちになる</div><div class="check-sub">3種セラミドでバリアを完成させる</div></div>
           </div>
           <div class="foot">
             <span class="logo logo-lt">🕯 mihada</span>

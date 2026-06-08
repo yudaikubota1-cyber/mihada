@@ -1287,15 +1287,13 @@ function showToast(msg) {
 }
 
 function captureSlide(el) {
-  // CSSのscale(0.42)を一時解除してフル1080×1080でキャプチャ
-  el.style.transform = 'scale(1)';
-  el.style.transformOrigin = 'top left';
   return html2canvas(el, {
     scale: 2, useCORS: true, allowTaint: true, logging: false,
-    width: 1080, height: 1080, windowWidth: 1080, windowHeight: 1080
-  }).finally(() => {
-    el.style.transform = '';
-    el.style.transformOrigin = '';
+    width: 1080, height: 1080, windowWidth: 1080, windowHeight: 1080,
+    onclone: (_doc, cloned) => {
+      cloned.style.transform = 'none';
+      cloned.style.transformOrigin = 'top left';
+    }
   });
 }
 

@@ -1350,29 +1350,51 @@ async function dlAll() {
   showToast('全スライド保存完了！');
 }
 
-// ─── 商品画像のフォールバック ───────────────────────────────
-// Rakuten CDNはホットリンク保護があるため、3段階で画像取得を試みる:
-//   1) /api/img プロキシ（Vercelサーバー側でRakuten Refererを付与）
-//   2) images.weserv.nl（公開画像プロキシ）
-//   3) 失敗時はブランド名のテキストプレースホルダーを表示
+// ─── 商品画像システム ────────────────────────────────────────
+// 優先順位: 1) ユーザーアップロード(localStorage)  2) /api/imgプロキシ  3) weserv.nl  4) ゴールドプレースホルダー
+
+const PROD_KEY_MAP = [
+  { key: 'cleansing', words: ['クレンジングオイル'] },
+  { key: 'serum',     words: ['ナイアシンセラム', 'ナイアシンアミドセラム'] },
+  { key: 'mask',      words: ['マスクパック'] },
+  { key: 'toner',     words: ['ナイアシントナー', 'ナイアシンアミドトナー'] },
+  { key: 'cream',     words: ['セラミドクリーム'] },
+];
+
+function getProdKey(alt) {
+  const a = alt || '';
+  for (const { key, words } of PROD_KEY_MAP) {
+    if (words.some(w => a.includes(w))) return key;
+  }
+  return null;
+}
+
+function applyStoredImages() {
+  document.querySelectorAll('img.prod-img, img.prod-img-sm').forEach(img => {
+    const key = getProdKey(img.alt);
+    if (!key) return;
+    const stored = localStorage.getItem('anua_img_' + key);
+    if (stored) { img.src = stored; img.dataset.userImage = '1'; }
+  });
+}
+applyStoredImages();
+
 function rakutenFromProxy(src) {
   const m = src.match(/[?&]url=([^&]+)/);
   if (!m) return null;
   try { return decodeURIComponent(m[1]); } catch { return null; }
 }
 document.querySelectorAll('img.prod-img, img.prod-img-sm').forEach(img => {
+  if (img.dataset.userImage) return;
   img.setAttribute('crossorigin', 'anonymous');
   let stage = 0;
   img.addEventListener('error', function onErr() {
-    const rakutenUrl = rakutenFromProxy(img.dataset.rakuten || img.src) ||
-                       (img.dataset.rakuten || '');
+    const rakutenUrl = rakutenFromProxy(img.dataset.rakuten || img.src) || (img.dataset.rakuten || '');
     if (stage === 0 && rakutenUrl) {
-      // → weserv.nl にフォールバック
       stage = 1;
       const stripped = rakutenUrl.replace(/^https?:\/\//, '');
       img.src = 'https://images.weserv.nl/?url=' + encodeURIComponent(stripped) + '&w=400&h=400&fit=contain&output=jpg';
     } else if (stage <= 1) {
-      // → テキストプレースホルダー
       stage = 2;
       img.removeEventListener('error', onErr);
       const ph = document.createElement('div');
@@ -1383,9 +1405,91 @@ document.querySelectorAll('img.prod-img, img.prod-img-sm').forEach(img => {
       img.replaceWith(ph);
     }
   });
-  // 元のRakuten URLを保存（フォールバック用）
   img.dataset.rakuten = rakutenFromProxy(img.src) || img.src;
 });
+
+// ─── 商品画像セットアップUI ────────────────────────────────────
+(function() {
+  const PRODUCTS = [
+    { key: 'cleansing', label: 'ドクダミ クレンジングオイル' },
+    { key: 'serum',     label: '桃70% ナイアシンセラム' },
+    { key: 'mask',      label: 'ドクダミ マスクパック' },
+    { key: 'toner',     label: '桃77+ ナイアシントナー' },
+    { key: 'cream',     label: '3セラミドクリーム' },
+  ];
+
+  const setupBtn = document.createElement('button');
+  setupBtn.id = 'setupBtn';
+  setupBtn.textContent = '📷 商品画像を設定';
+  setupBtn.style.cssText = 'position:fixed;bottom:28px;left:28px;background:#C9A96E;color:#1A1814;border:none;padding:14px 20px;border-radius:50px;font-size:12px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;box-shadow:0 8px 32px rgba(0,0,0,.3);z-index:998;transition:transform .15s';
+  setupBtn.onmouseover = () => setupBtn.style.transform = 'scale(1.04)';
+  setupBtn.onmouseout  = () => setupBtn.style.transform = '';
+  document.body.appendChild(setupBtn);
+
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1010;align-items:center;justify-content:center;padding:20px';
+
+  const modal = document.createElement('div');
+  modal.style.cssText = 'background:#FAF8F5;border-radius:24px;padding:36px;width:440px;max-width:100%;max-height:90vh;overflow-y:auto';
+  modal.innerHTML = `
+    <h2 style="font-size:18px;font-weight:800;color:#1A1814;margin-bottom:6px">商品画像を設定</h2>
+    <p style="font-size:12px;color:#AAA098;margin-bottom:24px">各商品の画像を選択 → 「スライドに適用」を押してください</p>
+    ${PRODUCTS.map(p => `
+      <div style="margin-bottom:18px;display:flex;align-items:center;gap:12px">
+        <img id="prev_${p.key}" style="width:52px;height:52px;object-fit:cover;border-radius:10px;border:2px solid #E8E4DF;background:#E8E4DF;flex-shrink:0" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==">
+        <div style="flex:1">
+          <div style="font-size:12px;font-weight:700;color:#1A1814;margin-bottom:6px">${p.label}</div>
+          <label style="display:inline-block;background:#1A1814;color:#FAF8F5;padding:8px 14px;border-radius:10px;font-size:11px;font-weight:600;cursor:pointer">
+            ファイルを選択
+            <input type="file" accept="image/*" data-key="${p.key}" style="display:none">
+          </label>
+          <span id="status_${p.key}" style="font-size:11px;color:#C9A96E;margin-left:8px;display:none">✓ 設定済</span>
+        </div>
+      </div>
+    `).join('')}
+    <div style="display:flex;gap:10px;margin-top:24px">
+      <button id="setup-cancel" style="flex:1;background:#E8E4DF;color:#1A1814;border:none;padding:13px;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">閉じる</button>
+      <button id="setup-apply" style="flex:2;background:#C9A96E;color:#1A1814;border:none;padding:13px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">スライドに適用</button>
+    </div>
+    <p style="font-size:10px;color:#CCC;margin-top:12px;text-align:center">設定はブラウザに保存されます（次回以降も有効）</p>
+  `;
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+
+  // プレビュー初期化（既存設定があれば表示）
+  PRODUCTS.forEach(p => {
+    const stored = localStorage.getItem('anua_img_' + p.key);
+    const prev = modal.querySelector('#prev_' + p.key);
+    const status = modal.querySelector('#status_' + p.key);
+    if (stored && prev) { prev.src = stored; if (status) status.style.display = ''; }
+  });
+
+  modal.querySelectorAll('input[type=file]').forEach(input => {
+    input.addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const key = input.dataset.key;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        localStorage.setItem('anua_img_' + key, ev.target.result);
+        const prev = modal.querySelector('#prev_' + key);
+        const status = modal.querySelector('#status_' + key);
+        if (prev) prev.src = ev.target.result;
+        if (status) status.style.display = '';
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+
+  setupBtn.addEventListener('click', () => { overlay.style.display = 'flex'; });
+  modal.querySelector('#setup-cancel').addEventListener('click', () => { overlay.style.display = 'none'; });
+  modal.querySelector('#setup-apply').addEventListener('click', () => {
+    applyStoredImages();
+    overlay.style.display = 'none';
+    showToast('商品画像を適用しました！');
+  });
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.style.display = 'none'; });
+})();
 </script>
 </body>
 </html>

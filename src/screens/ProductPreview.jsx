@@ -18,7 +18,7 @@ const MOCK = [
 
 const CONCERNS = ['乾燥・保湿','毛穴・黒ずみ','ニキビ・赤み','くすみ・シミ','たるみ・ハリ'];
 const BRANDS = [...new Set(MOCK.map(p => p.brand))];
-const G = '#1DAB6A';
+const G = '#111111';
 
 /* ── 共通パーツ ─────────────────────────────────────── */
 function Stars({ score }) {
@@ -29,8 +29,8 @@ function Pill({ text, accent }) {
   return (
     <span style={{
       display: 'inline-block', padding: '3px 8px', borderRadius: 99,
-      fontSize: 10, background: accent ? `rgba(29,171,106,0.10)` : '#F5F0EC',
-      color: accent ? G : '#888', border: accent ? `1px solid rgba(29,171,106,0.2)` : 'none',
+      fontSize: 10, background: accent ? `rgba(17,17,17,0.10)` : '#F5F0EC',
+      color: accent ? G : '#888', border: accent ? `1px solid rgba(17,17,17,0.2)` : 'none',
       fontWeight: accent ? 600 : 400, whiteSpace: 'nowrap',
     }}>{text}</span>
   );

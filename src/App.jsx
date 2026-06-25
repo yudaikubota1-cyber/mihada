@@ -33,10 +33,10 @@ function HeaderNavLink({ label, active, onClick }) {
       style={{
         background: 'none', border: 'none', cursor: 'pointer',
         padding: '6px 14px', borderRadius: 6,
-        fontSize: 13, fontWeight: active ? 600 : 400,
-        color: active ? '#111' : hovered ? '#333' : '#666',
-        fontFamily: 'inherit', letterSpacing: '-0.01em',
-        borderBottom: active ? '2px solid #111' : '2px solid transparent',
+        fontSize: 13, fontWeight: 300,
+        color: active ? '#111' : hovered ? '#333' : '#999',
+        fontFamily: 'inherit', letterSpacing: '0.04em',
+        textDecoration: 'none',
         transition: 'all 0.14s ease',
       }}
     >
@@ -63,12 +63,10 @@ function DesktopHeader({ screen, onHome }) {
           display: 'flex', alignItems: 'center', gap: 7,
         }}
       >
-        <span style={{ fontSize: 11, letterSpacing: '0.06em', color: '#AAA098' }}>🕯</span>
         <span style={{
-          fontSize: 14, fontWeight: 600, letterSpacing: '0.18em',
-          color: '#1A1814', fontFamily: 'inherit', textTransform: 'uppercase',
-        }}>mihada</span>
-        <span style={{ fontSize: 11, letterSpacing: '0.06em', color: '#AAA098' }}>🕯</span>
+          fontSize: 16, fontWeight: 300, letterSpacing: '0.18em',
+          color: '#111111', fontFamily: 'inherit',
+        }}>miHada</span>
       </button>
 
       {/* 右: スペーサー（左ナビと対称にするため） */}

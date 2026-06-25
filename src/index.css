@@ -1,12 +1,12 @@
 :root {
-  --bg: #FFFEFB;
-  --bg-soft: #F5F0EA;
-  --bg-warm: #EDE5DA;
-  --border: #E4D9CE;
-  --border-strong: #C8B8A8;
-  --text: #1A1814;
-  --text-secondary: #7A706A;
-  --text-muted: #AAA098;
+  --bg: #FFFFFF;
+  --bg-soft: #F5F5F5;
+  --bg-warm: #FAFAFA;
+  --border: #E0E0E0;
+  --border-strong: #CCCCCC;
+  --text: #111111;
+  --text-secondary: #999999;
+  --text-muted: #999999;
   --accent: #111;
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -29,7 +29,7 @@ body {
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #E0D8CF;
+  background: #F5F5F5;
   color: var(--text);
   /* iOSでのタップ時ハイライトを無効化 */
   -webkit-tap-highlight-color: transparent;
@@ -40,7 +40,7 @@ body {
   justify-content: center;
   align-items: flex-start;
   min-height: 100%;
-  background: #E0D8CF;
+  background: #F5F5F5;
 }
 
 .app-shell {

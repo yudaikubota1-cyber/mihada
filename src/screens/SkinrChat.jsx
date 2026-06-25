@@ -265,7 +265,7 @@ export default function SkinrChat({ initialMessage, onComplete, onBack }) {
                 send();
               }
             }}
-            placeholder={aiTyping ? '成分を分析中...' : messages.length === 1 ? '悩みを自由に書いてください…' : 'または自由に入力…'}
+            placeholder={aiTyping ? '成分を分析中...' : messages.length === 1 ? '例：最近頬が乾燥してファンデが浮く...' : 'または自由に入力…'}
             rows={1}
             disabled={aiTyping}
             style={{

@@ -25,9 +25,9 @@ const BRAND_STORE_URL = {
   'Goodal': 'https://www.rakuten.co.jp/cliojapan/',
 };
 
-// ── AI 肌診断チャットカード ─────────────────────────────────────
-const G = '#1DAB6A';   // メイングリーン（明るめ）
-const GD = '#178A55';  // ダークグリーン（ホバー用）
+// ── 診断チャットカード ─────────────────────────────────────
+const G = '#111111';   // モノクロ・メイン
+const GD = '#000000';  // モノクロ・ダーク
 
 // キーワード分類マップ
 const CONCERN_KEYWORDS = {
@@ -96,7 +96,7 @@ function ChatDiagnosisCard({ onComplete }) {
   // 初期メッセージ
   useEffect(() => {
     const t = setTimeout(() => {
-      setMessages([{ role: 'ai', text: 'こんにちは！\n今、一番気になるお肌の悩みを教えてください。', isFirst: true }]);
+      setMessages([{ role: 'ai', text: '今、気になっていることを教えてください。成分ロジックから、あなたに合う一本を見つけます。', isFirst: true }]);
       setPhase('concern_input');
     }, 400);
     return () => clearTimeout(t);
@@ -191,35 +191,12 @@ function ChatDiagnosisCard({ onComplete }) {
   return (
     <div style={{ width: '100%' }}>
       <div style={{
-        background: 'var(--bg)', borderRadius: 22, overflow: 'hidden',
-        boxShadow: '0 16px 64px rgba(80,60,40,0.14), 0 2px 8px rgba(80,60,40,0.06)',
-        border: '1px solid rgba(228,217,206,0.8)',
+        background: '#FFFFFF', borderRadius: 16, overflow: 'hidden',
+        border: '1px solid #E0E0E0',
       }}>
-        {/* ヘッダー */}
-        <div style={{ background: `linear-gradient(135deg, ${G} 0%, ${GD} 100%)`, padding: '14px 18px 13px', display: 'flex', alignItems: 'center', gap: 11 }}>
-          <div style={{ width: 38, height: 38, borderRadius: 12, background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Icon name="sparkle" size={17} color="#fff" />
-          </div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', letterSpacing: '-0.01em' }}>AI 肌診断</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
-              <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ADE80', boxShadow: '0 0 6px #4ADE80' }} />
-              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.7)', letterSpacing: '0.04em' }}>成分ロジック エンジン 稼働中</span>
-            </div>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: 9, fontFamily: 'JetBrains Mono, monospace', color: 'rgba(255,255,255,0.45)', letterSpacing: '0.1em' }}>
-              {phase === 'done' ? 'DONE' : 'STEP'}
-            </div>
-            <div style={{ fontSize: 16, fontWeight: 700, color: '#fff', fontFamily: 'JetBrains Mono, monospace', lineHeight: 1 }}>
-              {phase === 'done' ? '✓' : (phase === 'skintype' || phase === 'concern_followup') ? '2' : '1'}
-            </div>
-          </div>
-        </div>
-
         {/* プログレスバー */}
-        <div style={{ height: 2, background: `rgba(29,171,106,0.12)` }}>
-          <div style={{ height: '100%', background: `linear-gradient(90deg, ${G}, ${GD})`, width: `${progressPct}%`, transition: 'width 0.5s cubic-bezier(0.4,0,0.2,1)' }} />
+        <div style={{ height: 2, background: '#F0F0F0' }}>
+          <div style={{ height: '100%', background: '#111111', width: `${progressPct}%`, transition: 'width 0.5s cubic-bezier(0.4,0,0.2,1)' }} />
         </div>
 
         {/* メッセージエリア */}
@@ -228,16 +205,16 @@ function ChatDiagnosisCard({ onComplete }) {
             msg.role === 'ai' ? (
               <div key={i} style={{ display: 'flex', alignItems: 'flex-end', gap: 8, animation: 'skinrFadeIn 0.22s ease' }}>
                 {!msg.isFirst
-                  ? <div style={{ width: 28, height: 28, borderRadius: '50%', flexShrink: 0, background: `linear-gradient(135deg, ${G} 0%, ${GD} 100%)`, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 2px 8px rgba(29,171,106,0.25)` }}><Icon name="sparkle" size={12} color="#fff" /></div>
+                  ? <div style={{ width: 28, height: 28, borderRadius: '50%', flexShrink: 0, background: '#111111', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Icon name="sparkle" size={12} color="#fff" /></div>
                   : <div style={{ width: 28, flexShrink: 0 }} />
                 }
-                <div style={{ maxWidth: '80%', padding: '11px 15px', background: '#fff', borderRadius: '4px 18px 18px 18px', fontSize: 13, lineHeight: 1.65, color: '#1A1814', whiteSpace: 'pre-line', letterSpacing: '0.01em', boxShadow: '0 2px 12px rgba(80,60,40,0.08)' }}>
+                <div style={{ maxWidth: '80%', padding: '11px 15px', background: '#F5F5F5', borderRadius: '4px 18px 18px 18px', fontSize: 13, lineHeight: 1.65, color: '#111111', whiteSpace: 'pre-line', letterSpacing: '0.01em' }}>
                   {msg.text}
                 </div>
               </div>
             ) : (
               <div key={i} style={{ display: 'flex', justifyContent: 'flex-end', animation: 'skinrFadeIn 0.22s ease' }}>
-                <div style={{ maxWidth: '75%', padding: '11px 15px', background: `linear-gradient(135deg, ${G} 0%, ${GD} 100%)`, borderRadius: '18px 4px 18px 18px', fontSize: 13, lineHeight: 1.6, color: '#fff', fontWeight: 500, letterSpacing: '0.01em', boxShadow: `0 3px 12px rgba(29,171,106,0.28)` }}>
+                <div style={{ maxWidth: '75%', padding: '11px 15px', background: '#111111', borderRadius: '18px 4px 18px 18px', fontSize: 13, lineHeight: 1.6, color: '#fff', fontWeight: 500, letterSpacing: '0.01em' }}>
                   {msg.text}
                 </div>
               </div>
@@ -248,34 +225,32 @@ function ChatDiagnosisCard({ onComplete }) {
           {typing && (
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, animation: 'skinrFadeIn 0.18s ease' }}>
               <div style={{ width: 28, flexShrink: 0 }} />
-              <div style={{ padding: '12px 16px', background: '#fff', borderRadius: '4px 18px 18px 18px', display: 'flex', gap: 5, alignItems: 'center', boxShadow: '0 2px 12px rgba(80,60,40,0.08)' }}>
-                {[0,1,2].map(i => <div key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: '#C8B8A8', animation: `skinrTypingDot 1.3s ease ${i * 0.2}s infinite` }} />)}
+              <div style={{ padding: '12px 16px', background: '#F5F5F5', borderRadius: '4px 18px 18px 18px', display: 'flex', gap: 5, alignItems: 'center' }}>
+                {[0,1,2].map(i => <div key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: '#999999', animation: `skinrTypingDot 1.3s ease ${i * 0.2}s infinite` }} />)}
               </div>
             </div>
           )}
 
           {/* 結果カード */}
           {showResult && (
-            <div style={{ margin: '4px 0 0 36px', background: 'linear-gradient(135deg, #F0FAF4 0%, #E8F5EF 100%)', border: `1.5px solid rgba(29,171,106,0.18)`, borderRadius: 16, padding: '18px 18px 16px', animation: 'skinrSlideUp 0.3s ease', boxShadow: `0 4px 20px rgba(29,171,106,0.10)` }}>
+            <div style={{ margin: '4px 0 0 36px', background: '#F5F5F5', border: '1px solid #E0E0E0', borderRadius: 16, padding: '18px 18px 16px', animation: 'skinrSlideUp 0.3s ease' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                <div style={{ width: 6, height: 6, borderRadius: '50%', background: G }} />
-                <span style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.18em', color: G, fontWeight: 600 }}>診断完了 — あなたへのご提案</span>
+                <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#111111' }} />
+                <span style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.18em', color: '#111111', fontWeight: 600 }}>分析完了 — あなたへのご提案</span>
               </div>
-              <div style={{ fontSize: 13, color: '#1A1814', fontWeight: 600, marginBottom: 3 }}>{skinLabel} × {concern}</div>
-              <div style={{ fontSize: 11, color: '#7A706A', marginBottom: 14 }}>{resultNote}</div>
-              <div style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.14em', color: '#AAA098', marginBottom: 10 }}>注目すべき成分</div>
+              <div style={{ fontSize: 13, color: '#111111', fontWeight: 600, marginBottom: 3 }}>{skinLabel} × {concern}</div>
+              <div style={{ fontSize: 11, color: '#999999', marginBottom: 14 }}>{resultNote}</div>
+              <div style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.14em', color: '#999999', marginBottom: 10 }}>注目すべき成分</div>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
                 {ingredients.map(ing => (
-                  <div key={ing} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 99, background: '#fff', border: `1px solid rgba(29,171,106,0.15)`, fontSize: 12, fontWeight: 500, color: '#1A1814', boxShadow: `0 1px 4px rgba(29,171,106,0.06)` }}>
-                    <span style={{ fontSize: 13 }}>{INGR_ICONS[ing] || '🌿'}</span>{ing}
+                  <div key={ing} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 99, background: '#fff', border: '1px solid #DDDDDD', fontSize: 12, fontWeight: 500, color: '#555555' }}>
+                    {ing}
                   </div>
                 ))}
               </div>
               <button
                 onClick={() => onComplete && onComplete({ concern, skinType })}
-                style={{ width: '100%', padding: '12px', borderRadius: 10, border: 'none', background: `linear-gradient(135deg, ${G} 0%, ${GD} 100%)`, color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', letterSpacing: '0.02em', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, boxShadow: `0 4px 16px rgba(29,171,106,0.30)`, transition: 'all 0.15s ease' }}
-                onMouseEnter={e => e.currentTarget.style.boxShadow = `0 6px 24px rgba(29,171,106,0.40)`}
-                onMouseLeave={e => e.currentTarget.style.boxShadow = `0 4px 16px rgba(29,171,106,0.30)`}
+                style={{ width: '100%', padding: '12px', borderRadius: 10, border: 'none', background: '#111111', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', letterSpacing: '0.02em', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
               >
                 <Icon name="sparkle" size={13} color="#fff" />
                 おすすめ商品を全部見る
@@ -293,32 +268,28 @@ function ChatDiagnosisCard({ onComplete }) {
                 value={inputText}
                 onChange={e => setInputText(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submitConcern(); } }}
-                placeholder="例：ぶつぶつが気になる、乾燥してかさかさ…"
+                placeholder="例：最近頬が乾燥してファンデが浮く..."
                 style={{
                   flex: 1, padding: '11px 14px', borderRadius: 12,
-                  border: '1.5px solid var(--border)', background: 'var(--bg-soft)',
-                  fontSize: 13, fontFamily: 'inherit', color: '#1A1814',
+                  border: '1px solid #E0E0E0', background: '#FFFFFF',
+                  fontSize: 13, fontFamily: 'inherit', color: '#111111',
                   outline: 'none', transition: 'border-color 0.15s ease',
                 }}
-                onFocus={e => e.currentTarget.style.borderColor = G}
-                onBlur={e => e.currentTarget.style.borderColor = 'var(--border)'}
+                onFocus={e => e.currentTarget.style.borderColor = '#111111'}
+                onBlur={e => e.currentTarget.style.borderColor = '#E0E0E0'}
               />
               <button
                 onClick={submitConcern}
                 disabled={!inputText.trim()}
                 style={{
                   padding: '11px 18px', borderRadius: 12, border: 'none', flexShrink: 0,
-                  background: inputText.trim() ? `linear-gradient(135deg, ${G} 0%, ${GD} 100%)` : 'var(--bg-soft)',
-                  color: inputText.trim() ? '#fff' : '#C8B8A8',
+                  background: inputText.trim() ? '#111111' : '#E0E0E0',
+                  color: inputText.trim() ? '#fff' : '#999999',
                   fontSize: 13, fontWeight: 600,
                   cursor: inputText.trim() ? 'pointer' : 'default',
                   fontFamily: 'inherit', transition: 'all 0.15s ease',
-                  boxShadow: inputText.trim() ? '0 2px 12px rgba(29,171,106,0.28)' : 'none',
                 }}
               >送信</button>
-            </div>
-            <div style={{ marginTop: 8, fontSize: 10, color: '#C8C0B8', letterSpacing: '0.02em' }}>
-              気になることを自由に入力してください · Enter で送信
             </div>
           </div>
         )}
@@ -331,7 +302,7 @@ function ChatDiagnosisCard({ onComplete }) {
               {CONCERN_OPTIONS.map(q => (
                 <button key={q.label} onClick={() => pickConcernFollowup(q.label)}
                   style={optionButtonStyle(true)}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = G; e.currentTarget.style.background = `rgba(29,171,106,0.04)`; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = G; e.currentTarget.style.background = `rgba(17,17,17,0.04)`; e.currentTarget.style.transform = 'translateY(-1px)'; }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'var(--bg)'; e.currentTarget.style.transform = 'none'; }}
                 >
                   <span style={{ fontSize: 13, fontWeight: 500, color: '#1A1814', letterSpacing: '-0.01em' }}>{q.label}</span>
@@ -350,7 +321,7 @@ function ChatDiagnosisCard({ onComplete }) {
               {SKIN_TYPE_OPTIONS.map(q => (
                 <button key={q.label} onClick={() => pickSkinType(q.label)}
                   style={optionButtonStyle(true)}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = G; e.currentTarget.style.background = `rgba(29,171,106,0.04)`; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = G; e.currentTarget.style.background = `rgba(17,17,17,0.04)`; e.currentTarget.style.transform = 'translateY(-1px)'; }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'var(--bg)'; e.currentTarget.style.transform = 'none'; }}
                 >
                   <span style={{ fontSize: 13, fontWeight: 500, color: '#1A1814', letterSpacing: '-0.01em' }}>{q.label}</span>
@@ -422,8 +393,8 @@ function BrandDirectoryRow({ brand, total, lines, products, px, isDesktop, delay
         <button
           onClick={onClick}
           style={{
-            background: hovered ? '#1DAB6A' : 'none',
-            border: '1px solid ' + (hovered ? '#1DAB6A' : 'var(--border-strong)'),
+            background: hovered ? '#111111' : 'none',
+            border: '1px solid ' + (hovered ? '#111111' : 'var(--border-strong)'),
             borderRadius: 8, cursor: 'pointer',
             fontSize: 11, color: hovered ? '#fff' : '#555',
             fontWeight: 600, fontFamily: 'inherit',
@@ -519,7 +490,7 @@ function BrandDirectoryRow({ brand, total, lines, products, px, isDesktop, delay
                     flex: 1, padding: '4px 0', fontSize: 9, fontWeight: 700,
                     fontFamily: 'inherit', cursor: 'pointer',
                     border: 'none', borderRadius: 5,
-                    background: '#BF0000', color: '#fff',
+                    background: '#111111', color: '#fff',
                     letterSpacing: '0.02em',
                   }}
                 >購入</button>
@@ -535,7 +506,7 @@ function BrandDirectoryRow({ brand, total, lines, products, px, isDesktop, delay
               height: cardH,
               borderRadius: 10,
               border: '1px dashed var(--border-strong)',
-              background: hovered ? 'rgba(29,171,106,0.04)' : 'transparent',
+              background: hovered ? 'rgba(17,17,17,0.04)' : 'transparent',
               cursor: 'pointer',
               display: 'flex',
               flexDirection: 'column',
@@ -546,8 +517,8 @@ function BrandDirectoryRow({ brand, total, lines, products, px, isDesktop, delay
               alignSelf: 'flex-start',
             }}
           >
-            <span style={{ fontSize: 18, color: '#1DAB6A' }}>→</span>
-            <span style={{ fontSize: 9, color: '#1DAB6A', fontWeight: 600, letterSpacing: '0.05em' }}>全部見る</span>
+            <span style={{ fontSize: 18, color: '#111111' }}>→</span>
+            <span style={{ fontSize: 9, color: '#111111', fontWeight: 600, letterSpacing: '0.05em' }}>全部見る</span>
           </button>
         </div>
       </div>
@@ -692,30 +663,24 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
       {isDesktop ? (
         /* ── Desktop: フルスクリーンヒーロー ── */
         <div style={{
-          minHeight: 'calc(100dvh - 60px)',
-          padding: '0 64px',
-          background: 'linear-gradient(160deg, var(--bg-warm) 0%, var(--bg-soft) 60%, var(--bg) 100%)',
-          borderBottom: '1px solid var(--border-strong)',
+          padding: '56px 64px 64px',
+          background: '#FFFFFF',
+          borderBottom: '1px solid #E0E0E0',
           display: 'flex', flexDirection: 'row',
-          alignItems: 'center', gap: 'clamp(32px, 5vw, 80px)',
+          alignItems: 'flex-start', gap: 'clamp(32px, 5vw, 80px)',
         }}>
           {/* 左: コピー */}
-          <div style={{ flex: '0 0 auto', maxWidth: 360 }}>
+          <div style={{ flex: '0 0 auto', maxWidth: 360, paddingTop: 8 }}>
             <h1 style={{
               margin: '0 0 0',
-              fontSize: 52, lineHeight: 1.1,
-              fontWeight: 400, letterSpacing: '-0.04em',
+              fontSize: 52, lineHeight: 1.15,
+              fontWeight: 300, letterSpacing: '-0.02em', color: '#111111',
             }}>
               「何が合うか<br />わからない」を<br />終わりにする。
             </h1>
-            <p style={{ fontSize: 14, lineHeight: 1.7, color: '#999', margin: '20px 0 0' }}>
+            <p style={{ fontSize: 14, lineHeight: 1.7, color: '#999999', margin: '20px 0 0', fontWeight: 500 }}>
               悩みを入れるだけ。成分ロジックが一本に絞り込む。
             </p>
-            {/* スクロールヒント */}
-            <div style={{ marginTop: 48, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{ width: 1, height: 28, background: 'var(--border-strong)' }} />
-              <span style={{ fontSize: 10, color: '#C5C5C5', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.14em' }}>SCROLL TO BROWSE</span>
-            </div>
           </div>
 
           {/* 右: チャットカード */}
@@ -735,14 +700,14 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
       ) : (
         /* ── Mobile: chat card hero ─────────────── */
         <div style={{
-          padding: '32px 20px 28px',
-          background: 'linear-gradient(160deg, var(--bg-warm) 0%, var(--bg-soft) 60%, var(--bg) 100%)',
-          borderBottom: '1px solid var(--border-strong)',
+          padding: '20px 20px 24px',
+          background: '#FFFFFF',
+          borderBottom: '1px solid #E0E0E0',
         }}>
-          <h1 style={{ margin: '0 0 6px', fontSize: 26, lineHeight: 1.25, fontWeight: 400, letterSpacing: '-0.03em' }}>
+          <h1 style={{ margin: '0 0 8px', fontSize: 26, lineHeight: 1.3, fontWeight: 300, letterSpacing: '-0.01em', color: '#111111' }}>
             「何が合うかわからない」を終わりにする。
           </h1>
-          <p style={{ fontSize: 12, lineHeight: 1.65, color: '#999', margin: '0 0 20px' }}>
+          <p style={{ fontSize: 12, lineHeight: 1.65, color: '#999999', margin: '0 0 20px', fontWeight: 500 }}>
             悩みを入れるだけ。成分ロジックが一本に絞り込む。
           </p>
           <ChatDiagnosisCard onComplete={({ concern, skinType }) => {
@@ -768,9 +733,9 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {activeFilterIds ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-              <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#1DAB6A', boxShadow: '0 0 6px rgba(29,171,106,0.5)' }} />
+              <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#111111', boxShadow: '0 0 6px rgba(17,17,17,0.5)' }} />
               <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1814', margin: 0 }}>
-                {activeFilterLabel || 'AI診断'} の おすすめ
+                {activeFilterLabel || '提案'} の おすすめ
               </p>
             </div>
           ) : skinFilter ? (
@@ -930,7 +895,7 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
                 </span>
               </div>
               {(activeFilterIds || skinFilter || cat !== 'all') && (
-                <div style={{ fontSize: 11, color: '#1DAB6A', marginTop: 2 }}>
+                <div style={{ fontSize: 11, color: '#111111', marginTop: 2 }}>
                   {activeFilterLabel ? `${activeFilterLabel}のおすすめ` : '絞り込み中'}
                 </div>
               )}
@@ -941,7 +906,7 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
                 onClick={() => window.open(BRAND_STORE_URL[activeBrand], '_blank', 'noopener')}
                 style={{
                   marginLeft: 'auto', flexShrink: 0,
-                  background: '#BF0000', border: 'none', borderRadius: 8,
+                  background: '#111111', border: 'none', borderRadius: 8,
                   padding: '7px 14px', cursor: 'pointer',
                   fontSize: 11, fontWeight: 700, fontFamily: 'inherit',
                   color: '#fff', whiteSpace: 'nowrap',
@@ -971,7 +936,7 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
                 borderBottom: '1px solid var(--border)',
                 display: 'flex', alignItems: 'center', gap: 10,
               }}>
-                <div style={{ width: 3, height: 18, borderRadius: 2, background: 'linear-gradient(180deg, #1DAB6A 0%, #178A55 100%)', flexShrink: 0 }} />
+                <div style={{ width: 3, height: 18, borderRadius: 2, background: 'linear-gradient(180deg, #111111 0%, #000000 100%)', flexShrink: 0 }} />
                 <div style={{ flex: 1 }}>
                   <span style={{ fontSize: isDesktop ? 13 : 12, fontWeight: 700, color: '#1A1814', letterSpacing: '-0.01em' }}>
                     {line === '—' ? 'その他' : line}
@@ -1016,10 +981,10 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
                 </div>
                 <button
                   onClick={() => setActiveBrand(brand)}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, color: '#1DAB6A', fontWeight: 600, fontFamily: 'inherit', padding: '4px 0', display: 'flex', alignItems: 'center', gap: 4 }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, color: '#111111', fontWeight: 600, fontFamily: 'inherit', padding: '4px 0', display: 'flex', alignItems: 'center', gap: 4 }}
                 >
                   もっと見る
-                  <Icon name="arrowRight" size={10} color="#1DAB6A" />
+                  <Icon name="arrowRight" size={10} color="#111111" />
                 </button>
               </div>
               {/* プレビュー横スクロール */}
@@ -1034,7 +999,7 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
                     onClick={() => setActiveBrand(brand)}
                     style={{ width: isDesktop ? 80 : 70, flexShrink: 0, background: 'var(--bg-soft)', border: '1px dashed var(--border-strong)', borderRadius: 12, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, fontFamily: 'inherit' }}
                   >
-                    <span style={{ fontSize: 18, color: '#1DAB6A' }}>+{products.length - (isDesktop ? 5 : 4)}</span>
+                    <span style={{ fontSize: 18, color: '#111111' }}>+{products.length - (isDesktop ? 5 : 4)}</span>
                     <span style={{ fontSize: 10, color: '#B0A898' }}>見る</span>
                   </button>
                 )}
@@ -1053,7 +1018,7 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
                 該当する商品が見つかりません
               </div>
               <div style={{ fontSize: 12, color: '#ABABAB', lineHeight: 1.7, marginBottom: 24, maxWidth: 260, margin: '0 auto 24px' }}>
-                別のキーワードか、AIに相談してみてください
+                別のキーワードで検索してみてください
               </div>
               <button onClick={() => { setQuery(''); setCat('all'); setSkinFilter(null); setActiveFilterIds(null); }}
                 style={{ padding: '10px 22px', borderRadius: 999, border: '1.5px solid var(--border-strong)', background: 'var(--bg)', fontSize: 12, fontFamily: 'inherit', fontWeight: 600, color: '#555', cursor: 'pointer' }}>
@@ -1161,7 +1126,7 @@ function ConcernChip({ chip, onSend, index = 0 }) {
       <span style={{
         fontSize: 8,
         fontFamily: 'JetBrains Mono, monospace',
-        color: '#1DAB6A',
+        color: '#111111',
         letterSpacing: '0.08em',
         opacity: 0.65,
         lineHeight: 1,

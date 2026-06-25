@@ -408,11 +408,11 @@ export function ProductCard({ product, onClick }) {
               style={{
                 display: 'flex', alignItems: 'center', gap: 3,
                 padding: '5px 10px', borderRadius: 99,
-                background: '#1DAB6A', color: '#fff',
+                background: '#111111', color: '#fff',
                 fontSize: 10, fontWeight: 600,
                 textDecoration: 'none', letterSpacing: '0.03em',
                 whiteSpace: 'nowrap', flexShrink: 0,
-                boxShadow: '0 2px 8px rgba(29,171,106,0.28)',
+                boxShadow: '0 2px 8px rgba(17,17,17,0.28)',
                 transition: 'opacity 0.15s',
               }}
               onMouseEnter={e => e.currentTarget.style.opacity = '0.82'}

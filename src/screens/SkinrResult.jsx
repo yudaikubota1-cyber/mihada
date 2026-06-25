@@ -133,7 +133,7 @@ function RakutenCard({ item }) {
         <div style={{
           position: 'absolute', top: 5, right: 5,
           width: 16, height: 16, borderRadius: '50%',
-          background: '#BF0000',
+          background: '#111111',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
           <span style={{ color: '#fff', fontSize: 8, fontWeight: 700 }}>R</span>
@@ -221,7 +221,7 @@ function RakutenSection({ concerns, category, searchUrl, px = '24px' }) {
           }}
         >
           <div style={{
-            width: 20, height: 20, borderRadius: '50%', background: '#BF0000',
+            width: 20, height: 20, borderRadius: '50%', background: '#111111',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
             <span style={{ color: '#fff', fontSize: 9, fontWeight: 700 }}>R</span>
@@ -364,7 +364,7 @@ function ResultProductCard({ product: p, idx, onDetail }) {
             rel="noopener noreferrer"
             style={{
               flex: 1, padding: '6px 0',
-              background: '#BF0000', color: '#fff',
+              background: '#111111', color: '#fff',
               border: 'none', borderRadius: 5,
               fontSize: 9, fontFamily: 'inherit', fontWeight: 600,
               cursor: 'pointer', letterSpacing: '0.02em',
@@ -598,7 +598,7 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
             {/* 楽天商品（リアルタイム取得） */}
             <div style={{ padding: `0 ${px} 8px` }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
-                <div style={{ width: 14, height: 14, borderRadius: '50%', background: '#BF0000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: 14, height: 14, borderRadius: '50%', background: '#111111', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <span style={{ color: '#fff', fontSize: 7, fontWeight: 700 }}>R</span>
                 </div>
                 <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, letterSpacing: '0.14em', color: '#999' }}>RAKUTEN</span>

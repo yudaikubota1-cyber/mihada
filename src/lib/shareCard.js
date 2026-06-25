@@ -21,7 +21,7 @@ export async function generateShareImage({ skinType, concerns, ingredients, mess
   ctx.font = '500 16px "JetBrains Mono", monospace';
   ctx.textAlign = 'center';
   ctx.letterSpacing = '4px';
-  ctx.fillText('INGREDIENT LOGIC AI', W / 2, 80);
+  ctx.fillText('miHada', W / 2, 80);
 
   // miHada logo
   ctx.fillStyle = '#1A1814';
@@ -111,7 +111,7 @@ export async function generateShareImage({ skinType, concerns, ingredients, mess
   ctx.fillText('mihada.vercel.app', W / 2, H - 40);
   ctx.fillStyle = 'rgba(255,255,255,0.5)';
   ctx.font = '400 12px "JetBrains Mono", monospace';
-  ctx.fillText('AI × INGREDIENT LOGIC × KOREAN SKINCARE', W / 2, H - 18);
+  ctx.fillText('INGREDIENT LOGIC × KOREAN SKINCARE', W / 2, H - 18);
 
   return canvas;
 }

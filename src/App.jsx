@@ -6,6 +6,8 @@ import SkinrChat from './screens/SkinrChat.jsx';
 import SkinrResult from './screens/SkinrResult.jsx';
 import SkinrProduct from './screens/SkinrProduct.jsx';
 import SkinrArticle from './screens/SkinrArticle.jsx';
+import PrivacyPage from './screens/PrivacyPage.jsx';
+import DisclosurePage from './screens/DisclosurePage.jsx';
 import { SkinrLogo, Icon } from './components/shared.jsx';
 import { useIsDesktop } from './lib/useIsDesktop.js';
 
@@ -79,7 +81,10 @@ function DesktopHeader({ screen, onHome }) {
 export default function App() {
   const params = new URLSearchParams(location.search);
   const articleSlug = params.get('article');
+  const pathname = location.pathname;
   const [screen, setScreen] = useState(
+    pathname === '/privacy' ? 'privacy' :
+    pathname === '/disclosure' ? 'disclosure' :
     params.get('products') ? 'products' : params.get('preview') ? 'preview' : articleSlug ? 'article' : 'home'
   );
   const [prevScreen, setPrevScreen] = useState('home');
@@ -186,6 +191,8 @@ export default function App() {
   const goProduct = (id) => navigate('product', { productId: id });
   const goArticle = (slug) => navigate('article', { articleSlug: slug });
   const goBack = () => history.back();
+  const goPrivacy = () => navigate('privacy');
+  const goDisclosure = () => navigate('disclosure');
 
   return (
     <div className="app-shell">
@@ -211,6 +218,8 @@ export default function App() {
               lastDiagnosis={lastDiagnosis}
               onViewLastResult={goLastResult}
               homeFilter={homeFilter}
+              onOpenPrivacy={goPrivacy}
+              onOpenDisclosure={goDisclosure}
             />
           </div>
         )}
@@ -253,6 +262,16 @@ export default function App() {
               onOpenProduct={goProduct}
               onStartChat={() => goChat(null)}
             />
+          </div>
+        )}
+        {screen === 'privacy' && (
+          <div key="privacy" className="skinr-screen">
+            <PrivacyPage onBack={goHome} />
+          </div>
+        )}
+        {screen === 'disclosure' && (
+          <div key="disclosure" className="skinr-screen">
+            <DisclosurePage onBack={goHome} />
           </div>
         )}
       </div>

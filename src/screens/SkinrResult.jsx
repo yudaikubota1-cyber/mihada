@@ -380,7 +380,7 @@ function ResultProductCard({ product: p, idx, onDetail }) {
   );
 }
 
-export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduct, onNewChat, onViewCategory }) {
+export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduct, onNewChat, onViewCategory, onViewAll }) {
   const skinType = diagnosis?.skin_type || '混合肌';
   const concerns = diagnosis?.concerns || ['乾燥', '毛穴の開き', 'くすみ'];
   const aiMessage = diagnosis?.message;
@@ -389,19 +389,26 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
   const today = new Date();
   const dateStr = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
 
-  const byCategory = {
-    cleanser: PRODUCTS.filter(p => p.category === 'cleanser').sort((a, b) => scoreProduct(b, concerns, skinType) - scoreProduct(a, concerns, skinType)),
-    toner:    PRODUCTS.filter(p => p.category === 'toner').sort((a, b) => scoreProduct(b, concerns, skinType) - scoreProduct(a, concerns, skinType)),
-    serum:    PRODUCTS.filter(p => p.category === 'serum').sort((a, b) => scoreProduct(b, concerns, skinType) - scoreProduct(a, concerns, skinType)),
-    cream:    PRODUCTS.filter(p => p.category === 'cream').sort((a, b) => scoreProduct(b, concerns, skinType) - scoreProduct(a, concerns, skinType)),
-  };
-
-  const categoryOrder = [
-    { key: 'cleanser', label: '洗顔', step: '00' },
-    { key: 'toner',    label: 'トナー', step: '01' },
-    { key: 'serum',    label: '美容液', step: '02' },
-    { key: 'cream',    label: 'クリーム', step: '03' },
+  const FULL_CATEGORY_ORDER = [
+    { key: 'cleansing', label: 'クレンジング', step: '00' },
+    { key: 'cleanser',  label: '洗顔',         step: '01' },
+    { key: 'toner',     label: 'トナー',       step: '02' },
+    { key: 'pad',       label: 'トナーパッド', step: '03' },
+    { key: 'serum',     label: '美容液',       step: '04' },
+    { key: 'cream',     label: 'クリーム',     step: '05' },
+    { key: 'mask',      label: 'マスク',       step: '06' },
+    { key: 'sunscreen', label: '日焼け止め',   step: '07' },
   ];
+
+  const byCategory = Object.fromEntries(
+    FULL_CATEGORY_ORDER.map(cat => [
+      cat.key,
+      PRODUCTS.filter(p => p.category === cat.key)
+        .sort((a, b) => scoreProduct(b, concerns, skinType) - scoreProduct(a, concerns, skinType)),
+    ])
+  );
+
+  const categoryOrder = FULL_CATEGORY_ORDER.filter(cat => (byCategory[cat.key] || []).length > 0);
 
   const topProducts = categoryOrder.map(cat => (byCategory[cat.key] || [])[0]).filter(Boolean);
   const ingredients = topProducts
@@ -415,9 +422,6 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
     })
     .filter((ing, i, arr) => arr.findIndex(x => x.name === ing.name) === i)
     .slice(0, 5);
-
-  const comboGood = [...new Set(topProducts.flatMap(p => p.goodWith || []))].slice(0, 5);
-  const comboAvoid = [...new Set(topProducts.flatMap(p => p.avoidWith || []))].slice(0, 4);
 
   const rakutenUrls = Object.fromEntries(
     categoryOrder.map(cat => [cat.key, buildRakutenSearchUrl({ concerns, category: cat.key })])
@@ -523,46 +527,6 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
         )}
       </div>
 
-      {/* 相性ガイド */}
-      {(comboGood.length > 0 || comboAvoid.length > 0) && (
-        <div style={{ padding: `0 ${px} 24px` }}>
-          <div style={{ border: '1px solid #EBEBEB', borderRadius: 8, overflow: 'hidden' }}>
-            <div style={{
-              padding: '10px 16px', borderBottom: '1px solid var(--border)',
-              background: 'var(--bg-soft)', display: 'flex', alignItems: 'center', gap: 8,
-            }}>
-              <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, letterSpacing: '0.18em', color: '#ABABAB' }}>PAIRING GUIDE</span>
-            </div>
-            {comboGood.length > 0 && (
-              <div style={{ padding: '14px 16px', borderBottom: comboAvoid.length > 0 ? '1px solid var(--border)' : 'none' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: '#111', letterSpacing: '0.01em' }}>一緒に使うと効果的</span>
-                  <span style={{ fontSize: 9, fontFamily: 'JetBrains Mono, monospace', color: '#fff', background: '#111', padding: '2px 6px', borderRadius: 2, letterSpacing: '0.08em' }}>◎</span>
-                </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                  {comboGood.map(g => (
-                    <span key={g} style={{ padding: '5px 11px', borderRadius: 999, border: '1px solid var(--border)', background: 'var(--bg)', fontSize: 11, color: '#333', fontWeight: 500 }}>{g}</span>
-                  ))}
-                </div>
-              </div>
-            )}
-            {comboAvoid.length > 0 && (
-              <div style={{ padding: '14px 16px', background: '#FAFAFA' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 6 }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: '#555', letterSpacing: '0.01em' }}>使うタイミングに注意</span>
-                  <span style={{ fontSize: 9, fontFamily: 'JetBrains Mono, monospace', color: '#888', border: '1px solid #D8D8D8', padding: '2px 6px', borderRadius: 2, letterSpacing: '0.08em' }}>△</span>
-                </div>
-                <p style={{ margin: '0 0 10px', fontSize: 11, color: '#999', lineHeight: 1.6 }}>朝・夜で分けるか、日を変えるなど時間差での使用がおすすめ</p>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                  {comboAvoid.map(a => (
-                    <span key={a} style={{ padding: '5px 11px', borderRadius: 999, border: '1px dashed #D0D0D0', background: '#fff', fontSize: 11, color: '#888' }}>{a}</span>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* Products */}
       <div style={{ padding: `4px ${px} 0` }}>
@@ -609,6 +573,24 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
                       onDetail={() => onOpenProduct(p.id)}
                     />
                   ))}
+                  {/* SEE MORE — 商品一覧へ */}
+                  <button
+                    onClick={onBack}
+                    style={{
+                      flex: '0 0 90px',
+                      height: 130, alignSelf: 'flex-start',
+                      border: '1px dashed #D8D8D8', borderRadius: 10,
+                      background: 'var(--bg-soft)', cursor: 'pointer',
+                      display: 'flex', flexDirection: 'column',
+                      alignItems: 'center', justifyContent: 'center', gap: 6,
+                      fontFamily: 'inherit',
+                    }}
+                  >
+                    <Icon name="arrowRight" size={18} color="#999" />
+                    <span style={{ fontSize: 9, color: '#999', textAlign: 'center', lineHeight: 1.5, letterSpacing: '0.04em' }}>
+                      SEE<br />MORE
+                    </span>
+                  </button>
                 </div>
               </div>
             )}

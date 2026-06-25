@@ -564,7 +564,7 @@ const QUICK_CONCERN_MAP = {
   'たるみ・ハリ': ['たるみ'],
 };
 
-export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSendInline, onQuickDiagnosis, onOpenArticle, lastDiagnosis, onViewLastResult, homeFilter }) {
+export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSendInline, onQuickDiagnosis, onOpenArticle, lastDiagnosis, onViewLastResult, homeFilter, onOpenPrivacy, onOpenDisclosure }) {
   const [cat, setCat] = useState(homeFilter?.cat || 'all');
   const [skinFilter, setSkinFilter] = useState(null);
   const [query, setQuery] = useState('');
@@ -701,14 +701,16 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
         }}>
           {/* 左: コピー */}
           <div style={{ flex: '0 0 auto', maxWidth: 360 }}>
-            <SkinrEyebrow>Ingredient Logic AI</SkinrEyebrow>
             <h1 style={{
-              margin: '20px 0 0',
+              margin: '0 0 0',
               fontSize: 52, lineHeight: 1.1,
               fontWeight: 400, letterSpacing: '-0.04em',
             }}>
               「何が合うか<br />わからない」を<br />終わりにする。
             </h1>
+            <p style={{ fontSize: 14, lineHeight: 1.7, color: '#999', margin: '20px 0 0' }}>
+              悩みを入れるだけ。成分ロジックが一本に絞り込む。
+            </p>
             {/* スクロールヒント */}
             <div style={{ marginTop: 48, display: 'flex', alignItems: 'center', gap: 8 }}>
               <div style={{ width: 1, height: 28, background: 'var(--border-strong)' }} />
@@ -737,12 +739,11 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
           background: 'linear-gradient(160deg, var(--bg-warm) 0%, var(--bg-soft) 60%, var(--bg) 100%)',
           borderBottom: '1px solid var(--border-strong)',
         }}>
-          <SkinrEyebrow>Ingredient Logic AI</SkinrEyebrow>
-          <h1 style={{ margin: '10px 0 6px', fontSize: 26, lineHeight: 1.25, fontWeight: 400, letterSpacing: '-0.03em' }}>
+          <h1 style={{ margin: '0 0 6px', fontSize: 26, lineHeight: 1.25, fontWeight: 400, letterSpacing: '-0.03em' }}>
             「何が合うかわからない」を終わりにする。
           </h1>
           <p style={{ fontSize: 12, lineHeight: 1.65, color: '#999', margin: '0 0 20px' }}>
-            気になる悩みを入力するだけ。あなたの肌に合う成分を絞り込みます。
+            悩みを入れるだけ。成分ロジックが一本に絞り込む。
           </p>
           <ChatDiagnosisCard onComplete={({ concern, skinType }) => {
             const st = skinType === 'わからない' ? '混合肌' : skinType;
@@ -1104,8 +1105,27 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
         borderTop: '1px solid var(--border)',
         padding: `40px ${px} ${isDesktop ? '60px' : '60px'}`,
         textAlign: 'center',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16,
       }}>
         <SkinrLogo size={12} />
+        <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
+          <button
+            onClick={onOpenPrivacy}
+            style={{ fontSize: 10, color: '#999', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.1em', padding: 0 }}
+          >
+            プライバシーポリシー
+          </button>
+          <span style={{ fontSize: 10, color: '#D0D0D0' }}>|</span>
+          <button
+            onClick={onOpenDisclosure}
+            style={{ fontSize: 10, color: '#999', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.1em', padding: 0 }}
+          >
+            アフィリエイト表記
+          </button>
+        </div>
+        <p style={{ fontSize: 9, color: '#C8C8C8', margin: 0, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.08em' }}>
+          © 2025 miHada. All rights reserved.
+        </p>
       </div>
     </div>
   );

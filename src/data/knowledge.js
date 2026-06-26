@@ -220,7 +220,7 @@ export const INGREDIENT_DICT = [
       "ニキビ跡",
       "黒ずみ"
     ],
-    "caution": "ビタミンCと併用で効果UP"
+    "caution": "ビタミンCとの併用がおすすめ"
   },
   {
     "name": "TECA（ツボクサ有効成分）",

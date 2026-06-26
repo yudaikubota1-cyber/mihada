@@ -20,7 +20,7 @@ const ARTICLES = [
   },
   {
     slug: 'pore-care',
-    title: '毛穴ケアに効く韓国スキンケア成分',
+    title: '毛穴ケアにおすすめのスキンケア成分',
     subtitle: 'BHA・ナイアシンアミドで毛穴レス肌へ',
     concern: '毛穴',
     skinType: null,

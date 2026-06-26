@@ -154,7 +154,7 @@ skin_type MUST be exactly one of:
 乾燥肌, 脂性肌, 混合肌, 敏感肌, 普通肌
 
 concerns MUST be one or more of:
-乾燥, 赤ニキビ, 白ニキビ, ニキビ跡, くすみ, 美白, シミ, 毛穴の開き, 黒ずみ, たるみ, シワ, 皮脂, 肌荒れ, バリア低下
+乾燥, 赤ニキビ, 白ニキビ, ニキビ跡, くすみ, ブライトニング, シミ, 毛穴の開き, 黒ずみ, たるみ, シワ, 皮脂, 肌荒れ, バリア低下
 
 Important — handling concerns NOT in the list above:
 If the user mentions a concern that is NOT in the list (e.g. 赤ら顔, そばかす, クレーター, 毛穴落ち, 角質, ゴルゴライン, マリオネットライン, 目元のクマ, 首のシワ, 背中ニキビ, etc.), do NOT panic or give generic responses.

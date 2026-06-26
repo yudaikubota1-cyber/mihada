@@ -62,7 +62,7 @@ const ARTICLES = [
   },
   {
     slug: 'anti-aging',
-    title: 'シワ・たるみに効く韓国スキンケア',
+    title: 'シワ・たるみケアにおすすめのスキンケア',
     subtitle: 'レチノール・ペプチドでハリ肌へ',
     concern: 'たるみ',
     skinType: null,

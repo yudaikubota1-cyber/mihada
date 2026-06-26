@@ -359,7 +359,7 @@ function InputL({ onSend }) {
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20,
         flexShrink: 0,
       }}>
-        <div style={{ width: 1, flex: 1, background: 'linear-gradient(180deg, transparent, #C8A87A 30%, #C8A87A 70%, transparent)' }} />
+        <div style={{ width: 1, flex: 1, background: '#E0E0E0' }} />
         <span style={{
           fontSize: 10, fontFamily: 'serif', letterSpacing: '0.4em',
           color: '#A08060', fontWeight: 400,
@@ -371,7 +371,7 @@ function InputL({ onSend }) {
           letterSpacing: '0.2em', color: '#C8B8A8',
           writingMode: 'horizontal-tb',
         }}>SKIN AI</span>
-        <div style={{ width: 1, flex: 1, background: 'linear-gradient(180deg, #C8A87A 30%, #C8A87A 70%, transparent)' }} />
+        <div style={{ width: 1, flex: 1, background: '#E0E0E0' }} />
       </div>
 
       {/* メイン入力エリア */}
@@ -754,9 +754,9 @@ function InputO({ onSend }) {
     <div style={{ maxWidth: 600, margin: '0 auto' }}>
       {/* 装飾ライン */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 40 }}>
-        <div style={{ height: 1, flex: 1, background: 'linear-gradient(90deg, transparent, #B8A898)' }} />
+        <div style={{ height: 1, flex: 1, background: '#E0E0E0' }} />
         <span style={{ fontSize: 8, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.36em', color: '#C8B8A8' }}>SKIN · CONSULTATION</span>
-        <div style={{ height: 1, flex: 1, background: 'linear-gradient(90deg, #B8A898, transparent)' }} />
+        <div style={{ height: 1, flex: 1, background: '#E0E0E0' }} />
       </div>
 
       {/* メインの問い */}
@@ -800,7 +800,7 @@ function InputO({ onSend }) {
         {focused && (
           <div style={{
             position: 'absolute', bottom: 0, left: 0, right: 0, height: 1,
-            background: 'linear-gradient(90deg, #8A7868 0%, #B8A898 50%, transparent 100%)',
+            background: '#E0E0E0',
             animation: 'skinrSlideIn 0.4s ease',
           }} />
         )}
@@ -1427,7 +1427,7 @@ export default function InputPreview() {
       title: 'チャット診断カード ✦ ブラッシュアップ版',
       sub: 'カード内で診断から結果まで完結。成分提案 + おすすめ商品CTAまで一気通貫',
       ref: 'LINE / Intercom / iMessage + オリジナル設計',
-      bg: 'linear-gradient(160deg, #EDE5DA 0%, #E4DDD5 60%, #DDD6CE 100%)',
+      bg: '#EDE5DA',
       pad: '56px 72px',
       comp: <InputQ />,
       highlight: true,
@@ -1437,7 +1437,7 @@ export default function InputPreview() {
       title: 'Fill-in-the-blank',
       sub: '文章の中に入力欄が溶け込む。読む = 入力する体験',
       ref: '参考: Typology / Duolingo の文章完成',
-      bg: 'linear-gradient(180deg, #EDE5DA 0%, #E8DFCF 100%)',
+      bg: '#EDE5DA',
       pad: '64px 80px',
       comp: <InputI />,
     },
@@ -1446,7 +1446,7 @@ export default function InputPreview() {
       title: 'コマンドパレット',
       sub: '⌘K で発動、キーボードで悩みを即検索。候補リスト付き',
       ref: '参考: Linear ⌘K + macOS Spotlight',
-      bg: 'linear-gradient(180deg, #2A2622 0%, #1E1C18 100%)',
+      bg: '#2A2622',
       pad: '64px 80px',
       comp: <InputJ />,
     },
@@ -1455,7 +1455,7 @@ export default function InputPreview() {
       title: 'タイル選択式',
       sub: 'テキスト入力なし。タップだけで完結。複数選択 → まとめて診断',
       ref: '参考: Curology skin quiz + Glossier skin quiz',
-      bg: 'linear-gradient(180deg, #F0EBE3 0%, #E8E0D6 100%)',
+      bg: '#F0EBE3',
       pad: '56px 72px',
       comp: <InputK />,
     },
@@ -1464,7 +1464,7 @@ export default function InputPreview() {
       title: '日本高級化粧品',
       sub: '縦書きラベル・金縁・明朝体・文字カウンター。カウンター接客感',
       ref: '参考: 資生堂 / SUQQU / コスメデコルテ Web',
-      bg: 'linear-gradient(180deg, #F5EFE6 0%, #EDE5DA 100%)',
+      bg: '#F5EFE6',
       pad: '60px 80px',
       comp: <InputL />,
     },
@@ -1473,7 +1473,7 @@ export default function InputPreview() {
       title: '臨床成分表示',
       sub: '製品成分表のような無機質なUIで「科学的な診断」感を演出',
       ref: '参考: The Ordinary / Paula\'s Choice',
-      bg: 'linear-gradient(180deg, #F8F6F2 0%, #F0EEEA 100%)',
+      bg: '#F8F6F2',
       pad: '0',
       comp: <InputM />,
     },
@@ -1482,7 +1482,7 @@ export default function InputPreview() {
       title: 'iOS ステップ式',
       sub: 'Apple Health/UIKit 風。3ステップの選択でスムーズに診断',
       ref: '参考: Apple Health App / iOS HIG',
-      bg: 'linear-gradient(180deg, #EEE8E0 0%, #E4DDD5 100%)',
+      bg: '#EEE8E0',
       pad: '56px 72px',
       comp: <InputN />,
     },
@@ -1491,7 +1491,7 @@ export default function InputPreview() {
       title: '文学的・余白の美',
       sub: 'セリフ体の大きな問いと自由記述のみ。思索する体験',
       ref: '参考: Aesop.com / Diptyque Web',
-      bg: 'linear-gradient(180deg, #EDE5DA 0%, #E5DDD2 100%)',
+      bg: '#EDE5DA',
       pad: '72px 96px',
       comp: <InputO />,
     },
@@ -1500,7 +1500,7 @@ export default function InputPreview() {
       title: 'LINEチャット型',
       sub: 'AIが質問・ユーザーはタップだけ。日本人に馴染み深い会話UI',
       ref: '参考: LINE / Intercom / Drift',
-      bg: 'linear-gradient(180deg, #E8E0D8 0%, #DDD6CE 100%)',
+      bg: '#E8E0D8',
       pad: '48px 64px',
       comp: <InputP />,
     },

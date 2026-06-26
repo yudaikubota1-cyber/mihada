@@ -936,7 +936,7 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
                 borderBottom: '1px solid var(--border)',
                 display: 'flex', alignItems: 'center', gap: 10,
               }}>
-                <div style={{ width: 3, height: 18, borderRadius: 2, background: 'linear-gradient(180deg, #111111 0%, #000000 100%)', flexShrink: 0 }} />
+                <div style={{ width: 3, height: 18, borderRadius: 2, background: '#111111', flexShrink: 0 }} />
                 <div style={{ flex: 1 }}>
                   <span style={{ fontSize: isDesktop ? 13 : 12, fontWeight: 700, color: '#1A1814', letterSpacing: '-0.01em' }}>
                     {line === '—' ? 'その他' : line}

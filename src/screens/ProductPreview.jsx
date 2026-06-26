@@ -264,7 +264,7 @@ function LayoutE() {
         {/* 小カード x 3 */}
         {MOCK.slice(2, 5).map(p => <VCard key={p.id} p={p} size="sm" />)}
         {/* 大きいカード (col span 2) */}
-        <div style={{ gridColumn: 'span 2', borderRadius: 18, overflow: 'hidden', background: `linear-gradient(135deg, ${G}22, ${G}11)`, border: `1px solid ${G}33`, cursor: 'pointer' }}>
+        <div style={{ gridColumn: 'span 2', borderRadius: 18, overflow: 'hidden', background: 'rgba(17,17,17,0.05)', border: `1px solid ${G}33`, cursor: 'pointer' }}>
           <div style={{ display: 'flex', height: 130 }}>
             <img src={MOCK[5].img} alt="" style={{ width: 120, objectFit: 'cover', flexShrink: 0 }} />
             <div style={{ padding: 14, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>

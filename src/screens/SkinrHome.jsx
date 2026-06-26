@@ -1042,7 +1042,7 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
               { slug: 'dry-skin', label: '乾燥肌ケア', sub: 'セラミド・ヒアルロン酸' },
               { slug: 'pore-care', label: '毛穴ケア', sub: 'BHA・ナイアシンアミド' },
               { slug: 'acne', label: 'ニキビケア', sub: 'CICA・ドクダミ' },
-              { slug: 'brightening', label: '美白・くすみ', sub: 'ビタミンC・トラネキサム酸' },
+              { slug: 'brightening', label: 'ブライトニング・くすみ', sub: 'ビタミンC・トラネキサム酸' },
               { slug: 'anti-aging', label: 'シワ・たるみ', sub: 'レチノール・ペプチド' },
               { slug: 'sensitive', label: '敏感肌ケア', sub: 'マデカソシド・パンテノール' },
             ].map(a => (

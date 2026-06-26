@@ -473,7 +473,7 @@ function LayoutJ() {
 /* ══ プレビューページ ══════════════════════════════════════ */
 const OPTIONS = [
   { label:'A', title:'Netflixスタイル', sub:'ブランド別の横スクロール行。コンパクトで一覧性が高い', tag:'ブランド別', comp:<LayoutA /> },
-  { label:'B', title:'悩み別キュレーション', sub:'お悩みでセクション分け。AI診断との一貫性が高い', tag:'悩み別', comp:<LayoutB /> },
+  { label:'B', title:'悩み別キュレーション', sub:'お悩みでセクション分け。AI提案との一貫性が高い', tag:'悩み別', comp:<LayoutB /> },
   { label:'C', title:'ランキング形式', sub:'1位〜10位のリスト。SNS映えする、権威性が出る', tag:'ランキング', comp:<LayoutC /> },
   { label:'D', title:'エディトリアル（マガジン風）', sub:'大きなFeatured枠＋グリッド。高級感・編集感が出る', tag:'マガジン', comp:<LayoutD /> },
   { label:'E', title:'ベントグリッド（Bento Box）', sub:'サイズ混在の不規則グリッド。モダンでSNS映えする', tag:'Bento', comp:<LayoutE /> },

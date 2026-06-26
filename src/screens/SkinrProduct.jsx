@@ -69,7 +69,7 @@ function ProductBody({ product, px, openRakuten }) {
       {/* Ingredients */}
       <Divider label="主要成分" />
       <div style={{ padding: '20px 0 24px' }}>
-        <h3 style={{ margin: '0 0 16px', fontSize: 17, fontWeight: 400, letterSpacing: '-0.01em' }}>成分と効果</h3>
+        <h3 style={{ margin: '0 0 16px', fontSize: 17, fontWeight: 400, letterSpacing: '-0.01em' }}>成分と働き</h3>
         {ingredients.length === 0 ? (
           <p style={{ fontSize: 12, color: '#ABABAB' }}>成分データなし</p>
         ) : (
@@ -137,7 +137,7 @@ function ProductBody({ product, px, openRakuten }) {
                   <div style={{ width: 16, height: 16, borderRadius: '50%', background: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Icon name="check" size={9} color="#fff" />
                   </div>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: '#111' }}>一緒に使うと効果的</span>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: '#111' }}>一緒に使うと相性抜群</span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   {product.goodWith.map((g, i) => (

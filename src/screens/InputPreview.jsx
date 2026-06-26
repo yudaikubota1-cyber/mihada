@@ -5,7 +5,7 @@ const CONCERNS = ['乾燥', '毛穴の開き', '黒ずみ', '赤ニキビ', '白
 
 /* ══════════════════════════════════════════════════════════════
    案 I — "文中に書く"  Fill-in-the-blank
-   参考: Typology (仏) の診断フォーム + Duolingo の文章完成
+   参考: Typology (仏) の分析フォーム + Duolingo の文章完成
    ポイント: 文章の中に入力欄が溶け込む。読む行為 = 入力の行為
 ══════════════════════════════════════════════════════════════ */
 function InputI({ onSend }) {
@@ -90,7 +90,7 @@ function InputI({ onSend }) {
           }}
         >
           <Icon name="sparkle" size={11} color={main ? '#fff' : '#C8B8A8'} />
-          {main ? '診断する' : '上の文章を入力してください'}
+          {main ? '提案する' : '上の文章を入力してください'}
         </button>
         {main && (
           <span style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', color: '#C8B8A8', letterSpacing: '0.1em', animation: 'skinrFadeIn 0.3s ease' }}>
@@ -115,8 +115,8 @@ function InputJ({ onSend }) {
   const suggestions = [
     { key: '乾燥', desc: '保湿成分が強い商品を表示' },
     { key: '毛穴の開き', desc: '引き締め・収れん成分で絞り込む' },
-    { key: 'ニキビ', desc: '抗炎症・抗菌成分でフィルター' },
-    { key: 'くすみ', desc: 'ビタミンC・美白成分を優先表示' },
+    { key: 'ニキビ', desc: '鎮静ケア・清潔ケア成分でフィルター' },
+    { key: 'くすみ', desc: 'ビタミンC・透明感ケア成分を優先表示' },
     { key: 'たるみ', desc: 'レチノール・コラーゲン系を探す' },
   ].filter(s => !query || s.key.includes(query) || s.desc.includes(query));
 
@@ -333,7 +333,7 @@ function InputK({ onSend }) {
           }}
         >
           <Icon name="sparkle" size={11} color={selected.length ? '#fff' : '#C8B8A8'} />
-          {selected.length ? `${selected.length}件で診断する` : '選択してください'}
+          {selected.length ? `${selected.length}件で提案する` : '選択してください'}
         </button>
       </div>
     </div>
@@ -471,7 +471,7 @@ function InputL({ onSend }) {
 
 /* ══════════════════════════════════════════════════════════════
    案 M — "臨床成分表示"  The Ordinary / Paula's Choice 風
-   参考: The Ordinary (カナダ) の製品ページ + Paula's Choice のルーティン診断
+   参考: The Ordinary (カナダ) の製品ページ + Paula's Choice のルーティン分析
    ポイント: 製品成分表示の書体・余白をUI化。チェックボックスで悩みを選ぶ
    "あなたの肌を処方する" 感
 ══════════════════════════════════════════════════════════════ */
@@ -604,8 +604,8 @@ const STEPS_N = [
     choices: [
       { label: '乾燥・ハリ不足', icon: '🏔', sub: 'モイスチャー系が合いやすい' },
       { label: '毛穴・黒ずみ', icon: '🔬', sub: 'BHA・引き締め系' },
-      { label: 'ニキビ・赤み', icon: '🌡', sub: '抗炎症・低刺激系' },
-      { label: 'くすみ・シミ', icon: '☀️', sub: 'ビタミンC・美白系' },
+      { label: 'ニキビ・赤み', icon: '🌡', sub: '鎮静ケア・低刺激系' },
+      { label: 'くすみ・シミ', icon: '☀️', sub: 'ビタミンC・透明感ケア系' },
     ],
   },
   {
@@ -840,7 +840,7 @@ function InputO({ onSend }) {
 /* ══════════════════════════════════════════════════════════════
    案 P — "LINEチャット / 会話型UI"  Conversational form
    参考: LINE (日本最大チャットアプリ) + Intercom / Drift のチャットウィジェット
-   ポイント: 見慣れたチャット体験。テキストなし、ボタンタップだけで診断が進む
+   ポイント: 見慣れたチャット体験。テキストなし、ボタンタップだけで提案が進む
 ══════════════════════════════════════════════════════════════ */
 const CHAT_FLOW = [
   {
@@ -926,7 +926,7 @@ function InputP({ onSend }) {
           </div>
           <div>
             <div style={{ fontSize: 13, fontWeight: 600, color: '#fff', letterSpacing: '0.01em' }}>miHada</div>
-            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.65)', marginTop: 1 }}>成分ロジック診断</div>
+            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.65)', marginTop: 1 }}>成分ロジック分析</div>
           </div>
           <div style={{ marginLeft: 'auto', display: 'flex', gap: 5 }}>
             {[1, 0.6, 0.3].map((o, i) => (
@@ -1008,8 +1008,8 @@ function InputP({ onSend }) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   案 Q — チャット型診断カード（ブラッシュアップ版）
-   ポイント: ホームページのヒーローに埋め込む。カード内で診断 → 結果まで完結
+   案 Q — チャット型提案カード（ブラッシュアップ版）
+   ポイント: ホームページのヒーローに埋め込む。カード内で分析から結果まで完結
    → 最後に「詳しい結果を見る」でSkinrResultへ飛ぶ設計
 ══════════════════════════════════════════════════════════════ */
 const Q_FLOW = [
@@ -1157,7 +1157,7 @@ function ResultCard({ skinType, concern, routine, onDetail }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
         <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#111111' }} />
         <span style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.18em', color: '#111111', fontWeight: 600 }}>
-          診断完了 — あなたへのご提案
+          分析完了 — あなたへのご提案
         </span>
       </div>
 
@@ -1312,7 +1312,7 @@ function InputQ({ onComplete }) {
           </div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', letterSpacing: '-0.01em' }}>
-              AI 肌診断
+              AI 肌分析
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
               <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#111111', boxShadow: '0 0 6px #111111' }} />
@@ -1424,8 +1424,8 @@ export default function InputPreview() {
   const options = [
     {
       label: 'Q',
-      title: 'チャット診断カード ✦ ブラッシュアップ版',
-      sub: 'カード内で診断から結果まで完結。成分提案 + おすすめ商品CTAまで一気通貫',
+      title: 'チャット提案カード ✦ ブラッシュアップ版',
+      sub: 'カード内で分析から結果まで完結。成分提案 + おすすめ商品CTAまで一気通貫',
       ref: 'LINE / Intercom / iMessage + オリジナル設計',
       bg: '#EDE5DA',
       pad: '56px 72px',
@@ -1453,7 +1453,7 @@ export default function InputPreview() {
     {
       label: 'K',
       title: 'タイル選択式',
-      sub: 'テキスト入力なし。タップだけで完結。複数選択 → まとめて診断',
+      sub: 'テキスト入力なし。タップだけで完結。複数選択 → まとめて提案',
       ref: '参考: Curology skin quiz + Glossier skin quiz',
       bg: '#F0EBE3',
       pad: '56px 72px',
@@ -1471,7 +1471,7 @@ export default function InputPreview() {
     {
       label: 'M',
       title: '臨床成分表示',
-      sub: '製品成分表のような無機質なUIで「科学的な診断」感を演出',
+      sub: '製品成分表のような無機質なUIで「科学的な分析」感を演出',
       ref: '参考: The Ordinary / Paula\'s Choice',
       bg: '#F8F6F2',
       pad: '0',
@@ -1480,7 +1480,7 @@ export default function InputPreview() {
     {
       label: 'N',
       title: 'iOS ステップ式',
-      sub: 'Apple Health/UIKit 風。3ステップの選択でスムーズに診断',
+      sub: 'Apple Health/UIKit 風。3ステップの選択でスムーズに提案',
       ref: '参考: Apple Health App / iOS HIG',
       bg: '#EEE8E0',
       pad: '56px 72px',

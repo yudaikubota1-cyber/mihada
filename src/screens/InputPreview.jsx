@@ -31,7 +31,7 @@ function InputI({ onSend }) {
         width: width,
         minWidth: 80,
         border: 'none',
-        borderBottom: `2px solid ${value ? '#1A6644' : '#C8B8A8'}`,
+        borderBottom: `2px solid ${value ? '#111111' : '#C8B8A8'}`,
         outline: 'none',
         background: 'transparent',
         fontSize: 'inherit',
@@ -51,10 +51,10 @@ function InputI({ onSend }) {
     <div style={{ maxWidth: 640, margin: '0 auto' }}>
       {/* AI label */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 32 }}>
-        <div style={{ width: 16, height: 16, borderRadius: 4, background: '#1A6644', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: 16, height: 16, borderRadius: 4, background: '#111111', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Icon name="sparkle" size={8} color="#fff" />
         </div>
-        <span style={{ fontSize: 9, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.24em', color: '#1A6644' }}>成分ロジック AI — 肌の悩みを教えてください</span>
+        <span style={{ fontSize: 9, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.24em', color: '#111111' }}>成分ロジック AI — 肌の悩みを教えてください</span>
       </div>
 
       {/* 文章 */}
@@ -81,12 +81,12 @@ function InputI({ onSend }) {
             display: 'flex', alignItems: 'center', gap: 8,
             padding: '12px 28px', borderRadius: 999,
             border: 'none',
-            background: main ? '#1A6644' : '#E4D9CE',
+            background: main ? '#111111' : '#E4D9CE',
             color: main ? '#fff' : '#AAA098',
             fontSize: 13, fontWeight: 500, cursor: main ? 'pointer' : 'default',
             fontFamily: 'inherit', letterSpacing: '0.02em',
             transition: 'all 0.2s ease',
-            boxShadow: main ? '0 4px 16px rgba(26,102,68,0.3)' : 'none',
+            boxShadow: main ? '0 4px 16px rgba(17,17,17,0.3)' : 'none',
           }}
         >
           <Icon name="sparkle" size={11} color={main ? '#fff' : '#C8B8A8'} />
@@ -197,21 +197,21 @@ function InputJ({ onSend }) {
                 style={{
                   display: 'flex', alignItems: 'center', gap: 12,
                   padding: '10px 18px', cursor: 'pointer',
-                  background: i === 0 ? 'rgba(26,102,68,0.15)' : 'transparent',
+                  background: i === 0 ? 'rgba(17,17,17,0.15)' : 'transparent',
                   transition: 'background 0.1s',
                 }}
-                onMouseEnter={e => e.currentTarget.style.background = 'rgba(26,102,68,0.12)'}
-                onMouseLeave={e => e.currentTarget.style.background = i === 0 ? 'rgba(26,102,68,0.15)' : 'transparent'}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(17,17,17,0.12)'}
+                onMouseLeave={e => e.currentTarget.style.background = i === 0 ? 'rgba(17,17,17,0.15)' : 'transparent'}
               >
-                <div style={{ width: 28, height: 28, borderRadius: 7, background: i === 0 ? 'rgba(26,102,68,0.3)' : '#252220', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <Icon name="leaf" size={13} color={i === 0 ? '#2EA86A' : '#555'} />
+                <div style={{ width: 28, height: 28, borderRadius: 7, background: i === 0 ? 'rgba(17,17,17,0.3)' : '#252220', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <Icon name="leaf" size={13} color={i === 0 ? '#111111' : '#555'} />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 13, color: '#E8E0D8', fontWeight: i === 0 ? 500 : 400 }}>{s.key}</div>
                   <div style={{ fontSize: 11, color: '#555', marginTop: 1 }}>{s.desc}</div>
                 </div>
                 {i === 0 && (
-                  <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 4, border: '1px solid #2A4A3A', background: 'rgba(26,102,68,0.2)', color: '#2EA86A', fontFamily: 'JetBrains Mono, monospace' }}>
+                  <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 4, border: '1px solid #2A4A3A', background: 'rgba(17,17,17,0.2)', color: '#111111', fontFamily: 'JetBrains Mono, monospace' }}>
                     ENTER
                   </span>
                 )}
@@ -259,10 +259,10 @@ function InputK({ onSend }) {
       {/* ヘッダー */}
       <div style={{ textAlign: 'center', marginBottom: 28 }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
-          <div style={{ width: 16, height: 16, borderRadius: 4, background: '#1A6644', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: 16, height: 16, borderRadius: 4, background: '#111111', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Icon name="sparkle" size={8} color="#fff" />
           </div>
-          <span style={{ fontSize: 9, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.24em', color: '#1A6644' }}>成分ロジック AI</span>
+          <span style={{ fontSize: 9, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.24em', color: '#111111' }}>成分ロジック AI</span>
         </div>
         <div style={{ fontSize: 17, fontWeight: 400, color: '#1A1814', letterSpacing: '-0.01em' }}>
           気になるお悩みをすべて選んでください
@@ -281,13 +281,13 @@ function InputK({ onSend }) {
               style={{
                 padding: '18px 12px 16px',
                 borderRadius: 14,
-                border: `2px solid ${active ? '#1A6644' : 'var(--border)'}`,
-                background: active ? 'rgba(26,102,68,0.06)' : '#fff',
+                border: `2px solid ${active ? '#111111' : 'var(--border)'}`,
+                background: active ? 'rgba(17,17,17,0.06)' : '#fff',
                 cursor: 'pointer', fontFamily: 'inherit',
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
                 transition: 'all 0.18s ease',
                 boxShadow: active
-                  ? '0 4px 16px rgba(26,102,68,0.14)'
+                  ? '0 4px 16px rgba(17,17,17,0.14)'
                   : '0 2px 8px rgba(80,60,40,0.06)',
                 transform: active ? 'translateY(-2px)' : 'none',
                 position: 'relative',
@@ -298,7 +298,7 @@ function InputK({ onSend }) {
                 <div style={{
                   position: 'absolute', top: 8, right: 8,
                   width: 18, height: 18, borderRadius: '50%',
-                  background: '#1A6644',
+                  background: '#111111',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   animation: 'skinrFadeIn 0.15s ease',
                 }}>
@@ -306,7 +306,7 @@ function InputK({ onSend }) {
                 </div>
               )}
               <span style={{ fontSize: 20, lineHeight: 1 }}>{icon}</span>
-              <span style={{ fontSize: 12, fontWeight: 600, color: active ? '#1A6644' : '#1A1814', letterSpacing: '0.01em' }}>{label}</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: active ? '#111111' : '#1A1814', letterSpacing: '0.01em' }}>{label}</span>
               <span style={{ fontSize: 10, color: active ? '#2A5A3A' : '#AAA098', textAlign: 'center', lineHeight: 1.4 }}>{desc}</span>
             </button>
           );
@@ -315,7 +315,7 @@ function InputK({ onSend }) {
 
       {/* 選択状況 + 送信 */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ fontSize: 12, color: selected.length ? '#1A6644' : '#C8B8A8', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.06em', transition: 'color 0.2s' }}>
+        <div style={{ fontSize: 12, color: selected.length ? '#111111' : '#C8B8A8', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.06em', transition: 'color 0.2s' }}>
           {selected.length > 0 ? `${selected.length} 件選択中 — ${selected.join(' · ')}` : '悩みをタップして選択'}
         </div>
         <button
@@ -324,12 +324,12 @@ function InputK({ onSend }) {
           style={{
             display: 'flex', alignItems: 'center', gap: 8,
             padding: '12px 28px', borderRadius: 999, border: 'none',
-            background: selected.length ? '#1A6644' : '#E4D9CE',
+            background: selected.length ? '#111111' : '#E4D9CE',
             color: selected.length ? '#fff' : '#C8B8A8',
             fontSize: 13, fontWeight: 500, cursor: selected.length ? 'pointer' : 'default',
             fontFamily: 'inherit', letterSpacing: '0.02em',
             transition: 'all 0.2s',
-            boxShadow: selected.length ? '0 4px 20px rgba(26,102,68,0.30)' : 'none',
+            boxShadow: selected.length ? '0 4px 20px rgba(17,17,17,0.30)' : 'none',
           }}
         >
           <Icon name="sparkle" size={11} color={selected.length ? '#fff' : '#C8B8A8'} />
@@ -494,7 +494,7 @@ function InputM({ onSend }) {
       <div style={{ borderBottom: '2px solid #111', paddingBottom: 16, marginBottom: 0 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
           <div>
-            <div style={{ fontSize: 8, letterSpacing: '0.32em', color: '#999', marginBottom: 6 }}>SKINR · CLINICAL FORMULATION SYSTEM</div>
+            <div style={{ fontSize: 8, letterSpacing: '0.32em', color: '#999', marginBottom: 6 }}>miHada</div>
             <div style={{ fontSize: 20, letterSpacing: '0.08em', color: '#111', fontWeight: 700, fontFamily: 'JetBrains Mono, monospace' }}>
               SKIN CONCERN ASSESSMENT
             </div>
@@ -525,8 +525,8 @@ function InputM({ onSend }) {
             >
               {/* チェックボックス */}
               <div style={{
-                width: 16, height: 16, border: `1.5px solid ${active ? '#1A6644' : '#aaa'}`,
-                borderRadius: 2, background: active ? '#1A6644' : 'transparent',
+                width: 16, height: 16, border: `1.5px solid ${active ? '#111111' : '#aaa'}`,
+                borderRadius: 2, background: active ? '#111111' : 'transparent',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 flexShrink: 0, transition: 'all 0.12s',
               }}>
@@ -535,7 +535,7 @@ function InputM({ onSend }) {
 
               {/* コード */}
               <div>
-                <div style={{ fontSize: 10, letterSpacing: '0.18em', color: active ? '#1A6644' : '#111', fontWeight: active ? 700 : 400, transition: 'color 0.12s' }}>
+                <div style={{ fontSize: 10, letterSpacing: '0.18em', color: active ? '#111111' : '#111', fontWeight: active ? 700 : 400, transition: 'color 0.12s' }}>
                   {c.code}
                 </div>
                 <div style={{ fontSize: 8, color: '#ccc', letterSpacing: '0.1em', marginTop: 2 }}>
@@ -657,7 +657,7 @@ function InputN({ onSend }) {
         <div style={{ height: 4, borderRadius: 4, background: '#E4D9CE', overflow: 'hidden' }}>
           <div style={{
             height: '100%', borderRadius: 4,
-            background: 'linear-gradient(90deg, #1A6644, #2EA86A)',
+            background: '#111111',
             width: `${((step) / total) * 100}%`,
             transition: 'width 0.35s cubic-bezier(0.4,0,0.2,1)',
           }} />
@@ -667,7 +667,7 @@ function InputN({ onSend }) {
           {STEPS_N.map((_, i) => (
             <div key={i} style={{
               width: 8, height: 8, borderRadius: '50%',
-              background: i <= step ? '#1A6644' : '#E4D9CE',
+              background: i <= step ? '#111111' : '#E4D9CE',
               transition: 'background 0.25s',
             }} />
           ))}
@@ -684,10 +684,10 @@ function InputN({ onSend }) {
       }}>
         {/* AI badge */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 18 }}>
-          <div style={{ width: 22, height: 22, borderRadius: 7, background: '#1A6644', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: 22, height: 22, borderRadius: 7, background: '#111111', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Icon name="sparkle" size={11} color="#fff" />
           </div>
-          <span style={{ fontSize: 10, color: '#1A6644', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.16em' }}>SKINR AI</span>
+          <span style={{ fontSize: 10, color: '#111111', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.16em' }}>miHada</span>
         </div>
 
         <div style={{ fontSize: 18, fontWeight: 500, color: '#1A1814', letterSpacing: '-0.015em', lineHeight: 1.5, marginBottom: 24 }}>
@@ -709,7 +709,7 @@ function InputN({ onSend }) {
                 cursor: 'pointer', fontFamily: 'inherit',
                 textAlign: 'left', transition: 'all 0.14s ease',
               }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = '#1A6644'; e.currentTarget.style.background = 'rgba(26,102,68,0.04)'; }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = '#111111'; e.currentTarget.style.background = 'rgba(17,17,17,0.04)'; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = '#E8E0D8'; e.currentTarget.style.background = '#FFFEFB'; }}
             >
               <span style={{ fontSize: 20, lineHeight: 1, flexShrink: 0 }}>{icon}</span>
@@ -731,7 +731,7 @@ function InputN({ onSend }) {
           {answers.map((a, i) => (
             <span key={i} style={{
               padding: '4px 14px', borderRadius: 999,
-              background: 'rgba(26,102,68,0.1)', color: '#1A6644',
+              background: 'rgba(17,17,17,0.1)', color: '#111111',
               fontSize: 11, fontWeight: 500, letterSpacing: '0.01em',
             }}>{a}</span>
           ))}
@@ -918,14 +918,14 @@ function InputP({ onSend }) {
       }}>
         {/* ヘッダー */}
         <div style={{
-          background: '#1A6644', padding: '14px 18px',
+          background: '#111111', padding: '14px 18px',
           display: 'flex', alignItems: 'center', gap: 10,
         }}>
           <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Icon name="sparkle" size={16} color="#fff" />
           </div>
           <div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: '#fff', letterSpacing: '0.01em' }}>SKINR AI</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#fff', letterSpacing: '0.01em' }}>miHada</div>
             <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.65)', marginTop: 1 }}>成分ロジック診断</div>
           </div>
           <div style={{ marginLeft: 'auto', display: 'flex', gap: 5 }}>
@@ -945,7 +945,7 @@ function InputP({ onSend }) {
               animation: 'skinrFadeIn 0.2s ease',
             }}>
               {msg.role === 'ai' && (
-                <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#1A6644', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginRight: 8, alignSelf: 'flex-end' }}>
+                <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#111111', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginRight: 8, alignSelf: 'flex-end' }}>
                   <Icon name="sparkle" size={11} color="#fff" />
                 </div>
               )}
@@ -953,7 +953,7 @@ function InputP({ onSend }) {
                 maxWidth: '75%',
                 padding: '10px 14px',
                 borderRadius: msg.role === 'user' ? '16px 4px 16px 16px' : '4px 16px 16px 16px',
-                background: msg.role === 'user' ? '#1A6644' : '#fff',
+                background: msg.role === 'user' ? '#111111' : '#fff',
                 color: msg.role === 'user' ? '#fff' : '#1A1814',
                 fontSize: 13, lineHeight: 1.6, whiteSpace: 'pre-line',
                 boxShadow: '0 2px 8px rgba(80,60,40,0.08)',
@@ -966,7 +966,7 @@ function InputP({ onSend }) {
           {/* タイピングインジケーター */}
           {typing && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, animation: 'skinrFadeIn 0.2s ease' }}>
-              <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#1A6644', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#111111', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <Icon name="sparkle" size={11} color="#fff" />
               </div>
               <div style={{ padding: '10px 14px', background: '#fff', borderRadius: '4px 16px 16px 16px', display: 'flex', gap: 4, boxShadow: '0 2px 8px rgba(80,60,40,0.08)' }}>
@@ -991,13 +991,13 @@ function InputP({ onSend }) {
                 onClick={() => pick(q)}
                 style={{
                   padding: '8px 16px', borderRadius: 999,
-                  border: '1.5px solid #1A6644', background: '#fff',
-                  color: '#1A6644', fontSize: 12, fontWeight: 500,
+                  border: '1.5px solid #111111', background: '#fff',
+                  color: '#111111', fontSize: 12, fontWeight: 500,
                   cursor: 'pointer', fontFamily: 'inherit', letterSpacing: '0.01em',
                   transition: 'all 0.14s ease',
                 }}
-                onMouseEnter={e => { e.currentTarget.style.background = '#1A6644'; e.currentTarget.style.color = '#fff'; }}
-                onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = '#1A6644'; }}
+                onMouseEnter={e => { e.currentTarget.style.background = '#111111'; e.currentTarget.style.color = '#fff'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = '#111111'; }}
               >{q}</button>
             ))}
           </div>
@@ -1078,9 +1078,9 @@ function AiBubble({ text, isFirst }) {
       {!isFirst && (
         <div style={{
           width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
-          background: 'linear-gradient(135deg, #1A6644 0%, #2EA86A 100%)',
+          background: '#111111',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 2px 8px rgba(26,102,68,0.25)',
+          boxShadow: '0 2px 8px rgba(17,17,17,0.25)',
         }}>
           <Icon name="sparkle" size={12} color="#fff" />
         </div>
@@ -1105,11 +1105,11 @@ function UserBubble({ text }) {
     <div style={{ display: 'flex', justifyContent: 'flex-end', animation: 'skinrFadeIn 0.22s ease' }}>
       <div style={{
         maxWidth: '75%', padding: '11px 15px',
-        background: 'linear-gradient(135deg, #1A6644 0%, #155239 100%)',
+        background: '#111111',
         borderRadius: '18px 4px 18px 18px',
         fontSize: 13, lineHeight: 1.6, color: '#fff',
         fontWeight: 500, letterSpacing: '0.01em',
-        boxShadow: '0 3px 12px rgba(26,102,68,0.28)',
+        boxShadow: '0 3px 12px rgba(17,17,17,0.28)',
       }}>
         {text}
       </div>
@@ -1146,17 +1146,17 @@ function ResultCard({ skinType, concern, routine, onDetail }) {
   return (
     <div style={{
       margin: '4px 0 0 36px',
-      background: 'linear-gradient(135deg, #F0FAF4 0%, #E8F5EF 100%)',
-      border: '1.5px solid rgba(26,102,68,0.18)',
+      background: '#FFFFFF',
+      border: '1.5px solid rgba(17,17,17,0.18)',
       borderRadius: 16,
       padding: '18px 18px 16px',
       animation: 'skinrSlideUp 0.3s ease',
-      boxShadow: '0 4px 20px rgba(26,102,68,0.10)',
+      boxShadow: '0 4px 20px rgba(17,17,17,0.10)',
     }}>
       {/* タイトル */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-        <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#1A6644' }} />
-        <span style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.18em', color: '#1A6644', fontWeight: 600 }}>
+        <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#111111' }} />
+        <span style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.18em', color: '#111111', fontWeight: 600 }}>
           診断完了 — あなたへのご提案
         </span>
       </div>
@@ -1180,9 +1180,9 @@ function ResultCard({ skinType, concern, routine, onDetail }) {
           <div key={ing} style={{
             display: 'flex', alignItems: 'center', gap: 6,
             padding: '6px 12px', borderRadius: 99,
-            background: '#fff', border: '1px solid rgba(26,102,68,0.15)',
+            background: '#fff', border: '1px solid rgba(17,17,17,0.15)',
             fontSize: 12, fontWeight: 500, color: '#1A1814',
-            boxShadow: '0 1px 4px rgba(26,102,68,0.06)',
+            boxShadow: '0 1px 4px rgba(17,17,17,0.06)',
           }}>
             <span style={{ fontSize: 13 }}>{INGR_ICONS[ing] || '🌿'}</span>
             {ing}
@@ -1196,16 +1196,16 @@ function ResultCard({ skinType, concern, routine, onDetail }) {
         style={{
           width: '100%', padding: '12px', borderRadius: 10,
           border: 'none',
-          background: 'linear-gradient(135deg, #1A6644 0%, #155239 100%)',
+          background: '#111111',
           color: '#fff', fontSize: 13, fontWeight: 600,
           cursor: 'pointer', fontFamily: 'inherit',
           letterSpacing: '0.02em',
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-          boxShadow: '0 4px 16px rgba(26,102,68,0.30)',
+          boxShadow: '0 4px 16px rgba(17,17,17,0.30)',
           transition: 'all 0.15s ease',
         }}
-        onMouseEnter={e => e.currentTarget.style.boxShadow = '0 6px 24px rgba(26,102,68,0.40)'}
-        onMouseLeave={e => e.currentTarget.style.boxShadow = '0 4px 16px rgba(26,102,68,0.30)'}
+        onMouseEnter={e => e.currentTarget.style.boxShadow = '0 6px 24px rgba(17,17,17,0.40)'}
+        onMouseLeave={e => e.currentTarget.style.boxShadow = '0 4px 16px rgba(17,17,17,0.30)'}
       >
         <Icon name="sparkle" size={13} color="#fff" />
         おすすめ商品を全部見る
@@ -1297,7 +1297,7 @@ function InputQ({ onComplete }) {
 
         {/* ヘッダー */}
         <div style={{
-          background: 'linear-gradient(135deg, #1A6644 0%, #134D33 100%)',
+          background: '#111111',
           padding: '14px 18px 13px',
           display: 'flex', alignItems: 'center', gap: 11,
         }}>
@@ -1315,7 +1315,7 @@ function InputQ({ onComplete }) {
               AI 肌診断
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
-              <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ADE80', boxShadow: '0 0 6px #4ADE80' }} />
+              <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#111111', boxShadow: '0 0 6px #111111' }} />
               <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.7)', letterSpacing: '0.04em' }}>成分ロジック エンジン 稼働中</span>
             </div>
           </div>
@@ -1331,10 +1331,10 @@ function InputQ({ onComplete }) {
         </div>
 
         {/* プログレスバー */}
-        <div style={{ height: 2, background: 'rgba(26,102,68,0.1)' }}>
+        <div style={{ height: 2, background: 'rgba(17,17,17,0.1)' }}>
           <div style={{
             height: '100%',
-            background: 'linear-gradient(90deg, #1A6644, #2EA86A)',
+            background: '#111111',
             width: done ? '100%' : `${Math.max(8, (Math.max(0, flowStep - 1) / 3) * 100)}%`,
             transition: 'width 0.5s cubic-bezier(0.4,0,0.2,1)',
           }} />
@@ -1396,7 +1396,7 @@ function InputQ({ onComplete }) {
                     flex: currentQuick.length > 3 ? '0 0 calc(50% - 4px)' : '1',
                     minWidth: 0,
                   }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#1A6644'; e.currentTarget.style.background = 'rgba(26,102,68,0.04)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#111111'; e.currentTarget.style.background = 'rgba(17,17,17,0.04)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border, #E4D9CE)'; e.currentTarget.style.background = 'var(--bg, #FFFEFB)'; e.currentTarget.style.transform = 'none'; }}
                 >
                   <span style={{ fontSize: 13, fontWeight: 500, color: '#1A1814', letterSpacing: '-0.01em' }}>{q.label}</span>
@@ -1411,7 +1411,6 @@ function InputQ({ onComplete }) {
       {/* ブランドノート */}
       <div style={{ textAlign: 'center', marginTop: 14 }}>
         <span style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.14em', color: '#C8B8A8' }}>
-          POWERED BY SKINR INGREDIENT ENGINE · 1,200+ ACTIVES ANALYZED
         </span>
       </div>
     </div>
@@ -1531,13 +1530,13 @@ export default function InputPreview() {
         <div key={label} style={{ marginBottom: highlight ? 108 : 88 }}>
           {/* ラベル */}
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 22, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 11, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.12em', color: highlight ? '#1A6644' : '#1A6644', fontWeight: 600 }}>
+            <span style={{ fontSize: 11, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.12em', color: highlight ? '#111111' : '#111111', fontWeight: 600 }}>
               案 {label}
             </span>
             {highlight && (
               <span style={{
                 fontSize: 9, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.18em',
-                color: '#fff', background: '#1A6644', padding: '3px 10px', borderRadius: 4, fontWeight: 700,
+                color: '#fff', background: '#111111', padding: '3px 10px', borderRadius: 4, fontWeight: 700,
               }}>FEATURED</span>
             )}
             <span style={{ fontSize: highlight ? 22 : 20, fontWeight: highlight ? 600 : 500, letterSpacing: '-0.025em', color: '#1A1814' }}>{title}</span>
@@ -1548,7 +1547,7 @@ export default function InputPreview() {
           {/* プレビューボックス */}
           <div style={{
             background: bg, borderRadius: highlight ? 20 : 16, padding: pad,
-            border: highlight ? '2px solid rgba(26,102,68,0.14)' : '1px solid rgba(0,0,0,0.06)',
+            border: highlight ? '2px solid rgba(17,17,17,0.14)' : '1px solid rgba(0,0,0,0.06)',
             overflow: 'hidden',
             boxShadow: highlight ? '0 8px 48px rgba(80,60,40,0.10)' : 'none',
           }}>

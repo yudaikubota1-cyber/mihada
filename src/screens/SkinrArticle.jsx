@@ -211,7 +211,7 @@ export default function SkinrArticle({ slug, onBack, onOpenProduct, onStartChat 
           textAlign: 'center', marginBottom: 32,
         }}>
           <p style={{ fontSize: 14, fontWeight: 500, margin: '0 0 12px' }}>
-            あなたの肌に合う商品をAIが診断
+            あなたの肌に合う商品をAIが分析
           </p>
           <button
             onClick={onStartChat}
@@ -223,7 +223,7 @@ export default function SkinrArticle({ slug, onBack, onOpenProduct, onStartChat 
             }}
           >
             <Icon name="sparkle" size={14} color="#fff" />
-            無料で肌診断する
+            無料でAI提案を見る
           </button>
         </div>
       </article>

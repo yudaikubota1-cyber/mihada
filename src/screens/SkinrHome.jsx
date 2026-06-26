@@ -175,7 +175,7 @@ function ChatDiagnosisCard({ onComplete }) {
   const ingredients = (concern && skinType) ? getIngredients(skinType, concern) : [];
   const skinLabel   = skinType === 'わからない' ? '肌タイプ未判定' : skinType;
   const resultNote  = skinType === 'わからない'
-    ? '詳しい診断でさらに精度の高い提案ができます'
+    ? '詳しい分析でさらに精度の高い提案ができます'
     : `${skinLabel}の${concern}には、この成分の組み合わせがおすすめです`;
 
   // 選択ボタン共通スタイル生成

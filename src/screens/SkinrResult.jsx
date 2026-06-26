@@ -619,7 +619,7 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
         display: 'flex', flexDirection: 'column', gap: 10,
       }}>
         <div style={{ fontSize: 11, color: '#B5B5B5', textAlign: 'center', marginBottom: 6, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.1em' }}>
-          診断結果は成分ロジックに基づいています
+          提案は成分ロジックに基づいています
         </div>
 
         {/* シェアボタン */}
@@ -654,7 +654,7 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
             <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
             <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
           </svg>
-          {sharing ? '生成中...' : '診断結果をシェア'}
+          {sharing ? '生成中...' : '提案結果をシェア'}
         </button>
 
         <PrimaryButton full onClick={onNewChat} icon={<Icon name="sparkle" size={14} color="#fff" />}>

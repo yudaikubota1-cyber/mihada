@@ -1,5 +1,5 @@
 /**
- * 診断結果のシェア用画像をCanvas APIで生成
+ * 提案結果のシェア用画像をCanvas APIで生成
  */
 export async function generateShareImage({ skinType, concerns, ingredients, message }) {
   const W = 1080, H = 1080;
@@ -157,7 +157,7 @@ export async function shareOrDownload(canvas) {
   if (navigator.canShare?.({ files: [file] })) {
     try {
       await navigator.share({
-        title: 'miHada AI肌診断結果',
+        title: 'miHada AI成分分析結果',
         text: '成分ロジックで自分に合う韓国スキンケアを見つけました！',
         url: 'https://mihada.vercel.app',
         files: [file],

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { PRODUCTS, CATEGORIES, CONCERN_CHIPS, SKIN_TYPE_FILTER_CHIPS } from '../data/products.js';
 import {
   SkinrLogo, SkinrEyebrow, ProductImage, Icon,
-  Chip, Divider, ProductCard,
+  Chip, Divider, ProductCard, SiteFooter,
 } from '../components/shared.jsx';
 
 // ── 公式ショップURL ─────────────────────────────────────────────
@@ -1066,32 +1066,7 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
       )}
 
       {/* Footer */}
-      <div style={{
-        borderTop: '1px solid var(--border)',
-        padding: `40px ${px} ${isDesktop ? '60px' : '60px'}`,
-        textAlign: 'center',
-        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16,
-      }}>
-        <SkinrLogo size={12} />
-        <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
-          <button
-            onClick={onOpenPrivacy}
-            style={{ fontSize: 10, color: '#999', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.1em', padding: 0 }}
-          >
-            プライバシーポリシー
-          </button>
-          <span style={{ fontSize: 10, color: '#D0D0D0' }}>|</span>
-          <button
-            onClick={onOpenDisclosure}
-            style={{ fontSize: 10, color: '#999', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.1em', padding: 0 }}
-          >
-            アフィリエイト表記
-          </button>
-        </div>
-        <p style={{ fontSize: 9, color: '#C8C8C8', margin: 0, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.08em' }}>
-          © 2025 miHada. All rights reserved.
-        </p>
-      </div>
+      <SiteFooter />
     </div>
   );
 }

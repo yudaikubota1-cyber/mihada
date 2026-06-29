@@ -21,6 +21,31 @@ export function SkinrLogo({ size = 16, color = '#111' }) {
   );
 }
 
+export function SiteFooter() {
+  const linkStyle = {
+    fontSize: 12, color: '#999999', textDecoration: 'none',
+    background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+    fontFamily: 'inherit',
+  };
+  return (
+    <footer style={{
+      borderTop: '1px solid var(--border)',
+      padding: '28px 20px 40px',
+      textAlign: 'center',
+      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10,
+    }}>
+      <div style={{ display: 'flex', gap: 12, alignItems: 'center', justifyContent: 'center' }}>
+        <a href="/privacy" style={linkStyle}>プライバシーポリシー</a>
+        <span style={{ fontSize: 12, color: '#999999' }}>|</span>
+        <a href="/disclosure" style={linkStyle}>アフィリエイト表記</a>
+      </div>
+      <p style={{ fontSize: 12, color: '#999999', margin: 0, textAlign: 'center' }}>
+        © 2026 miHada
+      </p>
+    </footer>
+  );
+}
+
 export function SkinrEyebrow({ children, color = '#7A7A7A', size = 10 }) {
   return (
     <span style={{

@@ -1,6 +1,6 @@
 import React from 'react';
 import { PRODUCTS } from '../data/products.js';
-import { SkinrLogo, SkinrEyebrow, Icon, ProductCard } from '../components/shared.jsx';
+import { SkinrLogo, SkinrEyebrow, Icon, ProductCard, SiteFooter } from '../components/shared.jsx';
 
 // 記事テンプレートデータ
 const ARTICLES = [
@@ -227,6 +227,7 @@ export default function SkinrArticle({ slug, onBack, onOpenProduct, onStartChat 
           </button>
         </div>
       </article>
+      <SiteFooter />
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { PRODUCTS } from '../data/products.js';
 import { INGREDIENT_DICT } from '../data/knowledge.js';
 import {
   SkinrLogo, SkinrEyebrow, ProductImage, Icon,
-  Divider, PrimaryButton, shade,
+  Divider, PrimaryButton, shade, SiteFooter,
 } from '../components/shared.jsx';
 
 // 成分名でINGREDIENT_DICTを検索（部分一致）
@@ -254,6 +254,7 @@ export default function SkinrProduct({ isDesktop, productId, onBack }) {
           {/* 右: 商品情報 */}
           <div style={{ flex: 1, minWidth: 0, padding: '36px 48px 80px' }}>
             <ProductBody product={product} px="0px" openRakuten={openRakuten} />
+            <SiteFooter />
           </div>
         </div>
       </div>
@@ -290,6 +291,7 @@ export default function SkinrProduct({ isDesktop, productId, onBack }) {
         <div style={{ padding: '24px 24px 12px' }}>
           <ProductBody product={product} px="24px" openRakuten={openRakuten} />
         </div>
+        <SiteFooter />
       </div>
 
       {/* Mobile: sticky 購入ボタン */}

@@ -5,7 +5,7 @@ import { buildRakutenSearchUrl, buildProductUrl, searchRakutenProducts } from '.
 import { generateShareImage, shareOrDownload } from '../lib/shareCard.js';
 import {
   SkinrLogo, SkinrEyebrow, ProductImage, Icon,
-  Divider, PrimaryButton,
+  Divider, PrimaryButton, SiteFooter,
 } from '../components/shared.jsx';
 
 // AI診断の concerns からプロダクトを絞り込む簡易マッピング
@@ -675,6 +675,7 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
           商品一覧を見る
         </button>
       </div>
+      <SiteFooter />
     </div>
   );
 }

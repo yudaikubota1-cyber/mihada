@@ -86,9 +86,9 @@ textarea:focus:not(:focus-visible) {
   display: none;
 }
 
-/* Screen entrance */
+/* Screen entrance — 純粋なフェードイン（戻る時も同じ） */
 .skinr-screen {
-  animation: skinrScreenIn 0.22s ease;
+  animation: skinrScreenIn 0.2s ease;
   flex: 1;
   min-height: 0;
   display: flex;
@@ -97,8 +97,27 @@ textarea:focus:not(:focus-visible) {
 
 /* Animations */
 @keyframes skinrScreenIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* 横スクロールのスナップ */
+.skinr-snap-x {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+.skinr-snap-x > * {
+  scroll-snap-align: start;
+}
+
+/* 画像スケルトン（読み込み中の薄グレーパルス） */
+@keyframes skinrSkeletonPulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.45; }
+}
+.skinr-skeleton {
+  background: #F0F0F0;
+  animation: skinrSkeletonPulse 1.2s ease infinite;
 }
 
 @keyframes skinrFadeIn {

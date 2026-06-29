@@ -115,7 +115,7 @@ function RakutenCard({ item }) {
       {/* 画像 */}
       <div style={{
         width: 120, height: 120, borderRadius: 8, overflow: 'hidden',
-        background: 'var(--bg-soft)', marginBottom: 8, flexShrink: 0,
+        background: '#F8F8F8', marginBottom: 8, flexShrink: 0,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         position: 'relative',
       }}>
@@ -123,8 +123,9 @@ function RakutenCard({ item }) {
           <img
             src={item.image}
             alt={item.name}
+            loading="lazy"
             onError={() => setImgError(true)}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '8%' }}
           />
         ) : (
           <span style={{ fontSize: 11, color: '#C0C0C0', fontFamily: 'JetBrains Mono, monospace' }}>R</span>
@@ -292,7 +293,7 @@ function ResultProductCard({ product: p, idx, onDetail }) {
         onClick={onDetail}
         style={{
           width: 130, height: 130, borderRadius: 10, overflow: 'hidden',
-          background: p.image ? '#fff' : (p.swatch || '#F0EDE8'),
+          background: '#F8F8F8',
           marginBottom: 8, position: 'relative',
           boxShadow: pressed ? '0 2px 8px rgba(0,0,0,0.07)' : '0 4px 16px rgba(0,0,0,0.10)',
           transform: pressed ? 'scale(0.96)' : 'scale(1)',
@@ -385,6 +386,7 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
   const concerns = diagnosis?.concerns || ['乾燥', '毛穴の開き', 'くすみ'];
   const aiMessage = diagnosis?.message;
   const [sharing, setSharing] = useState(false);
+  const [selectedCat, setSelectedCat] = useState('all');
 
   const today = new Date();
   const dateStr = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
@@ -409,6 +411,17 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
   );
 
   const categoryOrder = FULL_CATEGORY_ORDER.filter(cat => (byCategory[cat.key] || []).length > 0);
+
+  // カテゴリフィルター用の短縮ラベル
+  const FILTER_LABELS = {
+    cleansing: 'クレンジング', cleanser: '洗顔', toner: 'トナー', pad: 'パッド',
+    serum: '美容液', cream: 'クリーム', mask: 'マスク', sunscreen: 'UV',
+  };
+  const enabledKeys = new Set(categoryOrder.map(c => c.key));
+  // 「すべて」選択時は全カテゴリ、それ以外は該当カテゴリのみ表示
+  const visibleCategories = selectedCat === 'all'
+    ? categoryOrder
+    : categoryOrder.filter(cat => cat.key === selectedCat);
 
   const topProducts = categoryOrder.map(cat => (byCategory[cat.key] || [])[0]).filter(Boolean);
   const ingredients = topProducts
@@ -533,7 +546,50 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
         <Divider label="01 — Recommended Products" />
       </div>
 
-      {categoryOrder.map(cat => {
+      {/* カテゴリフィルター（sticky） */}
+      <div
+        className="skinr-scroll"
+        style={{
+          position: 'sticky', top: 0, zIndex: 20,
+          background: 'var(--bg)',
+          display: 'flex', gap: 6,
+          overflowX: 'auto',
+          padding: `10px ${px}`,
+          borderBottom: '1px solid var(--border)',
+          WebkitOverflowScrolling: 'touch',
+        }}
+      >
+        {[{ key: 'all', label: 'すべて' }, ...FULL_CATEGORY_ORDER.map(c => ({ key: c.key, label: FILTER_LABELS[c.key] || c.label }))].map(f => {
+          const disabled = f.key !== 'all' && !enabledKeys.has(f.key);
+          const active = selectedCat === f.key;
+          return (
+            <button
+              key={f.key}
+              onClick={() => { if (!disabled) setSelectedCat(f.key); }}
+              disabled={disabled}
+              style={{
+                flexShrink: 0,
+                padding: '8px 14px',
+                minHeight: 36,
+                borderRadius: 2,
+                fontSize: 12,
+                fontFamily: 'inherit',
+                fontWeight: 500,
+                whiteSpace: 'nowrap',
+                cursor: disabled ? 'default' : 'pointer',
+                border: active ? '1px solid #111' : '1px solid #DDD',
+                background: active ? '#111' : disabled ? '#F5F5F5' : '#fff',
+                color: active ? '#fff' : disabled ? '#CCC' : '#555',
+                transition: 'all 0.12s ease',
+              }}
+            >
+              {f.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {visibleCategories.map(cat => {
         const items = (byCategory[cat.key] || []).slice(0, 5);
         const rakutenUrl = rakutenUrls[cat.key];
         return (
@@ -559,8 +615,8 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
                   width: 48, zIndex: 2, pointerEvents: 'none',
                   background: 'linear-gradient(to right, transparent, #fff)',
                 }} />
-                <div className="skinr-scroll" style={{
-                  display: 'flex', gap: 10,
+                <div className="skinr-scroll skinr-snap-x" style={{
+                  display: 'flex', gap: 12,
                   overflowX: 'auto',
                   padding: `0 ${px} 14px`,
                   WebkitOverflowScrolling: 'touch',
@@ -634,7 +690,7 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
                 message: aiMessage,
               });
               await shareOrDownload(canvas);
-            } catch (e) { console.error(e); }
+            } catch (e) { if (import.meta.env.DEV) console.error(e); }
             setSharing(false);
           }}
           disabled={sharing}

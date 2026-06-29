@@ -988,7 +988,7 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
                 </button>
               </div>
               {/* プレビュー横スクロール */}
-              <div className="skinr-scroll" style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: `0 ${px} 16px`, scrollbarWidth: 'none' }}>
+              <div className="skinr-scroll skinr-snap-x" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: `0 ${px} 16px`, scrollbarWidth: 'none' }}>
                 {products.slice(0, isDesktop ? 5 : 4).map(p => (
                   <div key={p.id} style={{ width: isDesktop ? 170 : 148, flexShrink: 0 }}>
                     <ProductCard product={p} onClick={() => onOpenProduct(p.id)} />

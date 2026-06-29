@@ -61,7 +61,7 @@ export default function SkinrChat({ initialMessage, onComplete, onBack }) {
         ? 'ただいま混み合っています。少し待ってもう一度お試しください。'
         : '通信に失敗しました。もう一度お試しください。';
       setError(friendlyMsg);
-      console.error(err);
+      if (import.meta.env.DEV) console.error(err);
     }
   };
 
@@ -290,6 +290,10 @@ export default function SkinrChat({ initialMessage, onComplete, onBack }) {
                 e.preventDefault();
                 send();
               }
+            }}
+            onFocus={e => {
+              // キーボード表示で入力欄が隠れないようにスクロール
+              setTimeout(() => e.target.scrollIntoView({ block: 'center', behavior: 'smooth' }), 300);
             }}
             placeholder={messages.length === 1 ? '例：最近頬が乾燥してファンデが浮く...' : 'メッセージを入力、または選択肢をタップ…'}
             rows={1}

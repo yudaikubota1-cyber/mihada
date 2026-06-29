@@ -59,6 +59,64 @@ export function SkinrEyebrow({ children, color = '#7A7A7A', size = 10 }) {
   );
 }
 
+// SmartImage — スケルトンローディング + エラー時フォールバック付き画像
+// contain で表示、背景は薄グレーで余白を埋める
+export function SmartImage({ src, alt, product, padding = '8%', radius = 0 }) {
+  const [loaded, setLoaded] = React.useState(false);
+  const [error, setError] = React.useState(false);
+  const showImg = src && !error;
+
+  return (
+    <div style={{
+      position: 'absolute', inset: 0,
+      background: '#F8F8F8',
+      borderRadius: radius,
+      overflow: 'hidden',
+    }}>
+      {/* スケルトン（読み込み中） */}
+      {showImg && !loaded && (
+        <div className="skinr-skeleton" style={{ position: 'absolute', inset: 0 }} />
+      )}
+
+      {showImg ? (
+        <img
+          src={src}
+          alt={alt}
+          loading="lazy"
+          onLoad={() => setLoaded(true)}
+          onError={() => setError(true)}
+          style={{
+            position: 'absolute', inset: 0,
+            width: '100%', height: '100%',
+            objectFit: 'contain',
+            padding,
+            opacity: loaded ? 1 : 0,
+            transition: 'opacity 0.25s ease',
+          }}
+        />
+      ) : (
+        // フォールバック: ブランド頭文字 + miHada プレースホルダー
+        <div style={{
+          position: 'absolute', inset: 0,
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8,
+          background: '#F8F8F8',
+        }}>
+          <span style={{
+            fontSize: 40, fontWeight: 100, lineHeight: 1,
+            color: '#CFCFCF', letterSpacing: '-0.04em', userSelect: 'none',
+          }}>
+            {(product?.brand || 'm').charAt(0)}
+          </span>
+          <span style={{
+            fontFamily: 'Inter, system-ui, sans-serif', fontWeight: 300,
+            fontSize: 9, letterSpacing: '0.3em', color: '#CFCFCF', paddingLeft: '0.3em',
+          }}>miHada</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ProductImage — used in detail pages (xl/lg size)
 export function ProductImage({ product, size = 'md', label = true }) {
   const [imgError, setImgError] = React.useState(false);
@@ -264,11 +322,10 @@ export function PrimaryButton({ children, onClick, full = false, icon = null }) 
 // ─── ProductCard — redesigned, image-forward ───────────────────────────────
 export function ProductCard({ product, onClick }) {
   const [pressed, setPressed] = React.useState(false);
-  const [imgError, setImgError] = React.useState(false);
-  const showImg = product.image && !imgError;
 
   return (
     <div
+      className="skinr-tappable"
       onClick={onClick}
       onMouseDown={() => setPressed(true)}
       onMouseUp={() => setPressed(false)}
@@ -280,57 +337,20 @@ export function ProductCard({ product, onClick }) {
         transition: 'transform 0.16s ease',
       }}
     >
-      {/* Full-width image — 4:5 aspect ratio */}
+      {/* Full-width image — 正方形 1:1 */}
       <div style={{
         position: 'relative',
-        paddingTop: '125%',
+        paddingTop: '100%',
         borderRadius: 12,
         overflow: 'hidden',
-        background: showImg ? 'var(--bg)' : (product.swatch || '#EDE5DA'),
+        background: '#F8F8F8',
         boxShadow: pressed
           ? '0 1px 6px rgba(80,60,40,0.07)'
           : '0 4px 20px rgba(80,60,40,0.09)',
         transition: 'box-shadow 0.16s ease',
         marginBottom: 10,
       }}>
-        {showImg ? (
-          <img
-            src={product.image}
-            alt={product.nameJa}
-            onError={() => setImgError(true)}
-            style={{
-              position: 'absolute', inset: 0,
-              width: '100%', height: '100%',
-              objectFit: 'contain',
-              padding: '5%',
-            }}
-          />
-        ) : (
-          <div style={{
-            position: 'absolute', inset: 0,
-            background: `linear-gradient(150deg, ${product.swatch || '#EDE5DA'} 0%, ${shade(product.swatch || '#EDE5DA', -6)} 100%)`,
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            gap: 10,
-          }}>
-            <span style={{
-              fontSize: 44, fontWeight: 100, lineHeight: 1,
-              color: product.accent || '#555',
-              opacity: 0.18,
-              letterSpacing: '-0.04em',
-              userSelect: 'none',
-            }}>
-              {(product.brand || '?').charAt(0)}
-            </span>
-            <span style={{
-              fontFamily: 'JetBrains Mono, monospace',
-              fontSize: 7, letterSpacing: '0.22em',
-              color: product.accent || '#555', opacity: 0.35,
-              textTransform: 'uppercase',
-            }}>
-              {(product.brand || '').split(' ')[0]}
-            </span>
-          </div>
-        )}
+        <SmartImage src={product.image} alt={product.nameJa} product={product} padding="6%" />
 
         {/* Category badge — frosted glass */}
         {product.categoryLabel && (

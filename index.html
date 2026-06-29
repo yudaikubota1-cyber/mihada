@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>miHada — 成分ロジックで選ぶスキンケア</title>
     <meta name="description" content="AIがあなたの肌タイプと悩みを分析し、成分ロジックから最適なスキンケアを提案。乾燥・毛穴・ニキビ・くすみ・シミ・シワに対応。" />
 
@@ -26,7 +27,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- 初回ロード時の白画面を防ぐスプラッシュ（React マウントで置換される） -->
+      <div id="initial-splash" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#FFFFFF;">
+        <span style="font-family:'Inter',system-ui,sans-serif;font-weight:300;letter-spacing:0.36em;font-size:18px;color:#111111;padding-left:0.36em;animation:splashPulse 1.4s ease infinite;">miHada</span>
+      </div>
+    </div>
+    <style>
+      @keyframes splashPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+    </style>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

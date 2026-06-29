@@ -132,7 +132,8 @@ export default function App() {
   }, []);
 
   // 画面遷移（ブラウザ履歴にpush or replace）— 遷移前にスクロール位置を保存
-  const navigate = useCallback((newScreen, extras = {}, { replace = false } = {}) => {
+  // back=true の場合は遷移先のスクロール位置を復元（戻る動作）
+  const navigate = useCallback((newScreen, extras = {}, { replace = false, back = false } = {}) => {
     saveScrollPos(screen);
     const state = { screen: newScreen, ...extras };
     if (replace) {
@@ -148,7 +149,7 @@ export default function App() {
       if (k === 'articleSlug') setCurrentArticle(v);
       if (k === 'diagnosis') { setDiagnosis(v); saveDiagnosis(v); setLastDiagnosis(v); }
     });
-    isGoingBack.current = false;
+    isGoingBack.current = back;
     setScreen(newScreen);
   }, [screen, saveScrollPos]);
 
@@ -188,7 +189,12 @@ export default function App() {
   };
   const goProduct = (id) => navigate('product', { productId: id });
   const goArticle = (slug) => navigate('article', { articleSlug: slug });
-  const goBack = () => history.back();
+  // アプリ内ナビゲーションで戻る（ブラウザの history.back() は使わない）
+  // 直前の画面へ戻る。商品詳細→結果（or ホーム）、記事→ホーム など
+  const goBack = () => {
+    const target = (prevScreen && prevScreen !== screen) ? prevScreen : 'home';
+    navigate(target, {}, { back: true });
+  };
   const goPrivacy = () => navigate('privacy');
   const goDisclosure = () => navigate('disclosure');
 

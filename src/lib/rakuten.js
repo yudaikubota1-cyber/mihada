@@ -44,27 +44,53 @@ export function buildRakutenSearchUrl({ concerns = [], category }) {
   return searchUrl;
 }
 
-// 楽天商品検索API（Vercelサーバー関数経由）
-export async function searchRakutenProducts({ concerns = [], category, hits = 5 }) {
-  const concernKw = concerns.slice(0, 2).map(c => CONCERN_KEYWORDS[c] || c).join(' ');
-  const catKw = CATEGORY_KEYWORDS[category] || 'スキンケア';
-  const keyword = `スキンケア ${catKw} ${concernKw}`.trim();
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-  const res = await fetch(`/api/rakuten?keyword=${encodeURIComponent(keyword)}&hits=${hits}`);
-  if (!res.ok) throw new Error(`Rakuten API error: ${res.status}`);
+// 画像URLを高解像度化（128x128 → 400x400）
+function upscaleImage(url) {
+  if (!url) return null;
+  return url.replace(/_ex=\d+x\d+/, '_ex=400x400');
+}
 
-  const data = await res.json();
-  if (!data.Items || data.error) return [];
-
-  return data.Items.map(({ Item }) => ({
+function mapItems(items) {
+  return items.map(({ Item }) => ({
     id: Item.itemCode,
     name: Item.itemName,
     price: Item.itemPrice,
     priceStr: `¥${Number(Item.itemPrice).toLocaleString()}`,
-    image: Item.smallImageUrls?.[0]?.imageUrl?.replace('_ex=128x128', '_ex=200x200') || null,
+    image: upscaleImage(Item.mediumImageUrls?.[0]?.imageUrl || Item.smallImageUrls?.[0]?.imageUrl) || null,
     url: Item.affiliateUrl || Item.itemUrl,
     shop: Item.shopName,
     rating: Item.reviewAverage,
     reviewCount: Item.reviewCount,
   }));
+}
+
+async function fetchRakuten(keyword, hits) {
+  const res = await fetch(`/api/rakuten?keyword=${encodeURIComponent(keyword)}&hits=${hits}`);
+  if (!res.ok) throw new Error(`Rakuten API error: ${res.status}`);
+  const data = await res.json();
+  if (!data.Items || data.error) return [];
+  return mapItems(data.Items);
+}
+
+// 楽天商品検索API（Vercelサーバー関数経由）
+export async function searchRakutenProducts({ concerns = [], category, hits = 5 }) {
+  const concernKw = concerns.slice(0, 2).map(c => CONCERN_KEYWORDS[c] || c).join(' ');
+  const catKw = CATEGORY_KEYWORDS[category] || 'スキンケア';
+
+  // レート制限対策: リクエスト前に 100ms ディレイ
+  await delay(100);
+
+  // ① カテゴリ + 悩みで具体的に検索
+  const keyword = `スキンケア ${catKw} ${concernKw}`.trim();
+  let items = await fetchRakuten(keyword, hits);
+
+  // ② ヒット0件 → カテゴリのみで再検索（フォールバック）
+  if (items.length === 0) {
+    await delay(100);
+    items = await fetchRakuten(catKw, hits);
+  }
+
+  return items;
 }

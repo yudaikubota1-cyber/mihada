@@ -275,9 +275,9 @@ export default function SkinrProduct({ isDesktop, productId, onBack }) {
         </div>
 
         {/* Hero image */}
-        <div style={{ position: 'relative', overflow: 'hidden', background: 'var(--bg)' }}>
+        <div style={{ position: 'relative', overflow: 'hidden', background: '#F8F8F8' }}>
           {product.image && !imgError ? (
-            <img src={product.image} alt={product.nameJa} onError={() => setImgError(true)} style={{ width: '100%', height: 300, objectFit: 'contain', display: 'block', padding: '6%' }} />
+            <img src={product.image} alt={product.nameJa} loading="lazy" onError={() => setImgError(true)} style={{ width: '100%', height: 300, objectFit: 'contain', display: 'block', padding: '6%', background: '#F8F8F8' }} />
           ) : (
             <div style={{ width: '100%', height: 300, background: product.swatch, backgroundImage: `repeating-linear-gradient(135deg, ${product.swatch} 0px, ${product.swatch} 18px, ${shade(product.swatch, -3)} 18px, ${shade(product.swatch, -3)} 19px)`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12 }}>
               <div style={{ width: 90, height: 140, background: shade(product.swatch, -10), borderRadius: 6 }} />

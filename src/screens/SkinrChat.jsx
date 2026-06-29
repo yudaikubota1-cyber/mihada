@@ -16,6 +16,7 @@ export default function SkinrChat({ initialMessage, onComplete, onBack }) {
   const [error, setError] = useState(null);
   const [diagnosed, setDiagnosed] = useState(false);
   const [diagnosis, setDiagnosis] = useState(null);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
   const scrollRef = useRef(null);
   const textareaRef = useRef(null);
   const initialSent = useRef(false);
@@ -96,13 +97,28 @@ export default function SkinrChat({ initialMessage, onComplete, onBack }) {
 
   const send = () => handleSend(input);
 
+  // 会話を最初の一言目に戻す
+  const handleReset = () => {
+    setHistory([]);
+    setMessages([{ role: 'ai', text: INITIAL_AI_MESSAGE }]);
+    setInput('');
+    setAiTyping(false);
+    setLoadingStep(-1);
+    setError(null);
+    setDiagnosed(false);
+    setDiagnosis(null);
+    initialSent.current = true; // リセット後に初期メッセージを再送信しない
+    setShowResetConfirm(false);
+    if (textareaRef.current) { textareaRef.current.style.height = 'auto'; }
+  };
+
   // ─── Loading overlay ───
   if (loadingStep >= 0) {
     return <LoadingScreen step={loadingStep} onBack={onBack} skinType={diagnosis?.skin_type} />;
   }
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg)' }}>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg)', position: 'relative' }}>
       {/* Top bar */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -120,7 +136,17 @@ export default function SkinrChat({ initialMessage, onComplete, onBack }) {
           }} />
           <SkinrEyebrow size={9}>{aiTyping ? '絞り込み中...' : 'miHada · LOGIC'}</SkinrEyebrow>
         </div>
-        <div style={{ width: 32 }} />
+        <button
+          onClick={() => setShowResetConfirm(true)}
+          style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: 4, padding: '4px 2px',
+            color: '#999', fontSize: 12, fontFamily: 'inherit',
+          }}
+        >
+          <span style={{ fontSize: 14, lineHeight: 1 }}>↺</span>
+          やり直す
+        </button>
       </div>
 
       {/* Conversation */}
@@ -246,10 +272,10 @@ export default function SkinrChat({ initialMessage, onComplete, onBack }) {
         <div style={{
           display: 'flex', alignItems: 'flex-end', gap: 10,
           padding: '10px 12px 10px 16px',
-          border: '1.5px solid ' + (aiTyping ? 'var(--border)' : 'var(--border-strong)'),
+          border: '1.5px solid var(--border-strong)',
           borderRadius: 999,
           transition: 'border-color 0.15s ease',
-          background: aiTyping ? 'var(--bg-soft)' : 'var(--bg)',
+          background: 'var(--bg)',
         }}>
           <textarea
             ref={textareaRef}
@@ -265,9 +291,8 @@ export default function SkinrChat({ initialMessage, onComplete, onBack }) {
                 send();
               }
             }}
-            placeholder={aiTyping ? '成分を分析中...' : messages.length === 1 ? '例：最近頬が乾燥してファンデが浮く...' : 'または自由に入力…'}
+            placeholder={messages.length === 1 ? '例：最近頬が乾燥してファンデが浮く...' : 'メッセージを入力、または選択肢をタップ…'}
             rows={1}
-            disabled={aiTyping}
             style={{
               flex: 1,
               border: 'none', outline: 'none', resize: 'none',
@@ -281,22 +306,75 @@ export default function SkinrChat({ initialMessage, onComplete, onBack }) {
           />
           <button
             onClick={send}
-            disabled={!input.trim() || aiTyping}
+            disabled={!input.trim()}
             style={{
               width: 36, height: 36, borderRadius: '50%',
               border: 'none',
-              cursor: (input.trim() && !aiTyping) ? 'pointer' : 'default',
-              background: (input.trim() && !aiTyping) ? '#111' : '#EFEFEF',
+              cursor: input.trim() ? 'pointer' : 'default',
+              background: input.trim() ? '#111' : '#EFEFEF',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               flexShrink: 0,
               transition: 'background 0.15s ease',
-              boxShadow: (input.trim() && !aiTyping) ? '0 4px 14px rgba(0,0,0,0.2)' : 'none',
+              boxShadow: input.trim() ? '0 4px 14px rgba(0,0,0,0.2)' : 'none',
             }}
           >
-            <Icon name="arrowRight" size={15} color={(input.trim() && !aiTyping) ? '#fff' : '#C0C0C0'} />
+            <Icon name="arrowRight" size={15} color={input.trim() ? '#fff' : '#C0C0C0'} />
           </button>
         </div>
       </div>
+
+      {/* リセット確認ダイアログ */}
+      {showResetConfirm && (
+        <div
+          onClick={() => setShowResetConfirm(false)}
+          style={{
+            position: 'absolute', inset: 0, zIndex: 50,
+            background: 'rgba(0,0,0,0.35)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: 24,
+            animation: 'skinrFadeIn 0.18s ease both',
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              width: '100%', maxWidth: 300,
+              background: 'var(--bg)', borderRadius: 14,
+              padding: '24px 22px 18px',
+              display: 'flex', flexDirection: 'column', gap: 18,
+              boxShadow: '0 12px 40px rgba(0,0,0,0.2)',
+            }}
+          >
+            <p style={{ margin: 0, fontSize: 15, fontWeight: 500, color: '#111', textAlign: 'center', lineHeight: 1.5 }}>
+              会話をリセットしますか？
+            </p>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                onClick={() => setShowResetConfirm(false)}
+                style={{
+                  flex: 1, padding: '11px', borderRadius: 8,
+                  border: '1px solid var(--border)', background: 'var(--bg)',
+                  fontSize: 13, fontWeight: 500, color: '#666',
+                  fontFamily: 'inherit', cursor: 'pointer',
+                }}
+              >
+                いいえ
+              </button>
+              <button
+                onClick={handleReset}
+                style={{
+                  flex: 1, padding: '11px', borderRadius: 8,
+                  border: 'none', background: '#111', color: '#fff',
+                  fontSize: 13, fontWeight: 500,
+                  fontFamily: 'inherit', cursor: 'pointer',
+                }}
+              >
+                はい
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

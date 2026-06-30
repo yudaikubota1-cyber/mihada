@@ -241,7 +241,7 @@ function RakutenSection({ concerns, category, searchUrl, px = '24px' }) {
         width: 48, zIndex: 2, pointerEvents: 'none',
         background: 'linear-gradient(to right, transparent, #fff)',
       }} />
-      <div className="skinr-scroll" style={{
+      <div className="skinr-scroll skinr-snap-x" style={{
         display: 'flex', gap: 10,
         overflowX: 'auto',
         padding: `0 ${px} 14px`,
@@ -690,7 +690,7 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
                 message: aiMessage,
               });
               await shareOrDownload(canvas);
-            } catch (e) { if (import.meta.env.DEV) console.error(e); }
+            } catch (e) { /* シェア生成失敗時は無視 */ }
             setSharing(false);
           }}
           disabled={sharing}

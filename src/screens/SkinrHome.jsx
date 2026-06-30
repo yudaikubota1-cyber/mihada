@@ -413,6 +413,7 @@ function BrandDirectoryRow({ brand, total, lines, products, px, isDesktop, delay
       <div style={{ position: 'relative', paddingBottom: 14 }}>
         <div
           ref={scrollRef}
+          className="skinr-snap-x"
           style={{
             display: 'flex',
             gap: 14,

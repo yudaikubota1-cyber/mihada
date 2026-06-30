@@ -61,7 +61,6 @@ export default function SkinrChat({ initialMessage, onComplete, onBack }) {
         ? 'ただいま混み合っています。少し待ってもう一度お試しください。'
         : '通信に失敗しました。もう一度お試しください。';
       setError(friendlyMsg);
-      if (import.meta.env.DEV) console.error(err);
     }
   };
 

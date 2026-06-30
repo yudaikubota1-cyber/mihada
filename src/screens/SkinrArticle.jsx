@@ -179,9 +179,9 @@ export default function SkinrArticle({ slug, onBack, onOpenProduct, onStartChat 
             <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16 }}>
               <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: '#B5B5B5', letterSpacing: '0.14em' }}>RECOMMENDED</span>
             </h2>
-            <div className="skinr-snap-x" style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 8 }}>
+            <div className="skinr-snap-x" style={{ display: 'flex', gap: 10, overflowX: 'auto', scrollSnapType: 'x mandatory', paddingBottom: 8 }}>
               {products.map(p => (
-                <div key={p.id} style={{ flex: '0 0 140px', cursor: 'pointer' }} onClick={() => onOpenProduct(p.id)}>
+                <div key={p.id} style={{ flex: '0 0 140px', cursor: 'pointer', scrollSnapAlign: 'start' }} onClick={() => onOpenProduct(p.id)}>
                   <div style={{
                     width: 140, height: 140, borderRadius: 10, overflow: 'hidden',
                     background: p.image ? '#fff' : (p.swatch || '#F0EDE8'),

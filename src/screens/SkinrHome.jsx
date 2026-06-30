@@ -418,6 +418,7 @@ function BrandDirectoryRow({ brand, total, lines, products, px, isDesktop, delay
             display: 'flex',
             gap: 14,
             overflowX: 'auto',
+            scrollSnapType: 'x mandatory',
             paddingLeft: px,
             paddingRight: px,
             scrollbarWidth: 'none',
@@ -429,7 +430,7 @@ function BrandDirectoryRow({ brand, total, lines, products, px, isDesktop, delay
           {imageProducts.map((p, i) => (
             <div
               key={p.id}
-              style={{ flexShrink: 0, width: cardW, textAlign: 'left' }}
+              style={{ flexShrink: 0, width: cardW, textAlign: 'left', scrollSnapAlign: 'start' }}
             >
               {/* 画像（クリックで詳細） */}
               <div
@@ -989,9 +990,9 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
                 </button>
               </div>
               {/* プレビュー横スクロール */}
-              <div className="skinr-scroll skinr-snap-x" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: `0 ${px} 16px`, scrollbarWidth: 'none' }}>
+              <div className="skinr-scroll skinr-snap-x" style={{ display: 'flex', gap: 12, overflowX: 'auto', scrollSnapType: 'x mandatory', padding: `0 ${px} 16px`, scrollbarWidth: 'none' }}>
                 {products.slice(0, isDesktop ? 5 : 4).map(p => (
-                  <div key={p.id} style={{ width: isDesktop ? 170 : 148, flexShrink: 0 }}>
+                  <div key={p.id} style={{ width: isDesktop ? 170 : 148, flexShrink: 0, scrollSnapAlign: 'start' }}>
                     <ProductCard product={p} onClick={() => onOpenProduct(p.id)} />
                   </div>
                 ))}

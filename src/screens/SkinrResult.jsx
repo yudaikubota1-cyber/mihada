@@ -108,6 +108,7 @@ function RakutenCard({ item }) {
       rel="noopener noreferrer"
       style={{
         flex: '0 0 120px',
+        scrollSnapAlign: 'start',
         display: 'flex', flexDirection: 'column',
         textDecoration: 'none', color: 'inherit',
       }}
@@ -244,6 +245,7 @@ function RakutenSection({ concerns, category, searchUrl, px = '24px' }) {
       <div className="skinr-scroll skinr-snap-x" style={{
         display: 'flex', gap: 10,
         overflowX: 'auto',
+        scrollSnapType: 'x mandatory',
         padding: `0 ${px} 14px`,
         WebkitOverflowScrolling: 'touch',
       }}>
@@ -282,7 +284,7 @@ function ResultProductCard({ product: p, idx, onDetail }) {
 
   return (
     <div
-      style={{ flex: '0 0 130px', cursor: 'pointer' }}
+      style={{ flex: '0 0 130px', cursor: 'pointer', scrollSnapAlign: 'start' }}
       onMouseDown={() => setPressed(true)}
       onMouseUp={() => setPressed(false)}
       onTouchStart={() => setPressed(true)}
@@ -618,6 +620,7 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
                 <div className="skinr-scroll skinr-snap-x" style={{
                   display: 'flex', gap: 12,
                   overflowX: 'auto',
+                  scrollSnapType: 'x mandatory',
                   padding: `0 ${px} 14px`,
                   WebkitOverflowScrolling: 'touch',
                 }}>

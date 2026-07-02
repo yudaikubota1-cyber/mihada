@@ -22,7 +22,8 @@ const BRAND_STORE_URL = {
   'Torriden': 'https://www.rakuten.co.jp/torriden-official/',
   'Centellian24': 'https://www.rakuten.co.jp/dongkook/',
   'ファンケル': 'https://www.rakuten.co.jp/fancl-shop/',
-  'Goodal': 'https://www.rakuten.co.jp/cliojapan/',
+  // キュレルは花王グループの一ブランドで単独公式ショップが存在しないため花王MALLのブランドページを採用
+  'キュレル': 'https://event.rakuten.co.jp/mc/kao-mall/brand/curel/',
 };
 
 // ── 診断チャットカード ─────────────────────────────────────

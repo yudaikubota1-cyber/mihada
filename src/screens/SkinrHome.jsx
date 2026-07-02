@@ -30,15 +30,6 @@ const BRAND_STORE_URL = {
 const G = '#111111';   // モノクロ・メイン
 const GD = '#000000';  // モノクロ・ダーク
 
-// キーワード分類マップ
-const CONCERN_KEYWORDS = {
-  '乾燥・保湿':   ['乾燥', 'かさつき', 'かさかさ', 'カサカサ', 'パサパサ', 'しっとり', '保湿', 'つっぱり', 'バリア', 'うるお', '乾いて', '皮むけ', 'ごわつき', 'ゴワつ', 'アトピー', 'インナードライ'],
-  '毛穴・黒ずみ': ['毛穴', '黒ずみ', '黒ずん', 'つまり', 'ざらつき', '角栓', 'ポア', 'テカリ', 'テカ', '皮脂', 'オイリー', 'べたつ', 'ベタつ', 'ザラザラ', '角質'],
-  'ニキビ・赤み': ['ニキビ', 'にきび', 'ぶつぶつ', '赤み', '赤く', '吹き出物', '炎症', '肌荒れ', 'アクネ', 'できもの', '荒れ', 'ぽつぽつ', 'コメド', '赤ら顔'],
-  'くすみ・シミ': ['くすみ', 'くすん', 'シミ', 'しみ', 'トーン', '明るく', '透明感', '色素', '暗い', 'くっきり', 'ブライトニング', '白く', '白い', '白さ', 'そばかす', '色白', 'ムラ', '均一'],
-  'たるみ・ハリ': ['たるみ', 'たるん', 'ハリ', 'はり', '弾力', 'リフト', 'しわ', 'シワ', '引き締め', 'たぷ', 'ほうれい線', '法令線', 'フェイスライン', '老け', 'エイジング', 'クマ', '目元'],
-};
-
 const CONCERN_OPTIONS = [
   { label: '乾燥・保湿',   sub: 'かさつき・バリアを整えたい' },
   { label: '毛穴・黒ずみ', sub: '毛穴を引き締めたい' },
@@ -53,13 +44,6 @@ const SKIN_TYPE_OPTIONS = [
   { label: '混合肌',    sub: 'Tゾーンのみテカる' },
   { label: 'わからない', sub: '自分の肌質に自信がない' },
 ];
-
-function classifyConcern(text) {
-  for (const [concern, keywords] of Object.entries(CONCERN_KEYWORDS)) {
-    if (keywords.some(kw => text.includes(kw))) return concern;
-  }
-  return null;
-}
 
 const INGR_MAP = {
   '乾燥肌':  { base: ['ヒアルロン酸Na','セラミド','グリセリン'] },
@@ -82,7 +66,7 @@ function getIngredients(skinType, concern) {
   return [...new Set([...c.slice(0, 2), ...base])].slice(0, 3);
 }
 
-function ChatDiagnosisCard({ onComplete }) {
+function ChatDiagnosisCard({ onComplete, onSendInline }) {
   // phase: 'init' | 'concern_input' | 'concern_followup' | 'skintype' | 'done'
   const [messages, setMessages]   = useState([]);
   const [typing, setTyping]       = useState(false);
@@ -118,26 +102,25 @@ function ChatDiagnosisCard({ onComplete }) {
   }, [phase]);
 
   // 自由記述の悩みを送信
+  // 初回の自由入力はキーワードマッチで即断定せず、必ずAI（Claude API）に渡して
+  // AIチャット画面で状態確認から応答を生成させる（型にはめる定型文を廃止）。
   const submitConcern = () => {
     const text = inputText.trim();
     if (!text) return;
     setInputText('');
+    if (onSendInline) {
+      // AIチャットへハンドオフ。1往復目の応答はすべてAI経由になる。
+      onSendInline(text);
+      return;
+    }
+    // フォールバック（AIチャット未接続時のみ）：選択式フォローアップに誘導
     setMessages(m => [...m, { role: 'user', text }]);
     setPhase('init');
     setTyping(true);
-
-    const matched = classifyConcern(text);
     setTimeout(() => {
-      if (matched) {
-        setConcern(matched);
-        setMessages(m => [...m, { role: 'ai', text: `「${matched}」のお悩みですね。\n次に、お肌のタイプを教えてください。` }]);
-        setTyping(false);
-        setPhase('skintype');
-      } else {
-        setMessages(m => [...m, { role: 'ai', text: 'ありがとうございます。\nお悩みに近いのはどちらですか？' }]);
-        setTyping(false);
-        setPhase('concern_followup');
-      }
+      setMessages(m => [...m, { role: 'ai', text: 'ありがとうございます。\nお悩みに近いのはどちらですか？' }]);
+      setTyping(false);
+      setPhase('concern_followup');
     }, 900);
   };
 
@@ -688,7 +671,7 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
 
           {/* 右: チャットカード */}
           <div style={{ flex: 1, minWidth: 0 }}>
-            <ChatDiagnosisCard onComplete={({ concern, skinType }) => {
+            <ChatDiagnosisCard onSendInline={onSendInline} onComplete={({ concern, skinType }) => {
               const st = skinType === 'わからない' ? '混合肌' : skinType;
               const concerns = QUICK_CONCERN_MAP[concern] || ['乾燥'];
               onQuickDiagnosis({
@@ -713,7 +696,7 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
           <p style={{ fontSize: 12, lineHeight: 1.65, color: '#999999', margin: '0 0 20px', fontWeight: 500 }}>
             悩みを入れるだけ。成分ロジックが一本に絞り込む。
           </p>
-          <ChatDiagnosisCard onComplete={({ concern, skinType }) => {
+          <ChatDiagnosisCard onSendInline={onSendInline} onComplete={({ concern, skinType }) => {
             const st = skinType === 'わからない' ? '混合肌' : skinType;
             const concerns = QUICK_CONCERN_MAP[concern] || ['乾燥'];
             onQuickDiagnosis({

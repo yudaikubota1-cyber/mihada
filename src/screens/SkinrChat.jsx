@@ -237,7 +237,7 @@ export default function SkinrChat({ initialMessage, onComplete, onBack }) {
               {/* 肌タイプチップ（症状/肌タイプ系の質問） */}
               {showSkinTypeChips && (
                 <div className="skinr-scroll" style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2 }}>
-                  {SKIN_TYPE_CHIPS.map((c, i) => (
+                  {SKIN_TYPE_CHIPS.filter(c => c && c.label).map((c, i) => (
                     <SkinTypeChip key={c.label} chip={c} onSend={handleSend} index={i} />
                   ))}
                 </div>
@@ -248,7 +248,7 @@ export default function SkinrChat({ initialMessage, onComplete, onBack }) {
                 <>
                   {(binaryOptions || showSkinTypeChips) && <div style={{ height: 1, background: 'var(--border)', margin: '10px 0' }} />}
                   <div className="skinr-scroll" style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2 }}>
-                    {CONCERN_CHIPS.map((c, i) => (
+                    {CONCERN_CHIPS.filter(c => c && c.label).map((c, i) => (
                       <Chip key={c.label} size="sm" onClick={() => handleSend(c.message)}>
                         {c.label}
                       </Chip>

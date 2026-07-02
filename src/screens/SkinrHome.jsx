@@ -326,18 +326,17 @@ function BrandDirectoryRow({ brand, total, lines, products, px, isDesktop, delay
           {imageProducts.map((p, i) => (
             <div
               key={p.id}
-              style={{ flexShrink: 0, width: cardW, textAlign: 'left', scrollSnapAlign: 'start' }}
+              onClick={() => onOpenProduct ? onOpenProduct(p.id) : onClick()}
+              style={{ flexShrink: 0, width: cardW, textAlign: 'left', scrollSnapAlign: 'start', cursor: 'pointer' }}
             >
-              {/* 画像（クリックで詳細） */}
+              {/* 画像（カード全体タップで詳細へ） */}
               <div
-                onClick={() => onOpenProduct ? onOpenProduct(p.id) : onClick()}
                 style={{
                   width: cardW, height: cardH,
                   borderRadius: 10, overflow: 'hidden',
                   background: p.swatch || '#F0EDE8',
                   border: '1px solid var(--border)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  cursor: 'pointer',
                 }}
               >
                 {p.image ? (
@@ -367,32 +366,24 @@ function BrandDirectoryRow({ brand, total, lines, products, px, isDesktop, delay
               <div style={{ fontSize: isDesktop ? 11 : 10, fontWeight: 700, color: '#1A1814', marginTop: 3 }}>
                 {p.price || '—'}
               </div>
-              {/* 詳細・購入ボタン */}
-              <div style={{ display: 'flex', gap: 4, marginTop: 6 }}>
-                <button
-                  onClick={() => onOpenProduct ? onOpenProduct(p.id) : onClick()}
-                  style={{
-                    flex: 1, padding: '4px 0', fontSize: 9, fontWeight: 600,
-                    fontFamily: 'inherit', cursor: 'pointer',
-                    border: '1px solid var(--border-strong)', borderRadius: 5,
-                    background: 'var(--bg-soft)', color: '#555',
-                    letterSpacing: '0.02em',
-                  }}
-                >詳細</button>
-                <button
-                  onClick={() => window.open(
+              {/* 購入ボタン1つのみ（黒背景白文字）。カード全体タップは詳細へ遷移 */}
+              <button
+                onClick={e => {
+                  e.stopPropagation();
+                  window.open(
                     p.url || `https://search.rakuten.co.jp/search/mall/${encodeURIComponent(p.nameJa || p.name)}/`,
                     '_blank', 'noopener'
-                  )}
-                  style={{
-                    flex: 1, padding: '4px 0', fontSize: 9, fontWeight: 700,
-                    fontFamily: 'inherit', cursor: 'pointer',
-                    border: 'none', borderRadius: 5,
-                    background: '#111111', color: '#fff',
-                    letterSpacing: '0.02em',
-                  }}
-                >購入</button>
-              </div>
+                  );
+                }}
+                style={{
+                  width: '100%', padding: '6px 0', marginTop: 6,
+                  fontSize: 10, fontWeight: 700,
+                  fontFamily: 'inherit', cursor: 'pointer',
+                  border: 'none', borderRadius: 5,
+                  background: '#111111', color: '#fff',
+                  letterSpacing: '0.04em',
+                }}
+              >{p.url ? '購入' : '商品ページを探す'}</button>
             </div>
           ))}
           {/* 末尾:もっと見るカード */}

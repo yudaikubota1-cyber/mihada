@@ -1,31 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { PRODUCTS, CATEGORIES, CONCERN_CHIPS, SKIN_TYPE_FILTER_CHIPS } from '../data/products.js';
+import { PRODUCTS, CATEGORIES, CONCERN_CHIPS, SKIN_TYPE_FILTER_CHIPS, BRAND_STORE_URL } from '../data/products.js';
 import {
   SkinrLogo, SkinrEyebrow, ProductImage, Icon,
   Chip, Divider, ProductCard, SiteFooter,
 } from '../components/shared.jsx';
 import { sendMessage, parseConfirmation } from '../lib/claude.js';
 
-// ── 公式ショップURL ─────────────────────────────────────────────
-const BRAND_STORE_URL = {
-  'ANUA': 'https://www.rakuten.co.jp/anuajapan/',
-  'MEDICUBE': 'https://www.rakuten.co.jp/apr-japan/',
-  'Numbuzin': 'https://www.rakuten.co.jp/numbuzin/',
-  'Dr.G': 'https://www.rakuten.co.jp/drg-japan/',
-  'dalba': 'https://www.rakuten.co.jp/dalba/',
-  'VT COSMETICS': 'https://www.rakuten.co.jp/vtcosmetic-official/',
-  'COSRX': 'https://www.rakuten.co.jp/cosrx-official/',
-  'SKIN1004': 'https://www.rakuten.co.jp/skin1004-official/',
-  'BIOHEAL BOH': 'https://www.rakuten.co.jp/biohealboh/',
-  '魔女工場': 'https://www.rakuten.co.jp/manyo-official/',
-  'innisfree': 'https://www.rakuten.co.jp/innisfree-official/',
-  'Abib': 'https://www.rakuten.co.jp/abibofficial/',
-  'Torriden': 'https://www.rakuten.co.jp/torriden-official/',
-  'Centellian24': 'https://www.rakuten.co.jp/dongkook/',
-  'ファンケル': 'https://www.rakuten.co.jp/fancl-shop/',
-  // キュレルは花王グループの一ブランドで単独公式ショップが存在しないため花王MALLのブランドページを採用
-  'キュレル': 'https://event.rakuten.co.jp/mc/kao-mall/brand/curel/',
-};
+// 公式ショップURL（BRAND_STORE_URL）は data/products.js に集約し import して使用
 
 // ── 診断チャットカード ─────────────────────────────────────
 const G = '#111111';   // モノクロ・メイン

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { PRODUCTS } from '../data/products.js';
+import { PRODUCTS, storeUrlFor } from '../data/products.js';
 import { INGREDIENT_DICT } from '../data/knowledge.js';
 import { buildRakutenSearchUrl, buildProductUrl, searchRakutenProducts } from '../lib/rakuten.js';
 import { generateShareImage, shareOrDownload } from '../lib/shareCard.js';
@@ -107,15 +107,15 @@ function RakutenCard({ item }) {
       target="_blank"
       rel="noopener noreferrer"
       style={{
-        flex: '0 0 120px',
+        flex: '0 0 150px',
         scrollSnapAlign: 'start',
         display: 'flex', flexDirection: 'column',
         textDecoration: 'none', color: 'inherit',
       }}
     >
-      {/* 画像 */}
+      {/* 画像（1:1 正方形・全カテゴリ共通サイズ） */}
       <div style={{
-        width: 120, height: 120, borderRadius: 8, overflow: 'hidden',
+        width: 150, height: 150, borderRadius: 10, overflow: 'hidden',
         background: '#F8F8F8', marginBottom: 8, flexShrink: 0,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         position: 'relative',
@@ -149,12 +149,11 @@ function RakutenCard({ item }) {
         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
       }}>{item.shop}</div>
 
-      {/* 商品名 */}
+      {/* 商品名（1行固定・省略記号でカード高さ統一） */}
       <div style={{
         fontSize: 11, fontWeight: 500, lineHeight: 1.4, color: '#111',
         marginBottom: 4,
-        display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
-        overflow: 'hidden',
+        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
       }}>{item.name}</div>
 
       {/* 価格 */}
@@ -194,10 +193,10 @@ function RakutenSection({ concerns, category, searchUrl, px = '24px' }) {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', gap: 10, padding: `0 ${px} 14px` }}>
+      <div style={{ display: 'flex', gap: 16, padding: `0 ${px} 14px` }}>
         {[1, 2, 3].map(i => (
           <div key={i} style={{
-            flex: '0 0 120px', height: 120, borderRadius: 8,
+            flex: '0 0 150px', height: 150, borderRadius: 10,
             background: 'linear-gradient(90deg, var(--bg-soft) 25%, var(--bg-warm) 50%, var(--bg-soft) 75%)',
             backgroundSize: '200% 100%',
             animation: 'skinrLoadBar 1.3s ease infinite',
@@ -218,7 +217,7 @@ function RakutenSection({ concerns, category, searchUrl, px = '24px' }) {
         background: 'linear-gradient(to right, transparent, #fff)',
       }} />
       <div className="skinr-scroll skinr-snap-x" style={{
-        display: 'flex', gap: 10,
+        display: 'flex', gap: 16,
         overflowX: 'auto',
         scrollSnapType: 'x mandatory',
         padding: `0 ${px} 14px`,
@@ -233,11 +232,11 @@ function RakutenSection({ concerns, category, searchUrl, px = '24px' }) {
           target="_blank"
           rel="noopener noreferrer"
           style={{
-            flex: '0 0 80px',
+            flex: '0 0 100px',
             display: 'flex', flexDirection: 'column',
             alignItems: 'center', justifyContent: 'center',
-            gap: 6, height: 120, alignSelf: 'flex-start',
-            border: '1px solid #E8E8E8', borderRadius: 8,
+            gap: 6, height: 150, alignSelf: 'flex-start',
+            border: '1px solid #E8E8E8', borderRadius: 10,
             background: 'var(--bg-soft)', textDecoration: 'none',
             padding: 12,
           }}
@@ -260,16 +259,16 @@ function ResultProductCard({ product: p, idx, onDetail }) {
   return (
     <div
       onClick={onDetail}
-      style={{ flex: '0 0 140px', cursor: 'pointer', scrollSnapAlign: 'start' }}
+      style={{ flex: '0 0 150px', cursor: 'pointer', scrollSnapAlign: 'start' }}
       onMouseDown={() => setPressed(true)}
       onMouseUp={() => setPressed(false)}
       onTouchStart={() => setPressed(true)}
       onTouchEnd={() => setPressed(false)}
     >
-      {/* 画像 */}
+      {/* 画像（1:1 正方形・全カテゴリ共通サイズ） */}
       <div
         style={{
-          width: 140, height: 140, borderRadius: 10, overflow: 'hidden',
+          width: 150, height: 150, borderRadius: 10, overflow: 'hidden',
           background: '#F8F8F8',
           marginBottom: 10, position: 'relative',
           boxShadow: pressed ? '0 2px 8px rgba(0,0,0,0.07)' : '0 4px 16px rgba(0,0,0,0.10)',
@@ -320,30 +319,25 @@ function ResultProductCard({ product: p, idx, onDetail }) {
         </div>
       </div>
 
-      {/* 購入ボタン（1つのみ・黒背景白文字）。カード全体タップは詳細へ遷移 */}
-      {p.url ? (
-        <a
-          href={p.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={e => e.stopPropagation()}
-          style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            padding: '8px 0',
-            background: '#111111', color: '#fff',
-            border: 'none', borderRadius: 6,
-            fontSize: 10, fontFamily: 'inherit', fontWeight: 600,
-            cursor: 'pointer', letterSpacing: '0.04em',
-            textDecoration: 'none',
-          }}
-        >
-          購入
-        </a>
-      ) : (
-        <div style={{ padding: '8px 0', textAlign: 'center', fontSize: 9, color: '#CCC', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.1em' }}>
-          準備中
-        </div>
-      )}
+      {/* 購入ボタン（1つのみ・黒背景白文字）。カード全体タップは詳細へ遷移。
+          url未設定でも公式ショップ導線にフォールバック（死に表示「準備中」は使わない） */}
+      <a
+        href={storeUrlFor(p)}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={e => e.stopPropagation()}
+        style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: '8px 0',
+          background: '#111111', color: '#fff',
+          border: 'none', borderRadius: 6,
+          fontSize: 10, fontFamily: 'inherit', fontWeight: 600,
+          cursor: 'pointer', letterSpacing: '0.04em',
+          textDecoration: 'none',
+        }}
+      >
+        {p.url ? '購入' : '商品ページを探す'}
+      </a>
     </div>
   );
 }
@@ -614,8 +608,8 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
                   <button
                     onClick={onBack}
                     style={{
-                      flex: '0 0 90px',
-                      height: 130, alignSelf: 'flex-start',
+                      flex: '0 0 100px',
+                      height: 150, alignSelf: 'flex-start',
                       border: '1px dashed #D8D8D8', borderRadius: 10,
                       background: 'var(--bg-soft)', cursor: 'pointer',
                       display: 'flex', flexDirection: 'column',

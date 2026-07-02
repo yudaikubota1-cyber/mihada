@@ -90,3 +90,32 @@ export const ROUTINE_STEPS = {
     { step: '05', label: 'キュレル クリーム', productId: '--98' },
   ],
 };
+
+// ブランド公式ショップURL（url未設定商品のフォールバック導線に使用）
+export const BRAND_STORE_URL = {
+  'ANUA': 'https://www.rakuten.co.jp/anuajapan/',
+  'MEDICUBE': 'https://www.rakuten.co.jp/apr-japan/',
+  'Numbuzin': 'https://www.rakuten.co.jp/numbuzin/',
+  'Dr.G': 'https://www.rakuten.co.jp/drg-japan/',
+  'dalba': 'https://www.rakuten.co.jp/dalba/',
+  'VT COSMETICS': 'https://www.rakuten.co.jp/vtcosmetic-official/',
+  'COSRX': 'https://www.rakuten.co.jp/cosrx-official/',
+  'SKIN1004': 'https://www.rakuten.co.jp/skin1004-official/',
+  'BIOHEAL BOH': 'https://www.rakuten.co.jp/biohealboh/',
+  '魔女工場': 'https://www.rakuten.co.jp/manyo-official/',
+  'innisfree': 'https://www.rakuten.co.jp/innisfree-official/',
+  'Abib': 'https://www.rakuten.co.jp/abibofficial/',
+  'Torriden': 'https://www.rakuten.co.jp/torriden-official/',
+  'Centellian24': 'https://www.rakuten.co.jp/dongkook/',
+  'ファンケル': 'https://www.rakuten.co.jp/fancl-shop/',
+  'キュレル': 'https://event.rakuten.co.jp/mc/kao-mall/brand/curel/',
+};
+
+// ブランド公式ショップ or 楽天検索へのフォールバックURLを返す
+export function storeUrlFor(product) {
+  if (product && product.url) return product.url;
+  const brand = product && product.brand;
+  if (brand && BRAND_STORE_URL[brand]) return BRAND_STORE_URL[brand];
+  const kw = encodeURIComponent(`${brand || ''} ${(product && (product.nameJa || product.name)) || ''}`.trim());
+  return `https://search.rakuten.co.jp/search/mall/${kw}/`;
+}

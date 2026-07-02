@@ -207,33 +207,8 @@ function RakutenSection({ concerns, category, searchUrl, px = '24px' }) {
     );
   }
 
-  if (items.length === 0) {
-    // APIが使えない場合は検索リンクボタンのみ
-    return (
-      <div style={{ padding: `0 ${px} 14px` }}>
-        <a
-          href={searchUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: 8,
-            padding: '10px 16px', borderRadius: 6,
-            border: '1px solid #E0E0E0', textDecoration: 'none',
-            background: 'var(--bg-soft)',
-          }}
-        >
-          <div style={{
-            width: 20, height: 20, borderRadius: '50%', background: '#111111',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <span style={{ color: '#fff', fontSize: 9, fontWeight: 700 }}>R</span>
-          </div>
-          <span style={{ fontSize: 12, color: '#555', fontWeight: 500 }}>楽天で探す</span>
-          <Icon name="arrowRight" size={14} color="#999" />
-        </a>
-      </div>
-    );
-  }
+  // 0件時は独立行を出さない（検索導線はセクションタイトル右端の「楽天で探す」に集約）
+  if (items.length === 0) return null;
 
   return (
     <div style={{ position: 'relative' }}>
@@ -284,7 +259,8 @@ function ResultProductCard({ product: p, idx, onDetail }) {
 
   return (
     <div
-      style={{ flex: '0 0 130px', cursor: 'pointer', scrollSnapAlign: 'start' }}
+      onClick={onDetail}
+      style={{ flex: '0 0 140px', cursor: 'pointer', scrollSnapAlign: 'start' }}
       onMouseDown={() => setPressed(true)}
       onMouseUp={() => setPressed(false)}
       onTouchStart={() => setPressed(true)}
@@ -292,11 +268,10 @@ function ResultProductCard({ product: p, idx, onDetail }) {
     >
       {/* 画像 */}
       <div
-        onClick={onDetail}
         style={{
-          width: 130, height: 130, borderRadius: 10, overflow: 'hidden',
+          width: 140, height: 140, borderRadius: 10, overflow: 'hidden',
           background: '#F8F8F8',
-          marginBottom: 8, position: 'relative',
+          marginBottom: 10, position: 'relative',
           boxShadow: pressed ? '0 2px 8px rgba(0,0,0,0.07)' : '0 4px 16px rgba(0,0,0,0.10)',
           transform: pressed ? 'scale(0.96)' : 'scale(1)',
           transition: 'all 0.15s ease',
@@ -306,6 +281,7 @@ function ResultProductCard({ product: p, idx, onDetail }) {
           <img
             src={p.image}
             alt={p.nameJa}
+            loading="lazy"
             onError={() => setImgError(true)}
             style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '8%' }}
           />
@@ -331,54 +307,43 @@ function ResultProductCard({ product: p, idx, onDetail }) {
         )}
       </div>
 
-      {/* テキスト情報 */}
-      <div onClick={onDetail}>
-        <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 7, letterSpacing: '0.14em', color: '#C0C0C0', marginBottom: 3 }}>
+      {/* テキスト情報（商品名は1行固定・省略記号で高さ統一） */}
+      <div style={{ padding: '0 2px' }}>
+        <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 7, letterSpacing: '0.14em', color: '#C0C0C0', marginBottom: 3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {p.brand}
         </div>
-        <div style={{ fontSize: 11, fontWeight: 500, lineHeight: 1.4, color: '#111', marginBottom: 5 }}>
+        <div style={{ fontSize: 11, fontWeight: 500, lineHeight: 1.4, color: '#111', marginBottom: 6, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {p.nameJa}
         </div>
-        <div style={{ fontSize: 11, fontWeight: 600, color: '#111', marginBottom: 5 }}>
+        <div style={{ fontSize: 11, fontWeight: 600, color: '#111', marginBottom: 8 }}>
           {p.price}
         </div>
       </div>
 
-      {/* アクションボタン行 */}
-      <div style={{ display: 'flex', gap: 5 }}>
-        {/* 詳細を見る */}
-        <button
-          onClick={onDetail}
+      {/* 購入ボタン（1つのみ・黒背景白文字）。カード全体タップは詳細へ遷移 */}
+      {p.url ? (
+        <a
+          href={p.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={e => e.stopPropagation()}
           style={{
-            flex: 1, padding: '6px 0',
-            background: '#111', color: '#fff',
-            border: 'none', borderRadius: 5,
-            fontSize: 9, fontFamily: 'inherit', fontWeight: 600,
-            cursor: 'pointer', letterSpacing: '0.02em',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: '8px 0',
+            background: '#111111', color: '#fff',
+            border: 'none', borderRadius: 6,
+            fontSize: 10, fontFamily: 'inherit', fontWeight: 600,
+            cursor: 'pointer', letterSpacing: '0.04em',
+            textDecoration: 'none',
           }}
         >
-          詳細
-        </button>
-        {/* 楽天で直接購入 */}
-        {p.url && (
-          <a
-            href={p.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              flex: 1, padding: '6px 0',
-              background: '#111111', color: '#fff',
-              border: 'none', borderRadius: 5,
-              fontSize: 9, fontFamily: 'inherit', fontWeight: 600,
-              cursor: 'pointer', letterSpacing: '0.02em',
-              textDecoration: 'none',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}
-          >
-            購入
-          </a>
-        )}
-      </div>
+          購入
+        </a>
+      ) : (
+        <div style={{ padding: '8px 0', textAlign: 'center', fontSize: 9, color: '#CCC', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.1em' }}>
+          準備中
+        </div>
+      )}
     </div>
   );
 }
@@ -419,7 +384,6 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
     cleansing: 'クレンジング', cleanser: '洗顔', toner: 'トナー', pad: 'パッド',
     serum: '美容液', cream: 'クリーム', mask: 'マスク', sunscreen: 'UV',
   };
-  const enabledKeys = new Set(categoryOrder.map(c => c.key));
   // 「すべて」選択時は全カテゴリ、それ以外は該当カテゴリのみ表示
   const visibleCategories = selectedCat === 'all'
     ? categoryOrder
@@ -561,14 +525,13 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
           WebkitOverflowScrolling: 'touch',
         }}
       >
-        {[{ key: 'all', label: 'すべて' }, ...FULL_CATEGORY_ORDER.map(c => ({ key: c.key, label: FILTER_LABELS[c.key] || c.label }))].map(f => {
-          const disabled = f.key !== 'all' && !enabledKeys.has(f.key);
+        {/* 該当商品0件のタブは非表示。選べるタブ（＋すべて）だけを表示する */}
+        {[{ key: 'all', label: 'すべて' }, ...categoryOrder.map(c => ({ key: c.key, label: FILTER_LABELS[c.key] || c.label }))].map(f => {
           const active = selectedCat === f.key;
           return (
             <button
               key={f.key}
-              onClick={() => { if (!disabled) setSelectedCat(f.key); }}
-              disabled={disabled}
+              onClick={() => setSelectedCat(f.key)}
               style={{
                 flexShrink: 0,
                 padding: '8px 14px',
@@ -578,10 +541,10 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
                 fontFamily: 'inherit',
                 fontWeight: 500,
                 whiteSpace: 'nowrap',
-                cursor: disabled ? 'default' : 'pointer',
+                cursor: 'pointer',
                 border: active ? '1px solid #111' : '1px solid #DDD',
-                background: active ? '#111' : disabled ? '#F5F5F5' : '#fff',
-                color: active ? '#fff' : disabled ? '#CCC' : '#555',
+                background: active ? '#111' : '#fff',
+                color: active ? '#fff' : '#555',
                 transition: 'all 0.12s ease',
               }}
             >
@@ -596,17 +559,32 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
         const rakutenUrl = rakutenUrls[cat.key];
         return (
           <div key={cat.key} style={{ padding: '20px 0 0' }}>
-            {/* カテゴリヘッダー */}
+            {/* カテゴリヘッダー（タイトル右端に「楽天で探す」を小さく配置） */}
             <div style={{
               display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
-              marginBottom: 12, padding: `0 ${px}`,
+              marginBottom: 12, padding: `0 ${px}`, gap: 10,
             }}>
               <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, letterSpacing: '0.18em', fontWeight: 500, color: '#111' }}>
                 {cat.key.toUpperCase()} · {cat.label}
               </span>
-              <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, letterSpacing: '0.16em', color: '#B5B5B5' }}>
-                STEP {cat.step}
-              </span>
+              <a
+                href={rakutenUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 4, flexShrink: 0,
+                  fontSize: 10, color: '#999', textDecoration: 'none', fontWeight: 500,
+                  letterSpacing: '0.04em',
+                }}
+              >
+                <span style={{
+                  width: 14, height: 14, borderRadius: '50%', background: '#111',
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  color: '#fff', fontSize: 7, fontWeight: 700,
+                }}>R</span>
+                楽天で探す
+                <Icon name="arrowRight" size={11} color="#BBB" />
+              </a>
             </div>
 
             {/* 自社DBの厳選商品（小さめカード） */}
@@ -618,7 +596,7 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
                   background: 'linear-gradient(to right, transparent, #fff)',
                 }} />
                 <div className="skinr-scroll skinr-snap-x" style={{
-                  display: 'flex', gap: 12,
+                  display: 'flex', gap: 16,
                   overflowX: 'auto',
                   scrollSnapType: 'x mandatory',
                   padding: `0 ${px} 14px`,

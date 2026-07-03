@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { PRODUCTS, storeUrlFor } from '../data/products.js';
-import { INGREDIENT_DICT } from '../data/knowledge.js';
+import { INGREDIENT_DICT, INGREDIENT_EVIDENCE } from '../data/knowledge.js';
 import { buildRakutenSearchUrl, buildProductUrl, searchRakutenProducts } from '../lib/rakuten.js';
 import { generateShareImage, shareOrDownload } from '../lib/shareCard.js';
 import {
@@ -49,6 +49,98 @@ function lookupIngEffect(name) {
   return dict?.effects || '';
 }
 
+// 成分名 → エビデンス（INGREDIENT_EVIDENCE を部分一致で照合）
+function lookupEvidence(name) {
+  // 括弧内の別名も拾えるよう、コア部分でも突き合わせる
+  const core = name.replace(/[（(].*?[）)]/g, '').trim();
+  return INGREDIENT_EVIDENCE.find(e => {
+    const en = e.name;
+    const ecore = en.replace(/[（(].*?[）)]/g, '').trim();
+    return en.includes(name) || name.includes(ecore) || ecore.includes(core) || core.includes(ecore);
+  }) || null;
+}
+
+// 展開式（アコーディオン）成分行 — タップで成分エビデンスの要約を表示
+function IngredientRow({ ing, index, isLast }) {
+  const [open, setOpen] = React.useState(false);
+  const ev = lookupEvidence(ing.name);
+  return (
+    <div style={{
+      borderBottom: !isLast ? '1px solid var(--border)' : 'none',
+      animation: `skinrFadeIn 0.3s ${0.08 + index * 0.07}s ease both`,
+    }}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center', gap: 14,
+          padding: '16px 0', background: 'none', border: 'none',
+          cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit',
+        }}
+      >
+        <span style={{
+          fontFamily: 'JetBrains Mono, monospace', fontSize: 10,
+          letterSpacing: '0.14em', color: '#C8C8C8',
+          minWidth: 20, flexShrink: 0,
+        }}>{String(index + 1).padStart(2, '0')}</span>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+            <span style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.01em' }}>{ing.name}</span>
+            <span style={{
+              fontSize: 9, fontFamily: 'JetBrains Mono, monospace',
+              letterSpacing: '0.08em', color: '#888',
+              background: '#EFEFEF', padding: '2px 7px', borderRadius: 3,
+              flexShrink: 0,
+            }}>{ing.category}</span>
+          </div>
+          <p style={{ margin: 0, fontSize: 12, color: '#888', lineHeight: 1.5 }}>{ing.effect}</p>
+        </div>
+        {/* 開閉インジケーター（＋ / −） */}
+        <span style={{
+          flexShrink: 0, width: 22, height: 22, borderRadius: '50%',
+          border: '1px solid var(--border)', color: '#999',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 14, lineHeight: 1,
+          transition: 'transform 0.2s ease', transform: open ? 'rotate(45deg)' : 'none',
+        }}>＋</span>
+      </button>
+
+      {/* 展開部：成分エビデンスの要約 */}
+      {open && (
+        <div style={{
+          padding: '2px 0 18px 34px',
+          animation: 'skinrFadeIn 0.2s ease both',
+        }}>
+          {ev ? (
+            <div style={{ background: 'var(--bg-soft)', borderRadius: 10, padding: '13px 15px' }}>
+              <p style={{ margin: '0 0 10px', fontSize: 12.5, lineHeight: 1.75, color: '#444' }}>
+                {ev.evidence}
+              </p>
+              <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                {ev.dose && (
+                  <div>
+                    <div style={{ fontSize: 9, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.12em', color: '#AAA', marginBottom: 2 }}>推奨濃度</div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: '#111' }}>{ev.dose}</div>
+                  </div>
+                )}
+                {ev.duration && (
+                  <div>
+                    <div style={{ fontSize: 9, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.12em', color: '#AAA', marginBottom: 2 }}>目安期間</div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: '#111' }}>{ev.duration}</div>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <p style={{ margin: 0, fontSize: 12, color: '#999', lineHeight: 1.6 }}>
+              {ing.name}（{ing.category}）— {ing.effect || 'スキンケアをサポートする成分です。'}
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ingredients フィールドが string[] か {name,effect}[] かを正規化する
 function normalizeIngredients(arr) {
   if (!Array.isArray(arr) || arr.length === 0) return [];
@@ -84,7 +176,7 @@ function resolveConcern(concern) {
   return concern;
 }
 
-function scoreProduct(product, concerns, skinType) {
+function scoreProduct(product, concerns, skinType, ingredient) {
   let score = 0;
   for (const concern of concerns) {
     const resolved = resolveConcern(concern);
@@ -95,6 +187,12 @@ function scoreProduct(product, concerns, skinType) {
   }
   const skinHaystack = [...(product.skinTypes || []), ...(product.forSkin || [])];
   if (skinType && skinHaystack.some(s => s === skinType || skinType.includes(s.replace('肌', '')))) score += 1;
+  // 成分名検索（#2 軽量案）: 指定成分を含む商品を強めに加点して上位に
+  if (ingredient) {
+    const core = ingredient.replace(/[（(].*?[）)]/g, '').trim();
+    const hay = [...(product.ingredients || []), ...(product.tags || [])];
+    if (hay.some(x => typeof x === 'string' && (x.includes(core) || core.includes(x)))) score += 4;
+  }
   return score;
 }
 
@@ -346,6 +444,7 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
   const skinType = diagnosis?.skin_type || '混合肌';
   const concerns = diagnosis?.concerns || ['乾燥', '毛穴の開き', 'くすみ'];
   const aiMessage = diagnosis?.message;
+  const searchIngredient = diagnosis?.ingredient || null; // 成分名検索時のみ設定
   const [sharing, setSharing] = useState(false);
   const [selectedCat, setSelectedCat] = useState('all');
 
@@ -367,7 +466,7 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
     FULL_CATEGORY_ORDER.map(cat => [
       cat.key,
       PRODUCTS.filter(p => p.category === cat.key)
-        .sort((a, b) => scoreProduct(b, concerns, skinType) - scoreProduct(a, concerns, skinType)),
+        .sort((a, b) => scoreProduct(b, concerns, skinType, searchIngredient) - scoreProduct(a, concerns, skinType, searchIngredient)),
     ])
   );
 
@@ -442,32 +541,22 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
           <span style={{ fontWeight: 700 }}>成分、{ingredients.length}つ。</span>
         </h1>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 0, marginTop: 24 }}>
+        {/* タップで成分の説明が開くヒント */}
+        <div style={{
+          fontSize: 11, color: '#AAA', marginTop: 20, marginBottom: 2,
+          display: 'flex', alignItems: 'center', gap: 5,
+          animation: 'skinrFadeIn 0.35s 0.25s ease both',
+        }}>
+          <span style={{ fontSize: 12 }}>＋</span> 成分名をタップすると、根拠と使い方が見られます
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 0, marginTop: 4 }}>
           {ingredients.map((ing, i) => (
-            <div key={ing.name} style={{
-              display: 'flex', alignItems: 'center', gap: 14,
-              padding: '16px 0',
-              borderBottom: i < ingredients.length - 1 ? '1px solid var(--border)' : 'none',
-              animation: `skinrFadeIn 0.3s ${0.08 + i * 0.07}s ease both`,
-            }}>
-              <span style={{
-                fontFamily: 'JetBrains Mono, monospace', fontSize: 10,
-                letterSpacing: '0.14em', color: '#C8C8C8',
-                minWidth: 20, flexShrink: 0,
-              }}>{String(i + 1).padStart(2, '0')}</span>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                  <span style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.01em' }}>{ing.name}</span>
-                  <span style={{
-                    fontSize: 9, fontFamily: 'JetBrains Mono, monospace',
-                    letterSpacing: '0.08em', color: '#888',
-                    background: '#EFEFEF', padding: '2px 7px', borderRadius: 3,
-                    flexShrink: 0,
-                  }}>{ing.category}</span>
-                </div>
-                <p style={{ margin: 0, fontSize: 12, color: '#888', lineHeight: 1.5 }}>{ing.effect}</p>
-              </div>
-            </div>
+            <IngredientRow
+              key={ing.name}
+              ing={ing}
+              index={i}
+              isLast={i === ingredients.length - 1}
+            />
           ))}
         </div>
 
@@ -481,6 +570,12 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
             letterSpacing: '0.14em', color: '#B8B8B8',
             border: '1px solid #EBEBEB', padding: '3px 8px', borderRadius: 999,
           }}>{skinType}</span>
+          {searchIngredient && (
+            <span style={{
+              padding: '3px 9px', borderRadius: 999,
+              background: '#111', color: '#fff', fontSize: 11, fontWeight: 600,
+            }}>{searchIngredient}</span>
+          )}
           {concerns.map(c => (
             <span key={c} style={{
               padding: '3px 9px', borderRadius: 999,

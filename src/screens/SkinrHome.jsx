@@ -177,49 +177,61 @@ function ChatDiagnosisCard({ onComplete }) {
             </div>
           )}
 
-          {/* 肌タイプ補助チップ（AIが肌タイプを尋ねたときのみ・空ラベルはスキップ） */}
+          {/* 肌タイプ補助チップ（AIが肌タイプを尋ねたときのみ）。
+              「または」＝入力が面倒な人向けのショートカット、という位置づけを明示 */}
           {askingSkinType && (
-            <div className="skinr-scroll" style={{ display: 'flex', flexWrap: 'wrap', gap: 6, margin: '2px 0 0 36px' }}>
-              {SKIN_TYPE_OPTIONS.filter(o => o && o.label).map(o => (
-                <button
-                  key={o.label}
-                  onClick={() => send(o.label)}
-                  style={{ padding: '7px 13px', borderRadius: 10, border: '1px solid var(--border)', background: 'var(--bg)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 12, fontWeight: 500, color: '#111', whiteSpace: 'nowrap' }}
-                >
-                  {o.label}
-                </button>
-              ))}
+            <div style={{ margin: '4px 0 0 36px' }}>
+              <div style={{ fontSize: 10, color: '#BBB', fontWeight: 500, letterSpacing: '0.06em', marginBottom: 6 }}>または、選択肢から</div>
+              <div className="skinr-scroll" style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                {SKIN_TYPE_OPTIONS.filter(o => o && o.label).map(o => (
+                  <button
+                    key={o.label}
+                    onClick={() => send(o.label)}
+                    style={{ padding: '5px 11px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 11, fontWeight: 500, color: '#777', whiteSpace: 'nowrap' }}
+                  >
+                    {o.label}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
         </div>
 
-        {/* ── 入力欄（常時アクティブ。確定後のみ非表示） ── */}
+        {/* ── 入力欄（メイン導線。確定後のみ非表示） ── */}
         {!done && (
-          <div style={{ padding: '12px 14px 14px', borderTop: '1px solid var(--border)' }}>
+          <div style={{ padding: '14px 16px 16px', borderTop: '1px solid var(--border)', background: '#FAFAFA' }}>
+            {/* 誘導コピー — 「文章で話しかける」ことがサービスの核心 */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 9 }}>
+              <Icon name="sparkle" size={13} color="#111" />
+              <span style={{ fontSize: 12, fontWeight: 600, color: '#111', letterSpacing: '0.01em' }}>
+                気になることを、文章で話しかけてください
+              </span>
+            </div>
             <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
               <input
                 ref={inputRef}
                 value={inputText}
                 onChange={e => setInputText(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
-                placeholder="例：最近頬が乾燥してファンデが浮く..."
+                placeholder="例：最近、頬が乾燥してファンデが浮くのが気になる…"
                 style={{
-                  flex: 1, padding: '11px 14px', borderRadius: 12,
-                  border: '1px solid #E0E0E0', background: '#FFFFFF',
-                  fontSize: 13, fontFamily: 'inherit', color: '#111111',
+                  flex: 1, padding: '15px 16px', borderRadius: 14,
+                  border: '1.5px solid #CCCCCC', background: '#FFFFFF',
+                  fontSize: 15, fontFamily: 'inherit', color: '#111111',
                   outline: 'none', transition: 'border-color 0.15s ease',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
                 }}
                 onFocus={e => e.currentTarget.style.borderColor = '#111111'}
-                onBlur={e => e.currentTarget.style.borderColor = '#E0E0E0'}
+                onBlur={e => e.currentTarget.style.borderColor = '#CCCCCC'}
               />
               <button
                 onClick={() => send()}
                 disabled={!inputText.trim() || typing}
                 style={{
-                  padding: '11px 18px', borderRadius: 12, border: 'none', flexShrink: 0,
+                  padding: '15px 20px', borderRadius: 14, border: 'none', flexShrink: 0,
                   background: (inputText.trim() && !typing) ? '#111111' : '#E0E0E0',
                   color: (inputText.trim() && !typing) ? '#fff' : '#999999',
-                  fontSize: 13, fontWeight: 600,
+                  fontSize: 14, fontWeight: 700,
                   cursor: (inputText.trim() && !typing) ? 'pointer' : 'default',
                   fontFamily: 'inherit', transition: 'all 0.15s ease',
                 }}

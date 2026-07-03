@@ -549,7 +549,9 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
       </div>
 
       {visibleCategories.map(cat => {
-        const items = (byCategory[cat.key] || []).slice(0, 5);
+        const allInCat = byCategory[cat.key] || [];
+        const items = allInCat.slice(0, 5);
+        const hasMore = allInCat.length > items.length; // 6件以上ある時だけ SEE MORE を出す
         const rakutenUrl = rakutenUrls[cat.key];
         return (
           <div key={cat.key} style={{ padding: '20px 0 0' }}>
@@ -604,24 +606,29 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
                       onDetail={() => onOpenProduct(p.id)}
                     />
                   ))}
-                  {/* SEE MORE — 商品一覧へ */}
-                  <button
-                    onClick={onBack}
-                    style={{
-                      flex: '0 0 100px',
-                      height: 150, alignSelf: 'flex-start',
-                      border: '1px dashed #D8D8D8', borderRadius: 10,
-                      background: 'var(--bg-soft)', cursor: 'pointer',
-                      display: 'flex', flexDirection: 'column',
-                      alignItems: 'center', justifyContent: 'center', gap: 6,
-                      fontFamily: 'inherit',
-                    }}
-                  >
-                    <Icon name="arrowRight" size={18} color="#999" />
-                    <span style={{ fontSize: 9, color: '#999', textAlign: 'center', lineHeight: 1.5, letterSpacing: '0.04em' }}>
-                      SEE<br />MORE
-                    </span>
-                  </button>
+                  {/* SEE MORE — 追加商品がある時だけ表示し、該当カテゴリの一覧へ遷移
+                      （以前は onBack でホームに戻ってしまう不具合があった） */}
+                  {hasMore && (
+                    <button
+                      onClick={() => onViewCategory
+                        ? onViewCategory(cat.key, allInCat.map(p => p.id), cat.label)
+                        : onBack()}
+                      style={{
+                        flex: '0 0 100px',
+                        height: 150, alignSelf: 'flex-start',
+                        border: '1px dashed #D8D8D8', borderRadius: 10,
+                        background: 'var(--bg-soft)', cursor: 'pointer',
+                        display: 'flex', flexDirection: 'column',
+                        alignItems: 'center', justifyContent: 'center', gap: 6,
+                        fontFamily: 'inherit',
+                      }}
+                    >
+                      <Icon name="arrowRight" size={18} color="#999" />
+                      <span style={{ fontSize: 9, color: '#999', textAlign: 'center', lineHeight: 1.5, letterSpacing: '0.04em' }}>
+                        SEE<br />MORE
+                      </span>
+                    </button>
+                  )}
                 </div>
               </div>
             )}

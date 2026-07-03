@@ -243,10 +243,14 @@ export default function SkinrChat({ initialMessage, onComplete, onBack }) {
                 </div>
               )}
 
-              {/* 最初のターンのみ：悩みチップも表示 */}
+              {/* 最初のターンのみ：悩みチップ。
+                  「文章で話しかける」がメイン導線。チップは入力が面倒な人向けのショートカットと明示する */}
               {isFirstTurn && (
                 <>
                   {(binaryOptions || showSkinTypeChips) && <div style={{ height: 1, background: 'var(--border)', margin: '10px 0' }} />}
+                  <div style={{ fontSize: 10, color: '#BBB', fontWeight: 500, letterSpacing: '0.06em', margin: '2px 0 6px' }}>
+                    または、よくあるお悩みから選ぶ
+                  </div>
                   <div className="skinr-scroll" style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2 }}>
                     {CONCERN_CHIPS.filter(c => c && c.label).map((c, i) => (
                       <Chip key={c.label} size="sm" onClick={() => handleSend(c.message)}>

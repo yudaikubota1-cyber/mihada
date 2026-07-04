@@ -440,13 +440,73 @@ function ResultProductCard({ product: p, idx, onDetail }) {
   );
 }
 
+// ── スロット絞り込み用ヘルパー ─────────────────────────────
+// カテゴリ表記（ラベル/同義語）→ 内部カテゴリID
+// 注: このDBではクレンジング/洗顔はいずれも category="cleanser" に格納されている
+// （"cleansing" idは実データが無い）ため、両方 cleanser に解決する。
+const CATEGORY_LABEL_TO_ID = [
+  [['クレンジング', 'クレンジングオイル', 'クレンジングバーム', 'メイク落とし', '洗顔', '洗顔料', '洗顔フォーム', 'フォームクレンザー', 'クレンザー'], 'cleanser'],
+  [['トナー', '化粧水', 'スキンブースター', '導入'], 'toner'],
+  [['パッド', 'トナーパッド', '拭き取り'], 'pad'],
+  [['美容液', 'セラム', 'アンプル', 'エッセンス'], 'serum'],
+  [['クリーム', '乳液', 'モイスチャライザー', 'ジェル'], 'cream'],
+  [['マスク', 'シートマスク', 'パック'], 'mask'],
+  [['日焼け止め', 'UV', 'サンスクリーン', 'サンクリーム', 'サンセラム'], 'sunscreen'],
+];
+function resolveCategoryId(label) {
+  if (!label) return null;
+  for (const [names, id] of CATEGORY_LABEL_TO_ID) {
+    if (names.some(n => label.includes(n) || n.includes(label))) return id;
+  }
+  return null;
+}
+// "¥2,970" / "¥32,000~" → 2970 / 32000
+function parsePrice(price) {
+  if (typeof price !== 'string') return NaN;
+  const digits = price.replace(/[^\d]/g, '');
+  return digits ? Number(digits) : NaN;
+}
+// 商品が指定成分を含むか（ingredients / tags を照合）
+function productHasIngredient(product, ingredient) {
+  const core = ingredient.replace(/[（(].*?[）)]/g, '').trim();
+  const hay = [...(product.ingredients || []), ...(product.tags || [])];
+  return hay.some(x => typeof x === 'string' && (x.includes(core) || core.includes(x)));
+}
+// ブランド名の緩い一致
+function productMatchesBrand(product, brand) {
+  const a = (product.brand || '').toLowerCase().replace(/\s/g, '');
+  const b = brand.toLowerCase().replace(/\s/g, '');
+  return a === b || a.includes(b) || b.includes(a);
+}
+
 export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduct, onNewChat, onViewCategory, onViewAll }) {
+  // ── スロット抽出 ──
+  const searchIngredient = diagnosis?.ingredient || null;
+  const searchBrand      = diagnosis?.brand || null;
+  const searchCategoryId = resolveCategoryId(diagnosis?.category);
+  const maxPrice         = (diagnosis?.max_price != null && diagnosis?.max_price !== '') ? Number(diagnosis.max_price) : null;
+  const hasSlotFilter    = !!(searchIngredient || searchBrand || searchCategoryId || (maxPrice != null && !isNaN(maxPrice)));
+
   const skinType = diagnosis?.skin_type || '混合肌';
-  const concerns = diagnosis?.concerns || ['乾燥', '毛穴の開き', 'くすみ'];
+  // 決定的スロットがある場合は無関係なデフォルト悩みを注入しない
+  const concerns = (diagnosis?.concerns && diagnosis.concerns.length)
+    ? diagnosis.concerns
+    : (hasSlotFilter ? [] : ['乾燥', '毛穴の開き', 'くすみ']);
   const aiMessage = diagnosis?.message;
-  const searchIngredient = diagnosis?.ingredient || null; // 成分名検索時のみ設定
   const [sharing, setSharing] = useState(false);
   const [selectedCat, setSelectedCat] = useState('all');
+
+  // ── 全スロットを AND 条件でハード絞り込み ──
+  const pool = PRODUCTS.filter(p => {
+    if (searchBrand && !productMatchesBrand(p, searchBrand)) return false;
+    if (searchIngredient && !productHasIngredient(p, searchIngredient)) return false;
+    if (searchCategoryId && p.category !== searchCategoryId) return false;
+    if (maxPrice != null && !isNaN(maxPrice)) {
+      const pr = parsePrice(p.price);
+      if (isNaN(pr) || pr > maxPrice) return false;
+    }
+    return true;
+  });
 
   const today = new Date();
   const dateStr = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
@@ -465,7 +525,7 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
   const byCategory = Object.fromEntries(
     FULL_CATEGORY_ORDER.map(cat => [
       cat.key,
-      PRODUCTS.filter(p => p.category === cat.key)
+      pool.filter(p => p.category === cat.key)
         .sort((a, b) => scoreProduct(b, concerns, skinType, searchIngredient) - scoreProduct(a, concerns, skinType, searchIngredient)),
     ])
   );
@@ -565,17 +625,22 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
           marginTop: 20, flexWrap: 'wrap',
           animation: 'skinrFadeIn 0.35s 0.3s ease both',
         }}>
-          <span style={{
-            fontFamily: 'JetBrains Mono, monospace', fontSize: 9,
-            letterSpacing: '0.14em', color: '#B8B8B8',
-            border: '1px solid #EBEBEB', padding: '3px 8px', borderRadius: 999,
-          }}>{skinType}</span>
-          {searchIngredient && (
+          {diagnosis?.skin_type && (
             <span style={{
-              padding: '3px 9px', borderRadius: 999,
-              background: '#111', color: '#fff', fontSize: 11, fontWeight: 600,
-            }}>{searchIngredient}</span>
+              fontFamily: 'JetBrains Mono, monospace', fontSize: 9,
+              letterSpacing: '0.14em', color: '#B8B8B8',
+              border: '1px solid #EBEBEB', padding: '3px 8px', borderRadius: 999,
+            }}>{skinType}</span>
           )}
+          {/* スロット絞り込みチップ（成分・ブランド・カテゴリ・予算）= 黒 */}
+          {[searchBrand, searchIngredient, diagnosis?.category,
+            (maxPrice != null && !isNaN(maxPrice)) ? `〜¥${maxPrice.toLocaleString()}` : null]
+            .filter(Boolean).map(s => (
+              <span key={s} style={{
+                padding: '3px 9px', borderRadius: 999,
+                background: '#111', color: '#fff', fontSize: 11, fontWeight: 600,
+              }}>{s}</span>
+          ))}
           {concerns.map(c => (
             <span key={c} style={{
               padding: '3px 9px', borderRadius: 999,
@@ -642,6 +707,28 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
           );
         })}
       </div>
+
+      {/* 0件フォールバック（スロット絞り込みで該当なし） */}
+      {categoryOrder.length === 0 && (
+        <div style={{ padding: `48px ${px}`, textAlign: 'center' }}>
+          <div style={{ fontSize: 15, fontWeight: 600, color: '#111', marginBottom: 8 }}>
+            条件に合う商品が見つかりませんでした
+          </div>
+          <p style={{ fontSize: 13, color: '#999', lineHeight: 1.7, margin: '0 0 20px' }}>
+            条件を少し広げるか、別の言葉でもう一度教えてください。
+          </p>
+          <button
+            onClick={onNewChat}
+            style={{
+              padding: '12px 24px', borderRadius: 8, border: 'none',
+              background: '#111', color: '#fff', fontSize: 13, fontWeight: 600,
+              fontFamily: 'inherit', cursor: 'pointer',
+            }}
+          >
+            条件を変えて相談する
+          </button>
+        </div>
+      )}
 
       {visibleCategories.map(cat => {
         const allInCat = byCategory[cat.key] || [];

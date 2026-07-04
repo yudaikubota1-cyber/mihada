@@ -67,10 +67,17 @@ export function parseConfirmation(text) {
     const match = text.match(/\{[\s\S]*?"status"\s*:\s*"confirmed"[\s\S]*?\}/);
     if (!match) return null;
     const parsed = JSON.parse(match[0]);
-    if (parsed.status === 'confirmed' && parsed.skin_type && parsed.concerns) {
-      return parsed;
-    }
-    return null;
+    if (parsed.status !== 'confirmed') return null;
+    // スロット埋め方式: skin_type/concerns 以外に ingredient/brand/category/max_price の
+    // いずれか1つでも埋まっていれば確定として受理する（成分・ブランド単独検索に対応）。
+    const hasSlot =
+      parsed.skin_type ||
+      (Array.isArray(parsed.concerns) && parsed.concerns.length > 0) ||
+      parsed.ingredient ||
+      parsed.brand ||
+      parsed.category ||
+      (parsed.max_price != null && parsed.max_price !== '');
+    return hasSlot ? parsed : null;
   } catch {
     return null;
   }

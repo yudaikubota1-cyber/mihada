@@ -52,7 +52,7 @@ function ChatDiagnosisCard({ onComplete }) {
   // ホーム画面に埋め込まれたインラインAIチャット。全画面には切り替えない。
   // 会話はすべて Claude API 経由で進み、確定(JSON)時に onComplete(diagnosis) で
   // 結果画面へ遷移する（キーワードマッチによる即断定・定型文は使わない）。
-  const INTRO = '今、気になっていることを教えてください。成分ロジックから、あなたに合う一本を見つけます。';
+  const INTRO = '今、気になっていることを教えてください。文章でも、下のボタンでもどちらでもお答えください。成分ロジックから、あなたに合う一本を見つけます。';
   const [messages, setMessages]   = useState([]);      // 表示用 { role:'ai'|'user', text, isFirst? }
   const [history, setHistory]     = useState([]);      // Claude形式 { role, content }
   const [typing, setTyping]       = useState(false);

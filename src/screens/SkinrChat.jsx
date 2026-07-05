@@ -4,7 +4,7 @@ import { SkinrLogo, SkinrEyebrow, Icon, Chip } from '../components/shared.jsx';
 import { sendMessage, parseConfirmation } from '../lib/claude.js';
 
 export default function SkinrChat({ initialMessage, onComplete, onBack }) {
-  const INITIAL_AI_MESSAGE = '今、気になっていることを教えてください。成分ロジックから、あなたに合う一本を見つけます。';
+  const INITIAL_AI_MESSAGE = '今、気になっていることを教えてください。文章でも、下のボタンでもどちらでもお答えください。成分ロジックから、あなたに合う一本を見つけます。';
 
   // history: Anthropic形式 { role: 'user'|'assistant', content: string }
   const [history, setHistory] = useState([]);
@@ -298,7 +298,7 @@ export default function SkinrChat({ initialMessage, onComplete, onBack }) {
               // キーボード表示で入力欄が隠れないようにスクロール
               setTimeout(() => e.target.scrollIntoView({ block: 'center', behavior: 'smooth' }), 300);
             }}
-            placeholder={messages.length === 1 ? '例：最近頬が乾燥してファンデが浮く...' : 'メッセージを入力、または選択肢をタップ…'}
+            placeholder={messages.length === 1 ? '自由に書いても、下から選んでもOK（例：頬が乾燥してファンデが浮く）' : 'メッセージを入力、または選択肢をタップ…'}
             rows={1}
             style={{
               flex: 1,

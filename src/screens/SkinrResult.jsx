@@ -546,17 +546,42 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
     : categoryOrder.filter(cat => cat.key === selectedCat);
 
   const topProducts = categoryOrder.map(cat => (byCategory[cat.key] || [])[0]).filter(Boolean);
-  const ingredients = topProducts
-    .flatMap(p => {
-      const names = normalizeIngredients(p.ingredients).slice(0, 2);
-      return names.map(name => ({
-        name,
-        effect: lookupIngEffect(name),
-        category: getIngCategory(name),
-      }));
-    })
-    .filter((ing, i, arr) => arr.findIndex(x => x.name === ing.name) === i)
-    .slice(0, 5);
+
+  let ingredients;
+  if (searchIngredient) {
+    // 成分名を直接指定した場合：その成分に完全一致するもののみ表示する。
+    // 悩みベースの複数成分推奨はバイパスし、無関係な成分（ナイアシンアミド等）を混ぜない。
+    // 同一成分の濃度・派生バリエーション（例：レチノール0.3% / バイオレチノール）は許容する。
+    const core = searchIngredient.replace(/[（(].*?[）)]/g, '').trim();
+    const variants = [...new Set(
+      pool.flatMap(p => normalizeIngredients(p.ingredients))
+        .filter(n => n.includes(core) || core.includes(n))
+    )];
+    // 指定成分そのものを先頭に、次いで派生バリエーション
+    const ordered = [
+      ...variants.filter(v => v === searchIngredient),
+      ...variants.filter(v => v !== searchIngredient),
+    ];
+    const finalNames = ordered.length ? ordered : [searchIngredient];
+    ingredients = finalNames.slice(0, 5).map(name => ({
+      name,
+      effect: lookupIngEffect(name),
+      category: getIngCategory(name),
+    }));
+  } else {
+    // 通常（悩み/肌タイプベース）：上位商品の成分表から導出
+    ingredients = topProducts
+      .flatMap(p => {
+        const names = normalizeIngredients(p.ingredients).slice(0, 2);
+        return names.map(name => ({
+          name,
+          effect: lookupIngEffect(name),
+          category: getIngCategory(name),
+        }));
+      })
+      .filter((ing, i, arr) => arr.findIndex(x => x.name === ing.name) === i)
+      .slice(0, 5);
+  }
 
   const rakutenUrls = Object.fromEntries(
     categoryOrder.map(cat => [cat.key, buildRakutenSearchUrl({ concerns, category: cat.key })])

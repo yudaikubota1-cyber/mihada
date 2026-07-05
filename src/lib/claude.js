@@ -1,61 +1,30 @@
-import { SYSTEM_PROMPT } from '../prompts/systemPrompt.js';
+// AIチャットは /api/chat（Vercelサーバーレス関数）経由で呼び出す。
+// APIキー・システムプロンプトはサーバー側のみで保持し、クライアントには一切含めない。
+// リトライ／モデルフォールバックはサーバー側で完結する。
 
-const PRIMARY_MODEL = 'gemini-2.5-flash';
-const FALLBACK_MODEL = 'gemini-2.0-flash-001';
-const MAX_RETRIES = 3;
-
-async function callGemini(model, messages) {
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-
-  const contents = messages.map(m => ({
-    role: m.role === 'user' ? 'user' : 'model',
-    parts: [{ text: m.content }],
-  }));
-
-  const res = await fetch(url, {
+/**
+ * サーバーレス関数 /api/chat にメッセージを送信し、AIの返答テキストを返す。
+ * messages: [{ role: 'user'|'assistant', content: string }]
+ */
+export async function sendMessage(messages) {
+  const res = await fetch('/api/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-      contents,
-    }),
+    body: JSON.stringify({ messages }),
   });
 
   if (!res.ok) {
-    const errText = await res.text();
-    const status = res.status;
-    throw Object.assign(new Error(`Gemini API ${status}: ${errText}`), { status });
+    let msg = `Chat API ${res.status}`;
+    try {
+      const e = await res.json();
+      if (e && e.error) msg = e.error;
+    } catch { /* ignore */ }
+    // 混雑系ステータスは呼び出し側の「混み合っています」表示に使われる
+    throw Object.assign(new Error(msg), { status: res.status });
   }
 
   const data = await res.json();
-  return data.candidates[0].content.parts[0].text;
-}
-
-/**
- * リトライ＋フォールバック付きでGeminiにメッセージを送信する。
- */
-export async function sendMessage(messages) {
-  const models = [PRIMARY_MODEL, FALLBACK_MODEL];
-
-  for (const model of models) {
-    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-      try {
-        return await callGemini(model, messages);
-      } catch (err) {
-        const isRetryable = err.status === 503 || err.status === 429;
-        const isLastAttempt = attempt === MAX_RETRIES;
-        const isLastModel = model === models[models.length - 1];
-
-        if (isRetryable && !isLastAttempt) {
-          await new Promise(r => setTimeout(r, attempt * 1500));
-          continue;
-        }
-        if (isLastAttempt && !isLastModel) break; // 次のモデルへ
-        if (isLastAttempt && isLastModel) throw err;
-      }
-    }
-  }
+  return data.text;
 }
 
 /**

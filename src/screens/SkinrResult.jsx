@@ -495,6 +495,9 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
   const aiMessage = diagnosis?.message;
   const [sharing, setSharing] = useState(false);
   const [selectedCat, setSelectedCat] = useState('all');
+  // カテゴリごとの「その場で展開」状態（SEE MORE でインライン展開／再タップで折りたたみ）
+  const [expandedCats, setExpandedCats] = useState({});
+  const toggleExpand = (key) => setExpandedCats(s => ({ ...s, [key]: !s[key] }));
 
   // ── 全スロットを AND 条件でハード絞り込み ──
   const pool = PRODUCTS.filter(p => {
@@ -732,8 +735,9 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
 
       {visibleCategories.map(cat => {
         const allInCat = byCategory[cat.key] || [];
-        const items = allInCat.slice(0, 5);
-        const hasMore = allInCat.length > items.length; // 6件以上ある時だけ SEE MORE を出す
+        const expanded = !!expandedCats[cat.key];
+        const items = expanded ? allInCat : allInCat.slice(0, 5); // 展開時は全件、通常は5件
+        const hasMore = allInCat.length > 5; // 6件以上ある時だけ SEE MORE / 閉じる を出す
         const rakutenUrl = rakutenUrls[cat.key];
         return (
           <div key={cat.key} style={{ padding: '20px 0 0' }}>
@@ -788,13 +792,10 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
                       onDetail={() => onOpenProduct(p.id)}
                     />
                   ))}
-                  {/* SEE MORE — 追加商品がある時だけ表示し、該当カテゴリの一覧へ遷移
-                      （以前は onBack でホームに戻ってしまう不具合があった） */}
+                  {/* SEE MORE / 閉じる — 画面遷移せず、その場でインライン展開・折りたたみ */}
                   {hasMore && (
                     <button
-                      onClick={() => onViewCategory
-                        ? onViewCategory(cat.key, allInCat.map(p => p.id), cat.label)
-                        : onBack()}
+                      onClick={() => toggleExpand(cat.key)}
                       style={{
                         flex: '0 0 100px',
                         height: 150, alignSelf: 'flex-start',
@@ -805,9 +806,9 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
                         fontFamily: 'inherit',
                       }}
                     >
-                      <Icon name="arrowRight" size={18} color="#999" />
+                      <span style={{ fontSize: 20, color: '#999', lineHeight: 1 }}>{expanded ? '×' : '＋'}</span>
                       <span style={{ fontSize: 9, color: '#999', textAlign: 'center', lineHeight: 1.5, letterSpacing: '0.04em' }}>
-                        SEE<br />MORE
+                        {expanded ? '閉じる' : <>SEE<br />MORE<br />(+{allInCat.length - 5})</>}
                       </span>
                     </button>
                   )}

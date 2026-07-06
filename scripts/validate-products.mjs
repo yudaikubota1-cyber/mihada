@@ -63,17 +63,98 @@ if (dupes.length) {
   for (const id of [...new Set(dupes)]) console.error(`  ✗ 重複 id: ${id}`);
 }
 
+// ═══ 以下は「警告」: ビルドは止めず、人間の確認を促すためのレポートのみ ═══
+const { BRAND_STORE_URL } = data;
+
+// URLから楽天の店舗スラッグを抽出（アフィリンクは pc= を復号してから）
+function extractShopSlug(url) {
+  if (typeof url !== 'string' || !url) return null;
+  let target = url;
+  try {
+    const u = new URL(url);
+    const pc = u.searchParams.get('pc');
+    if (pc) target = decodeURIComponent(pc);
+  } catch { /* URLでなければそのまま */ }
+  // search.rakuten.co.jp（検索結果ページ）は店舗特定不可
+  if (/search\.rakuten\.co\.jp/.test(target)) return null;
+  const m = target.match(/(?:item\.|www\.|event\.)?rakuten\.co\.jp\/(?:mc\/)?([^/]+)\//);
+  return m ? m[1] : null;
+}
+
+// ── 警告② : url が対応ブランドの公式ショップ・ドメイン配下にあるか ──
+const urlWarnings = [];
+for (const p of PRODUCTS) {
+  if (p.brand === 'キュレル') continue; // 単独公式ショップが無い（花王正規取扱店網）ため対象外
+  const official = BRAND_STORE_URL && BRAND_STORE_URL[p.brand];
+  if (!official) continue;
+  const officialSlug = extractShopSlug(official);
+  const productSlug = extractShopSlug(p.url);
+  if (!officialSlug || !productSlug) continue; // 検索URL等は判定不可
+  if (productSlug !== officialSlug) {
+    urlWarnings.push({ id: p.id, brand: p.brand, name: p.nameJa || p.name, officialSlug, productSlug });
+  }
+}
+
+// ── 警告④ : 重複候補（正規化名 / 同一url / 同一画像）──
+function normName(s) {
+  return (s || '')
+    .replace(/[（(].*?[）)]/g, '')                 // 括弧内
+    .replace(/\d+(\.\d+)?\s*(ml|mL|g|G|枚|本|回|ea)/g, '') // 容量
+    .replace(/spf\s*\d+|pa\++/gi, '')             // SPF/PA
+    .replace(/\d+(\.\d+)?%?/g, '')                 // 数字・濃度
+    .replace(/no\.?|ナンバーズイン|番/gi, '')
+    .replace(/[\s　・\-/、,。.【】\[\]#]/g, '')
+    .toLowerCase();
+}
+const dupWarnings = [];
+const groupBy = (keyFn) => {
+  const map = new Map();
+  for (const p of PRODUCTS) {
+    const k = keyFn(p);
+    if (!k) continue;
+    (map.get(k) || map.set(k, []).get(k)).push(p);
+  }
+  return [...map.values()].filter(g => g.length > 1);
+};
+for (const g of groupBy(p => normName(p.nameJa))) {
+  dupWarnings.push({ reason: '正規化名が一致', ids: g.map(p => p.id), sample: g[0].nameJa });
+}
+for (const g of groupBy(p => p.url)) {
+  dupWarnings.push({ reason: '同一url', ids: g.map(p => p.id), sample: g[0].nameJa });
+}
+for (const g of groupBy(p => (p.image || '').split('?')[0])) {
+  dupWarnings.push({ reason: '同一画像URL', ids: g.map(p => p.id), sample: g[0].nameJa });
+}
+
 // ── レポート ───────────────────────────────────────────
 console.log('─'.repeat(48));
 console.log(`商品データバリデーション`);
 console.log(`  PRODUCTS 総件数: ${PRODUCTS.length}`);
-console.log(`  1) 必須フィールド欠損: ${missing.length}件`);
-console.log(`  2) 配列への商品混入 : ${intruders.length}件`);
-console.log(`  3) 重複ID           : ${[...new Set(dupes)].length}件`);
+console.log(`  [エラー] 1) 必須フィールド欠損: ${missing.length}件`);
+console.log(`  [エラー] 2) 配列への商品混入 : ${intruders.length}件`);
+console.log(`  [エラー] 3) 重複ID           : ${[...new Set(dupes)].length}件`);
+console.log(`  [警告]  4) URL≠公式ドメイン  : ${urlWarnings.length}件`);
+console.log(`  [警告]  5) 重複候補          : ${dupWarnings.length}組`);
 console.log('─'.repeat(48));
 
+if (urlWarnings.length) {
+  console.log('\n⚠ 警告④: url が公式ショップ・ドメイン外（要・人手確認。ビルドは止めません）');
+  for (const w of urlWarnings) {
+    console.log(`  ・[${w.brand}] ${w.id} 「${w.name}」 公式=${w.officialSlug} / 実際=${w.productSlug}`);
+  }
+}
+if (dupWarnings.length) {
+  console.log('\n⚠ 警告⑤: 重複候補（要・人手確認。ビルドは止めません）');
+  for (const w of dupWarnings) {
+    console.log(`  ・${w.reason}: ${w.ids.join(' ↔ ')}  「${w.sample}」`);
+  }
+}
+
 if (errors.length) {
-  console.error(`\n❌ バリデーション失敗: ${errors.join(' / ')}`);
+  console.error(`\n❌ バリデーション失敗（エラー）: ${errors.join(' / ')}`);
   process.exit(1);
 }
-console.log('\n✅ バリデーション成功: 問題は見つかりませんでした');
+const warnTotal = urlWarnings.length + dupWarnings.length;
+console.log(warnTotal
+  ? `\n✅ エラーなし（ビルド継続）。ただし警告 ${warnTotal} 件あり → 上記を人手で確認してください。`
+  : '\n✅ バリデーション成功: エラー・警告ともにありません');

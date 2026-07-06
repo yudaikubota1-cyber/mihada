@@ -248,14 +248,24 @@ export default function SkinrChat({ initialMessage, onComplete, onBack }) {
               {isFirstTurn && (
                 <>
                   {(binaryOptions || showSkinTypeChips) && <div style={{ height: 1, background: 'var(--border)', margin: '10px 0' }} />}
+                  {/* 補助的な導線であることを明示（入力欄がメイン） */}
                   <div style={{ fontSize: 10, color: '#BBB', fontWeight: 500, letterSpacing: '0.06em', margin: '2px 0 6px' }}>
-                    または、よくあるお悩みから選ぶ
+                    または、下から選ぶこともできます
                   </div>
                   <div className="skinr-scroll" style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2 }}>
                     {CONCERN_CHIPS.filter(c => c && c.label).map((c, i) => (
-                      <Chip key={c.label} size="sm" onClick={() => handleSend(c.message)}>
+                      <button
+                        key={c.label}
+                        onClick={() => handleSend(c.message)}
+                        style={{
+                          flexShrink: 0, padding: '5px 11px', borderRadius: 999,
+                          border: '1px solid #DDD', background: 'var(--bg)',
+                          color: '#999', fontSize: 11, fontWeight: 500,
+                          fontFamily: 'inherit', cursor: 'pointer', whiteSpace: 'nowrap',
+                        }}
+                      >
                         {c.label}
-                      </Chip>
+                      </button>
                     ))}
                   </div>
                 </>
@@ -266,19 +276,22 @@ export default function SkinrChat({ initialMessage, onComplete, onBack }) {
 
       </div>
 
-      {/* Input */}
+      {/* Input — メインの入力手段であることが一目で伝わるよう強調 */}
       <div style={{
         borderTop: '1px solid var(--border)',
-        padding: '10px 16px 20px',
+        padding: '12px 16px 20px',
         background: 'var(--bg)',
       }}>
+        <div style={{ fontSize: 11, fontWeight: 600, color: '#111', letterSpacing: '0.02em', margin: '0 4px 8px' }}>
+          気になることを、文章で話しかけてください
+        </div>
         <div style={{
           display: 'flex', alignItems: 'flex-end', gap: 10,
-          padding: '10px 12px 10px 16px',
-          border: '1.5px solid var(--border-strong)',
-          borderRadius: 999,
+          padding: '14px 14px 14px 18px',
+          border: '2px solid #111',
+          borderRadius: 20,
           transition: 'border-color 0.15s ease',
-          background: 'var(--bg)',
+          background: '#FAFAFA',
         }}>
           <textarea
             ref={textareaRef}

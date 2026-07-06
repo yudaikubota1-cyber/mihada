@@ -216,13 +216,13 @@ function ChatDiagnosisCard({ onComplete }) {
                 placeholder="例：最近、頬が乾燥してファンデが浮くのが気になる…"
                 style={{
                   flex: 1, padding: '15px 16px', borderRadius: 14,
-                  border: '1.5px solid #CCCCCC', background: '#FFFFFF',
+                  border: '2px solid #111111', background: '#FAFAFA',
                   fontSize: 15, fontFamily: 'inherit', color: '#111111',
                   outline: 'none', transition: 'border-color 0.15s ease',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
                 }}
                 onFocus={e => e.currentTarget.style.borderColor = '#111111'}
-                onBlur={e => e.currentTarget.style.borderColor = '#CCCCCC'}
+                onBlur={e => e.currentTarget.style.borderColor = '#111111'}
               />
               <button
                 onClick={() => send()}

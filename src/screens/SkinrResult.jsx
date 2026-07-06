@@ -537,8 +537,8 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
   const FULL_CATEGORY_ORDER = [
     { key: 'cleansing', label: 'クレンジング', step: '00' },
     { key: 'cleanser',  label: '洗顔',         step: '01' },
-    { key: 'toner',     label: 'トナー',       step: '02' },
-    { key: 'pad',       label: 'トナーパッド', step: '03' },
+    { key: 'toner',     label: 'トナー（化粧水）', step: '02' },
+    { key: 'pad',       label: 'トナーパッド',     step: '03' },
     { key: 'serum',     label: '美容液',       step: '04' },
     { key: 'cream',     label: 'クリーム',     step: '05' },
     { key: 'mask',      label: 'マスク',       step: '06' },
@@ -557,7 +557,7 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
 
   // カテゴリフィルター用の短縮ラベル
   const FILTER_LABELS = {
-    cleansing: 'クレンジング', cleanser: '洗顔', toner: 'トナー', pad: 'パッド',
+    cleansing: 'クレンジング', cleanser: '洗顔', toner: 'トナー（化粧水）', pad: 'トナーパッド',
     serum: '美容液', cream: 'クリーム', mask: 'マスク', sunscreen: 'UV',
   };
   // 「すべて」選択時は全カテゴリ、それ以外は該当カテゴリのみ表示
@@ -820,22 +820,18 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
               </a>
             </div>
 
-            {/* 自社DBの厳選商品（小さめカード） */}
+            {/* 自社DBの厳選商品。
+                「すべて」タブ = 横スクロール（カテゴリ別）／個別カテゴリ選択時 = 縦スクロールのグリッド */}
             {items.length > 0 && (
-              <div style={{ position: 'relative' }}>
+              selectedCat !== 'all' ? (
+                // ── 個別カテゴリ選択時：全件を縦スクロールのグリッド表示 ──
                 <div style={{
-                  position: 'absolute', right: 0, top: 0, bottom: 14,
-                  width: 48, zIndex: 2, pointerEvents: 'none',
-                  background: 'linear-gradient(to right, transparent, #fff)',
-                }} />
-                <div className="skinr-scroll skinr-snap-x" style={{
-                  display: 'flex', gap: 16,
-                  overflowX: 'auto',
-                  scrollSnapType: 'x mandatory',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, 150px)',
+                  gap: 16, justifyContent: 'space-between',
                   padding: `0 ${px} 14px`,
-                  WebkitOverflowScrolling: 'touch',
                 }}>
-                  {items.map((p, idx) => (
+                  {allInCat.map((p, idx) => (
                     <ResultProductCard
                       key={p.id}
                       product={p}
@@ -844,28 +840,54 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
                       onDetail={() => onOpenProduct(p.id)}
                     />
                   ))}
-                  {/* SEE MORE / 閉じる — 画面遷移せず、その場でインライン展開・折りたたみ */}
-                  {hasMore && (
-                    <button
-                      onClick={() => toggleExpand(cat.key)}
-                      style={{
-                        flex: '0 0 100px',
-                        height: 150, alignSelf: 'flex-start',
-                        border: '1px dashed #D8D8D8', borderRadius: 10,
-                        background: 'var(--bg-soft)', cursor: 'pointer',
-                        display: 'flex', flexDirection: 'column',
-                        alignItems: 'center', justifyContent: 'center', gap: 6,
-                        fontFamily: 'inherit',
-                      }}
-                    >
-                      <span style={{ fontSize: 20, color: '#999', lineHeight: 1 }}>{expanded ? '×' : '＋'}</span>
-                      <span style={{ fontSize: 9, color: '#999', textAlign: 'center', lineHeight: 1.5, letterSpacing: '0.04em' }}>
-                        {expanded ? '閉じる' : <>SEE<br />MORE<br />(+{allInCat.length - 5})</>}
-                      </span>
-                    </button>
-                  )}
                 </div>
-              </div>
+              ) : (
+                // ── 「すべて」タブ：横スクロール（先頭5件＋SEE MORE） ──
+                <div style={{ position: 'relative' }}>
+                  <div style={{
+                    position: 'absolute', right: 0, top: 0, bottom: 14,
+                    width: 48, zIndex: 2, pointerEvents: 'none',
+                    background: 'linear-gradient(to right, transparent, #fff)',
+                  }} />
+                  <div className="skinr-scroll skinr-snap-x" style={{
+                    display: 'flex', gap: 16,
+                    overflowX: 'auto',
+                    scrollSnapType: 'x mandatory',
+                    padding: `0 ${px} 14px`,
+                    WebkitOverflowScrolling: 'touch',
+                  }}>
+                    {items.map((p, idx) => (
+                      <ResultProductCard
+                        key={p.id}
+                        product={p}
+                        idx={idx}
+                        best={p.id === bestMatchId}
+                        onDetail={() => onOpenProduct(p.id)}
+                      />
+                    ))}
+                    {/* SEE MORE / 閉じる — 画面遷移せず、その場でインライン展開・折りたたみ */}
+                    {hasMore && (
+                      <button
+                        onClick={() => toggleExpand(cat.key)}
+                        style={{
+                          flex: '0 0 100px',
+                          height: 150, alignSelf: 'flex-start',
+                          border: '1px dashed #D8D8D8', borderRadius: 10,
+                          background: 'var(--bg-soft)', cursor: 'pointer',
+                          display: 'flex', flexDirection: 'column',
+                          alignItems: 'center', justifyContent: 'center', gap: 6,
+                          fontFamily: 'inherit',
+                        }}
+                      >
+                        <span style={{ fontSize: 20, color: '#999', lineHeight: 1 }}>{expanded ? '×' : '＋'}</span>
+                        <span style={{ fontSize: 9, color: '#999', textAlign: 'center', lineHeight: 1.5, letterSpacing: '0.04em' }}>
+                          {expanded ? '閉じる' : <>SEE<br />MORE<br />(+{allInCat.length - 5})</>}
+                        </span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )
             )}
 
             {/* 楽天商品（リアルタイム取得） */}

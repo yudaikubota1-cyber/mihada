@@ -361,7 +361,7 @@ function RakutenSection({ concerns, category, searchUrl, px = '24px' }) {
 }
 
 // アプリ内商品カード（診断結果用）
-function ResultProductCard({ product: p, idx, onDetail }) {
+function ResultProductCard({ product: p, idx, best, onDetail }) {
   const [pressed, setPressed] = React.useState(false);
   const [imgError, setImgError] = React.useState(false);
 
@@ -405,7 +405,7 @@ function ResultProductCard({ product: p, idx, onDetail }) {
             }}>{p.brand.split(' ')[0]}</span>
           </div>
         )}
-        {idx === 0 && (
+        {best && (
           <div style={{
             position: 'absolute', top: 6, left: 6,
             background: '#111', color: '#fff',
@@ -482,6 +482,15 @@ function productHasIngredient(product, ingredient) {
   const core = ingredient.replace(/[（(].*?[）)]/g, '').trim();
   const hay = [...(product.ingredients || []), ...(product.tags || [])];
   return hay.some(x => typeof x === 'string' && (x.includes(core) || core.includes(x)));
+}
+
+// 指定成分が、その商品の「主成分（ingredients の index 0）」であるか
+function isPrimaryIngredient(product, ingredient) {
+  const core = ingredient.replace(/[（(].*?[）)]/g, '').trim();
+  const ordered = normalizeIngredients(product.ingredients);
+  if (!ordered.length) return false;
+  const first = ordered[0];
+  return typeof first === 'string' && (first.includes(core) || core.includes(first));
 }
 // ブランド名の緩い一致
 function productMatchesBrand(product, brand) {
@@ -775,6 +784,12 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
         const items = expanded ? allInCat : allInCat.slice(0, 5); // 展開時は全件、通常は5件
         const hasMore = allInCat.length > 5; // 6件以上ある時だけ SEE MORE / 閉じる を出す
         const rakutenUrl = rakutenUrls[cat.key];
+        // BEST MATCH の対象商品を決める：
+        //  - 通常時: カテゴリ先頭商品
+        //  - 成分検索時: 指定成分が「主成分(index 0)」の最初の商品のみ。無ければバッジ無し。
+        const bestMatchId = searchIngredient
+          ? (allInCat.find(p => isPrimaryIngredient(p, searchIngredient))?.id ?? null)
+          : (allInCat[0]?.id ?? null);
         return (
           <div key={cat.key} style={{ padding: '20px 0 0' }}>
             {/* カテゴリヘッダー（タイトル右端に「楽天で探す」を小さく配置） */}
@@ -825,6 +840,7 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
                       key={p.id}
                       product={p}
                       idx={idx}
+                      best={p.id === bestMatchId}
                       onDetail={() => onOpenProduct(p.id)}
                     />
                   ))}

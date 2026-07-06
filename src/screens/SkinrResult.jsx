@@ -187,11 +187,22 @@ function scoreProduct(product, concerns, skinType, ingredient) {
   }
   const skinHaystack = [...(product.skinTypes || []), ...(product.forSkin || [])];
   if (skinType && skinHaystack.some(s => s === skinType || skinType.includes(s.replace('肌', '')))) score += 1;
-  // 成分名検索（#2 軽量案）: 指定成分を含む商品を強めに加点して上位に
+  // 成分名検索: 指定成分が ingredients の「何番目」にあるかで重み付けする。
+  // 主成分（先頭）ほど高得点、後方＝申し訳程度の配合ほど低得点。
+  // これにより「ナイアシンアミド主体でレチノールは2番目」の商品がBEST MATCHにならない。
   if (ingredient) {
     const core = ingredient.replace(/[（(].*?[）)]/g, '').trim();
-    const hay = [...(product.ingredients || []), ...(product.tags || [])];
-    if (hay.some(x => typeof x === 'string' && (x.includes(core) || core.includes(x)))) score += 4;
+    const ordered = normalizeIngredients(product.ingredients);
+    const idx = ordered.findIndex(x => typeof x === 'string' && (x.includes(core) || core.includes(x)));
+    if (idx === 0)      score += 8;   // 主成分
+    else if (idx === 1) score += 5;
+    else if (idx === 2) score += 3;
+    else if (idx > 2)   score += 1;   // 末尾に少しだけ
+    else {
+      // ingredients に無く tags のみに含まれる場合はごく弱く
+      const inTags = (product.tags || []).some(x => typeof x === 'string' && (x.includes(core) || core.includes(x)));
+      if (inTags) score += 1;
+    }
   }
   return score;
 }

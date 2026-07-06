@@ -1,3 +1,5 @@
+import { pickBestImageUrl } from './productImage.js';
+
 const AFFILIATE_ID = import.meta.env.VITE_RAKUTEN_AFFILIATE_ID;
 
 const CONCERN_KEYWORDS = {
@@ -53,17 +55,27 @@ function upscaleImage(url) {
 }
 
 function mapItems(items) {
-  return items.map(({ Item }) => ({
-    id: Item.itemCode,
-    name: Item.itemName,
-    price: Item.itemPrice,
-    priceStr: `¥${Number(Item.itemPrice).toLocaleString()}`,
-    image: upscaleImage(Item.mediumImageUrls?.[0]?.imageUrl || Item.smallImageUrls?.[0]?.imageUrl) || null,
-    url: Item.affiliateUrl || Item.itemUrl,
-    shop: Item.shopName,
-    rating: Item.reviewAverage,
-    reviewCount: Item.reviewCount,
-  }));
+  return items.map(({ Item }) => {
+    // 楽天が返す全画像URL候補（medium優先→small）を集め、
+    // 商品写真でない可能性が高いもの（logo/banner/pr等）を避けて選ぶ。
+    const urls = [
+      ...(Item.mediumImageUrls || []).map(x => x?.imageUrl),
+      ...(Item.smallImageUrls || []).map(x => x?.imageUrl),
+    ].filter(Boolean);
+    const chosen = pickBestImageUrl(urls);
+    return {
+      id: Item.itemCode,
+      name: Item.itemName,
+      price: Item.itemPrice,
+      priceStr: `¥${Number(Item.itemPrice).toLocaleString()}`,
+      image: upscaleImage(chosen) || null,
+      images: urls.map(upscaleImage).filter(Boolean), // 管理者が後で選び直せるよう全候補を保持
+      url: Item.affiliateUrl || Item.itemUrl,
+      shop: Item.shopName,
+      rating: Item.reviewAverage,
+      reviewCount: Item.reviewCount,
+    };
+  });
 }
 
 async function fetchRakuten(keyword, hits) {

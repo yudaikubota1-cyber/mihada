@@ -10,6 +10,8 @@ import PrivacyPage from './screens/PrivacyPage.jsx';
 import DisclosurePage from './screens/DisclosurePage.jsx';
 import { SkinrLogo, Icon } from './components/shared.jsx';
 import { useIsDesktop } from './lib/useIsDesktop.js';
+import { clearMemory } from './lib/uiMemory.js';
+import { PRODUCTS } from './data/products.js';
 
 // localStorage helpers
 function loadDiagnosis() {
@@ -21,6 +23,25 @@ function loadDiagnosis() {
 function saveDiagnosis(d) {
   try { localStorage.setItem('skinr_last_diagnosis', JSON.stringify(d)); } catch {}
 }
+
+// 画面ごとのURL。商品・記事は共有や再読み込みで同じ画面に戻れるようにする。
+function urlFor(screen, { productId, articleSlug } = {}) {
+  if (screen === 'product' && productId) return `/?p=${encodeURIComponent(productId)}`;
+  if (screen === 'article' && articleSlug) return `/?article=${encodeURIComponent(articleSlug)}`;
+  if (screen === 'privacy') return '/privacy';
+  if (screen === 'disclosure') return '/disclosure';
+  if (screen === 'preview') return '/?preview=1';
+  if (screen === 'products') return '/?products=1';
+  return '/';
+}
+
+// 実際にスクロールする要素（デスクトップ=ページ全体 / モバイル=画面内のスクロール領域）
+function getScroller() {
+  if (window.matchMedia('(min-width: 768px)').matches) return document.scrollingElement;
+  return document.querySelector('.skinr-screen .skinr-scroll');
+}
+
+const BASE_TITLE = 'miHada — 成分ロジックで選ぶスキンケア';
 
 // ─── Desktop top header ───────────────────────────────────
 function HeaderNavLink({ label, active, onClick }) {
@@ -80,16 +101,29 @@ export default function App() {
   const params = new URLSearchParams(location.search);
   const articleSlug = params.get('article');
   const pathname = location.pathname;
-  const [screen, setScreen] = useState(
-    pathname === '/privacy' ? 'privacy' :
-    pathname === '/disclosure' ? 'disclosure' :
-    params.get('products') ? 'products' : params.get('preview') ? 'preview' : articleSlug ? 'article' : 'home'
-  );
+  const productParam = params.get('p');
+  const validProductParam = productParam && PRODUCTS.some(p => p.id === productParam) ? productParam : null;
+  // 再読み込み時は、ブラウザが保持している履歴状態から同じ画面を復元する
+  const [boot] = useState(() => {
+    const saved = history.state;
+    const fromUrl =
+      pathname === '/privacy' ? 'privacy' :
+      pathname === '/disclosure' ? 'disclosure' :
+      params.get('products') ? 'products' : params.get('preview') ? 'preview' :
+      articleSlug ? 'article' : validProductParam ? 'product' : 'home';
+    if (saved && saved.screen && fromUrl === 'home') {
+      // 結果画面は診断データが残っている場合だけ復元（無ければホーム）
+      if (saved.screen === 'result' && saved.diagnosis) return { screen: 'result', diagnosis: saved.diagnosis };
+      if (saved.screen === 'chat') return { screen: 'chat' };
+    }
+    return { screen: fromUrl };
+  });
+  const [screen, setScreen] = useState(boot.screen);
   const [prevScreen, setPrevScreen] = useState('home');
-  const [productId, setProductId] = useState(null);
+  const [productId, setProductId] = useState(validProductParam);
   const [currentArticle, setCurrentArticle] = useState(articleSlug);
   const [chatSeed, setChatSeed] = useState(null);
-  const [diagnosis, setDiagnosis] = useState(null);
+  const [diagnosis, setDiagnosis] = useState(boot.diagnosis || null);
   const [lastDiagnosis, setLastDiagnosis] = useState(loadDiagnosis);
   const [homeFilter, setHomeFilter] = useState(null);
 
@@ -105,11 +139,12 @@ export default function App() {
       isGoingBack.current = false;
       const savedPos = scrollPositions.current[screen];
       if (savedPos != null) {
+        // 画像や一覧の描画で高さが決まるまで数フレーム待って復元する
         const tryRestore = (attempts) => {
-          const el = document.querySelector('.skinr-content');
+          const el = getScroller();
           if (el) {
             el.scrollTop = savedPos;
-            if (el.scrollTop === 0 && savedPos > 0 && attempts < 5) {
+            if (Math.abs(el.scrollTop - savedPos) > 2 && attempts < 20) {
               requestAnimationFrame(() => tryRestore(attempts + 1));
             }
           }
@@ -119,15 +154,26 @@ export default function App() {
     } else {
       // 新規遷移はトップへ
       requestAnimationFrame(() => {
-        const el = document.querySelector('.skinr-content');
+        const el = getScroller();
         if (el) el.scrollTop = 0;
       });
     }
-  }, [screen]);
+  }, [screen, productId]);
+
+  // タブのタイトルを画面に合わせる
+  useEffect(() => {
+    const product = screen === 'product' ? PRODUCTS.find(p => p.id === productId) : null;
+    document.title =
+      product ? `${product.nameJa} | miHada` :
+      screen === 'result' ? 'あなたへの提案 | miHada' :
+      screen === 'privacy' ? 'プライバシーポリシー | miHada' :
+      screen === 'disclosure' ? 'アフィリエイト表記 | miHada' :
+      BASE_TITLE;
+  }, [screen, productId]);
 
   // スクロール位置を保存
   const saveScrollPos = useCallback((screenName) => {
-    const el = document.querySelector('.skinr-content');
+    const el = getScroller();
     if (el) scrollPositions.current[screenName] = el.scrollTop;
   }, []);
 
@@ -135,13 +181,22 @@ export default function App() {
   // back=true の場合は遷移先のスクロール位置を復元（戻る動作）
   const navigate = useCallback((newScreen, extras = {}, { replace = false, back = false } = {}) => {
     saveScrollPos(screen);
+    // 戻る以外でホーム／結果に入るときは、前回の絞り込み・展開状態を持ち越さない
+    if (!back && newScreen === 'home') clearMemory('home:');
+    if (!back && newScreen === 'result') clearMemory('result:');
     const state = { screen: newScreen, ...extras };
+    // 戻る遷移では extras が空なので、いま表示中の値を履歴とURLに残す
+    if (newScreen === 'product' && !state.productId) state.productId = productId;
+    if (newScreen === 'article' && !state.articleSlug) state.articleSlug = currentArticle;
+    if (newScreen === 'result' && !state.diagnosis) state.diagnosis = diagnosis;
+    const url = urlFor(newScreen, state);
     if (replace) {
-      history.replaceState(state, '', '');
+      history.replaceState(state, '', url);
     } else {
-      history.pushState(state, '', '');
+      history.pushState(state, '', url);
     }
-    setPrevScreen(screen);
+    // 商品→関連商品のように同じ画面内で移るときは「戻り先」を上書きしない
+    if (newScreen !== screen) setPrevScreen(screen);
     Object.entries(extras).forEach(([k, v]) => {
       if (k === 'productId') setProductId(v);
       if (k === 'chatSeed') setChatSeed(v);
@@ -151,7 +206,7 @@ export default function App() {
     });
     isGoingBack.current = back;
     setScreen(newScreen);
-  }, [screen, saveScrollPos]);
+  }, [screen, saveScrollPos, productId, currentArticle, diagnosis]);
 
   // ブラウザの戻る/進むボタン — 戻る時はスクロール復元フラグを立てる
   useEffect(() => {
@@ -160,16 +215,22 @@ export default function App() {
       isGoingBack.current = true;
       if (state && state.screen) {
         if (state.productId) setProductId(state.productId);
+        if (state.articleSlug) setCurrentArticle(state.articleSlug);
         if (state.homeFilter !== undefined) setHomeFilter(state.homeFilter);
         if (state.diagnosis) { setDiagnosis(state.diagnosis); }
-        setScreen(state.screen);
+        // 診断データの無い結果画面には戻れないのでホームへ
+        setScreen(state.screen === 'result' && !state.diagnosis ? 'home' : state.screen);
       } else {
         setScreen('home');
         setHomeFilter(null);
       }
     };
     window.addEventListener('popstate', handlePopState);
-    history.replaceState({ screen }, '', '');
+    // 初回表示の状態を履歴に記録（再読み込みで復元した結果データは消さない）
+    history.replaceState(
+      { screen, ...(productId ? { productId } : {}), ...(currentArticle ? { articleSlug: currentArticle } : {}), ...(diagnosis ? { diagnosis } : {}) },
+      '', ''
+    );
     return () => window.removeEventListener('popstate', handlePopState);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -252,9 +313,11 @@ export default function App() {
         {screen === 'product' && (
           <div key="product" className="skinr-screen">
             <SkinrProduct
+              key={productId}
               isDesktop={isDesktop}
               productId={productId}
               onBack={goBack}
+              onOpenProduct={goProduct}
             />
           </div>
         )}

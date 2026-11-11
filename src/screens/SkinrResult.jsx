@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useMemoryState } from '../lib/uiMemory.js';
 import { PRODUCTS, storeUrlFor } from '../data/products.js';
 import { INGREDIENT_DICT, INGREDIENT_EVIDENCE } from '../data/knowledge.js';
 import { buildRakutenSearchUrl, buildProductUrl, searchRakutenProducts } from '../lib/rakuten.js';
@@ -514,9 +515,9 @@ export default function SkinrResult({ isDesktop, diagnosis, onBack, onOpenProduc
     : (hasSlotFilter ? [] : ['乾燥', '毛穴の開き', 'くすみ']);
   const aiMessage = diagnosis?.message;
   const [sharing, setSharing] = useState(false);
-  const [selectedCat, setSelectedCat] = useState('all');
+  const [selectedCat, setSelectedCat] = useMemoryState('result:cat', 'all');
   // カテゴリごとの「その場で展開」状態（SEE MORE でインライン展開／再タップで折りたたみ）
-  const [expandedCats, setExpandedCats] = useState({});
+  const [expandedCats, setExpandedCats] = useMemoryState('result:expanded', {});
   const toggleExpand = (key) => setExpandedCats(s => ({ ...s, [key]: !s[key] }));
 
   // ── 全スロットを AND 条件でハード絞り込み ──

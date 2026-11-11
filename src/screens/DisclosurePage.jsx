@@ -60,7 +60,7 @@ export default function DisclosurePage({ onBack }) {
           <div>
             <h2 style={{ fontSize: 15, fontWeight: 600, margin: '0 0 12px', letterSpacing: '-0.01em' }}>お問い合わせ</h2>
             <p>広告・アフィリエイトに関するご質問は下記までお問い合わせください。</p>
-            <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12 }}>yudaikubota1@gmail.com</p>
+            <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12 }}>onirymth@gmail.com</p>
           </div>
         </div>
       </div>

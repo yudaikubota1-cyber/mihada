@@ -4,6 +4,8 @@ import {
   SkinrLogo, SkinrEyebrow, ProductImage, Icon,
   Chip, Divider, ProductCard, SiteFooter,
 } from '../components/shared.jsx';
+import { useMemoryState } from '../lib/uiMemory.js';
+import { useFavorites } from '../lib/favorites.js';
 import { sendMessage, parseConfirmation } from '../lib/claude.js';
 
 // 公式ショップURL（BRAND_STORE_URL）は data/products.js に集約し import して使用
@@ -436,16 +438,54 @@ const QUICK_CONCERN_MAP = {
   'たるみ・ハリ': ['たるみ'],
 };
 
+// 前回の提案をもう一度開くリンク（診断をやり直さずに結果へ戻れる）
+function LastResultLink({ diagnosis, onClick }) {
+  if (!diagnosis) return null;
+  const parts = [
+    diagnosis.skin_type,
+    ...(diagnosis.concerns || []).slice(0, 2),
+    diagnosis.ingredient,
+    diagnosis.brand,
+    diagnosis.category,
+    diagnosis.max_price ? `〜¥${Number(diagnosis.max_price).toLocaleString()}` : null,
+  ].filter(Boolean);
+  return (
+    <button
+      onClick={onClick}
+      className="skinr-tappable"
+      style={{
+        marginTop: 12, width: '100%',
+        display: 'flex', alignItems: 'center', gap: 10,
+        padding: '12px 16px',
+        background: '#FFFFFF', border: '1px solid #E0E0E0', borderRadius: 12,
+        cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left',
+      }}
+    >
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 13, fontWeight: 500, color: '#111111' }}>前回の提案をもう一度見る</div>
+        {parts.length > 0 && (
+          <div style={{ fontSize: 11, color: '#999999', marginTop: 3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {parts.join(' ・ ')}
+          </div>
+        )}
+      </div>
+      <Icon name="arrowRight" size={14} color="#999999" />
+    </button>
+  );
+}
+
 export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSendInline, onQuickDiagnosis, onOpenArticle, lastDiagnosis, onViewLastResult, homeFilter, onOpenPrivacy, onOpenDisclosure }) {
-  const [cat, setCat] = useState(homeFilter?.cat || 'all');
-  const [skinFilter, setSkinFilter] = useState(null);
-  const [query, setQuery] = useState('');
+  const [cat, setCat] = useMemoryState('home:cat', homeFilter?.cat || 'all');
+  const [skinFilter, setSkinFilter] = useMemoryState('home:skin', null);
+  const [query, setQuery] = useMemoryState('home:query', '');
+  const { ids: favoriteIds } = useFavorites();
+  const favoriteProducts = favoriteIds.map(id => PRODUCTS.find(p => p.id === id)).filter(Boolean);
   const [searchFocused, setSearchFocused] = useState(false);
   const scrollRowRefs = useRef({});
   // 診断フィルター（結果画面の「すべて見る」から来た場合）
-  const [activeFilterIds, setActiveFilterIds] = useState(homeFilter?.productIds || null);
+  const [activeFilterIds, setActiveFilterIds] = useMemoryState('home:filterIds', homeFilter?.productIds || null);
   const activeFilterLabel = homeFilter?.label || null;
-  const [activeBrand, setActiveBrand] = useState(null);
+  const [activeBrand, setActiveBrand] = useMemoryState('home:brand', null);
 
   const scrollRow = (key, dir) => {
     const el = scrollRowRefs.current[key];
@@ -469,12 +509,16 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
     if (query) {
       const searchTarget = [
         p.nameJa, p.name, p.brand,
-        ...p.tags,
-        ...p.concerns,
-        ...p.forSkin,
-        ...(Array.isArray(p.ingredients) ? p.ingredients : p.ingredients.map(i => i.name || '')),
-      ].join(' ').toLowerCase();
-      if (!searchTarget.includes(query.toLowerCase())) return false;
+        ...(p.tags || []),
+        ...(p.concerns || []),
+        ...(p.forSkin || []),
+        ...(p.skinTypes || []),
+        p.line, p.categoryLabel,
+        ...(Array.isArray(p.ingredients) ? p.ingredients.map(i => (typeof i === 'string' ? i : i?.name || '')) : []),
+      ].filter(Boolean).join(' ').toLowerCase();
+      // 空白区切りの複数語はすべて含むものだけ（例:「レチノール クリーム」）
+      const words = query.toLowerCase().split(/[\s\u3000]+/).filter(Boolean);
+      if (!words.every(w => searchTarget.includes(w))) return false;
     }
     return true;
   }).sort((a, b) => {
@@ -571,10 +615,10 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
           alignItems: 'flex-start', gap: 'clamp(32px, 5vw, 80px)',
         }}>
           {/* 左: コピー */}
-          <div style={{ flex: '0 0 auto', maxWidth: 360, paddingTop: 8 }}>
+          <div style={{ flex: '0 0 auto', paddingTop: 8 }}>
             <h1 style={{
               margin: '0 0 0',
-              fontSize: 52, lineHeight: 1.15,
+              fontSize: 'clamp(34px, 3.6vw, 52px)', lineHeight: 1.2, whiteSpace: 'nowrap',
               fontWeight: 300, letterSpacing: '-0.02em', color: '#111111',
             }}>
               「何が合うか<br />わからない」を<br />終わりにする。
@@ -587,6 +631,7 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
           {/* 右: チャットカード（AI応答をカード内で完結。全画面には切り替えない） */}
           <div style={{ flex: 1, minWidth: 0 }}>
             <ChatDiagnosisCard onComplete={(diagnosis) => onQuickDiagnosis(diagnosis)} />
+            <LastResultLink diagnosis={lastDiagnosis} onClick={onViewLastResult} />
           </div>
         </div>
       ) : (
@@ -603,6 +648,29 @@ export default function SkinrHome({ isDesktop, onStartChat, onOpenProduct, onSen
             悩みを入れるだけ。成分ロジックが一本に絞り込む。
           </p>
           <ChatDiagnosisCard onComplete={(diagnosis) => onQuickDiagnosis(diagnosis)} />
+          <LastResultLink diagnosis={lastDiagnosis} onClick={onViewLastResult} />
+        </div>
+      )}
+
+      {/* 保存した商品（お気に入り） */}
+      {favoriteProducts.length > 0 && (
+        <div style={{ padding: '24px 0 4px' }}>
+          <div style={{ padding: `0 ${px} 14px`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+              <Icon name="heart" size={14} color="#111111" />
+              <p style={{ fontSize: 13, fontWeight: 500, color: '#111111', margin: 0 }}>保存した商品</p>
+            </div>
+            <span style={{ fontSize: 10, color: '#999999', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.1em' }}>
+              {favoriteProducts.length} ITEMS
+            </span>
+          </div>
+          <div className="skinr-scroll skinr-snap-x" style={{ display: 'flex', gap: 12, overflowX: 'auto', scrollSnapType: 'x mandatory', padding: `0 ${px} 8px`, scrollPaddingLeft: px, scrollbarWidth: 'none' }}>
+            {favoriteProducts.map(p => (
+              <div key={p.id} style={{ flexShrink: 0, width: 150, scrollSnapAlign: 'start' }}>
+                <ProductCard product={p} onClick={() => onOpenProduct(p.id)} />
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

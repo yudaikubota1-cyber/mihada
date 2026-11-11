@@ -235,6 +235,10 @@ export function Icon({ name, size = 20, color = 'currentColor', strokeWidth = 1.
       return (<svg {...props}><path d="M12 3l1.8 5.4L19 10l-5.2 1.6L12 17l-1.8-5.4L5 10l5.2-1.6L12 3z"/></svg>);
     case 'flask':
       return (<svg {...props}><path d="M9 3h6M9 3v8l-4 9h14l-4-9V3"/><path d="M6.8 15h10.4"/></svg>);
+    case 'heart':
+      return (<svg {...props}><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>);
+    case 'share':
+      return (<svg {...props}><path d="M12 15V4M8 8l4-4 4 4"/><path d="M5 13v6h14v-6"/></svg>);
     case 'leaf':
       return (<svg {...props}><path d="M17 8C8 10 5.9 16.17 3.82 19.82A1 1 0 0 0 5 21C9 21 16 14 18 10"/><path d="M17 8C17 8 17 14 13 19"/></svg>);
     default: return null;
@@ -379,7 +383,7 @@ export function ProductCard({ product, onClick }) {
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1,
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-              <span style={{ fontSize: 9, color: '#E8A020' }}>★</span>
+              <span style={{ fontSize: 9, color: '#111111' }}>★</span>
               <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9, color: '#333', letterSpacing: '0.04em', fontWeight: 600 }}>
                 {product.review.score}
               </span>

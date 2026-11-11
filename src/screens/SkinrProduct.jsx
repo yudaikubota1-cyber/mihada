@@ -3,8 +3,9 @@ import { PRODUCTS } from '../data/products.js';
 import { INGREDIENT_DICT } from '../data/knowledge.js';
 import {
   SkinrLogo, SkinrEyebrow, ProductImage, Icon,
-  Divider, PrimaryButton, shade, SiteFooter,
+  Divider, PrimaryButton, shade, SiteFooter, ProductCard,
 } from '../components/shared.jsx';
+import { useFavorites } from '../lib/favorites.js';
 
 // 成分名でINGREDIENT_DICTを検索（部分一致）
 function lookupIngredient(name) {
@@ -12,6 +13,83 @@ function lookupIngredient(name) {
   return INGREDIENT_DICT.find(d =>
     name.includes(d.name) || d.name.includes(name)
   ) || null;
+}
+
+// 同じカテゴリの中から、悩み・肌タイプ・主成分が近い商品を選ぶ
+function findRelated(product, limit = 8) {
+  const concerns = new Set(product.concerns || []);
+  const skins = new Set([...(product.skinTypes || []), ...(product.forSkin || [])]);
+  const main = Array.isArray(product.ingredients) && typeof product.ingredients[0] === 'string' ? product.ingredients[0] : null;
+  return PRODUCTS
+    .filter(p => p.id !== product.id && p.category === product.category)
+    .map(p => {
+      let score = 0;
+      (p.concerns || []).forEach(c => { if (concerns.has(c)) score += 3; });
+      [...(p.skinTypes || []), ...(p.forSkin || [])].forEach(t => { if (skins.has(t)) score += 1; });
+      if (main && Array.isArray(p.ingredients) && p.ingredients.includes(main)) score += 2;
+      return { p, score };
+    })
+    .filter(x => x.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
+    .map(x => x.p);
+}
+
+// 保存（お気に入り）・共有ボタン
+function ProductActions({ product }) {
+  const { has, toggle } = useFavorites();
+  const [copied, setCopied] = useState(false);
+  const saved = has(product.id);
+
+  const share = async () => {
+    const url = `${location.origin}/?p=${encodeURIComponent(product.id)}`;
+    const title = `${product.nameJa} | miHada`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, url });
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch { /* 共有シートを閉じた場合などは何もしない */ }
+  };
+
+  const btn = { background: 'none', border: 'none', padding: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'inherit', fontSize: 11, color: '#111111' };
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+      {copied && <span style={{ fontSize: 10, color: '#999999', marginRight: 2, whiteSpace: 'nowrap' }}>リンクをコピーしました</span>}
+      <button onClick={share} aria-label="この商品を共有" style={btn}>
+        <Icon name="share" size={19} />
+      </button>
+      <button onClick={() => toggle(product.id)} aria-label={saved ? '保存を解除' : 'この商品を保存'} aria-pressed={saved} style={btn}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill={saved ? '#111111' : 'none'} stroke="#111111" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" />
+        </svg>
+      </button>
+    </div>
+  );
+}
+
+// 関連商品（商品詳細が行き止まりにならないようにする）
+function RelatedProducts({ product, onOpenProduct, bleed }) {
+  const related = findRelated(product);
+  if (related.length === 0 || !onOpenProduct) return null;
+  return (
+    <div style={{ marginTop: 28 }}>
+      <Divider label="あわせて比較" />
+      <h3 style={{ margin: '20px 0 14px', fontSize: 17, fontWeight: 400, letterSpacing: '-0.01em' }}>
+        近い悩みに合う{product.categoryLabel || '商品'}
+      </h3>
+      <div className="skinr-scroll skinr-snap-x" style={{ display: 'flex', gap: 12, overflowX: 'auto', scrollSnapType: 'x mandatory', margin: `0 -${bleed}`, padding: `0 ${bleed} 8px`, scrollPaddingLeft: bleed, scrollbarWidth: 'none' }}>
+        {related.map(p => (
+          <div key={p.id} style={{ flexShrink: 0, width: 150, scrollSnapAlign: 'start' }}>
+            <ProductCard product={p} onClick={() => onOpenProduct(p.id)} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 // ── 商品情報の本文（デスクトップ右カラム・モバイル共通） ──────────
@@ -33,7 +111,7 @@ function ProductBody({ product, px, openRakuten }) {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
           <SkinrEyebrow size={10}>{product.brand}</SkinrEyebrow>
           <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-            <span style={{ color: '#D4A017', fontSize: 13 }}>★</span>
+            <span style={{ color: '#111111', fontSize: 13 }}>★</span>
             <span style={{ fontSize: 13, fontWeight: 600 }}>{product.review.score}</span>
             <span style={{ fontSize: 11, color: '#ABABAB' }}>({product.review.count})</span>
           </div>
@@ -176,7 +254,7 @@ function ProductBody({ product, px, openRakuten }) {
         <button onClick={openRakuten} className="skinr-tappable" style={{ width: '100%', padding: '14px 16px', background: '#FAFAF8', border: '1px solid #E8E4DE', borderRadius: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', fontFamily: 'inherit', gap: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{ width: 36, height: 36, borderRadius: 8, background: 'var(--bg-warm)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <span style={{ color: '#D4A017', fontSize: 16 }}>★</span>
+              <span style={{ color: '#111111', fontSize: 16 }}>★</span>
             </div>
             <div style={{ textAlign: 'left' }}>
               <div style={{ fontSize: 13, fontWeight: 500, color: '#111', marginBottom: 2 }}>楽天レビューを見る</div>
@@ -203,7 +281,7 @@ function ProductBody({ product, px, openRakuten }) {
   );
 }
 
-export default function SkinrProduct({ isDesktop, productId, onBack }) {
+export default function SkinrProduct({ isDesktop, productId, onBack, onOpenProduct }) {
   const product = PRODUCTS.find(p => p.id === productId) || PRODUCTS[0];
   const [imgError, setImgError] = useState(false);
 
@@ -222,6 +300,8 @@ export default function SkinrProduct({ isDesktop, productId, onBack }) {
             <Icon name="arrowLeft" size={18} />
           </button>
           <SkinrEyebrow size={9}>{(product.categoryLabel || '').toUpperCase()}</SkinrEyebrow>
+          <div style={{ flex: 1 }} />
+          <ProductActions product={product} />
         </div>
 
         {/* 2カラム */}
@@ -254,6 +334,7 @@ export default function SkinrProduct({ isDesktop, productId, onBack }) {
           {/* 右: 商品情報 */}
           <div style={{ flex: 1, minWidth: 0, padding: '36px 48px 80px' }}>
             <ProductBody product={product} px="0px" openRakuten={openRakuten} />
+            <RelatedProducts product={product} onOpenProduct={onOpenProduct} bleed="0px" />
             <SiteFooter />
           </div>
         </div>
@@ -271,7 +352,7 @@ export default function SkinrProduct({ isDesktop, productId, onBack }) {
             <Icon name="arrowLeft" size={20} />
           </button>
           <SkinrEyebrow size={9}>{(product.categoryLabel || '').toUpperCase()}</SkinrEyebrow>
-          <div style={{ width: 32 }} />
+          <ProductActions product={product} />
         </div>
 
         {/* Hero image */}
@@ -284,12 +365,12 @@ export default function SkinrProduct({ isDesktop, productId, onBack }) {
               <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, letterSpacing: '0.22em', color: product.accent, opacity: 0.7 }}>{product.brand.toUpperCase()}</span>
             </div>
           )}
-          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 80, background: 'linear-gradient(to top, rgba(255,255,255,0.7), transparent)' }} />
         </div>
 
         {/* Body */}
         <div style={{ padding: '24px 24px 12px' }}>
           <ProductBody product={product} px="24px" openRakuten={openRakuten} />
+          <RelatedProducts product={product} onOpenProduct={onOpenProduct} bleed="24px" />
         </div>
         <SiteFooter />
       </div>

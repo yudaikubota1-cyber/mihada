@@ -69,7 +69,7 @@ export default function PrivacyPage({ onBack }) {
 
         <Section title="7. お問い合わせ">
           <p>プライバシーに関するお問い合わせは、下記までご連絡ください。</p>
-          <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12 }}>yudaikubota1@gmail.com</p>
+          <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12 }}>onirymth@gmail.com</p>
         </Section>
       </div>
     </div>
